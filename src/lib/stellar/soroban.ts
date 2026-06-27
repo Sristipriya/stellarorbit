@@ -39,7 +39,7 @@ export function rpcServer(): rpc.Server {
  * paths into the browser bundle during module evaluation and crashes the
  * published `/app` route before React can render.
  */
-const READ_SOURCE_PK = "GAWGGVQZTAY77QSRUE74U4PNXTQFL32TODVK6ECWJ";
+const READ_SOURCE_PK = "GAWGGVQZTAY77QSRUE74U4PNXTQ5J4PKWBQ2UNMONQFL32TODVK6ECWJ";
 
 export type ScArg = xdr.ScVal;
 
