@@ -28,30 +28,19 @@ import { ActivityFeed } from "./ActivityFeed";
 import { FundBanner } from "./FundBanner";
 import { useWallet } from "@/hooks/use-wallet";
 import { useVault } from "@/hooks/use-vault";
-import {
-  NETWORK,
-  shortAddr,
-  stroopsToXlm,
-  HAS_REAL_CONTRACT,
-} from "@/lib/stellar/network";
+import { type ActivityEvent } from "@/lib/stellar/events";
+import { NETWORK, shortAddr, stroopsToXlm, HAS_REAL_CONTRACT } from "@/lib/stellar/network";
 import { type VaultState } from "@/lib/stellar/vault";
 
 // ──────────────────── Types ────────────────────
-type Tab =
-  | "portfolio"
-  | "deposit"
-  | "withdraw"
-  | "history"
-  | "faucet"
-  | "settings";
+type Tab = "portfolio" | "deposit" | "withdraw" | "history" | "faucet" | "settings";
 
 // ──────────────────── Helpers ──────────────────
 function pricePerShare(state: VaultState): string {
   if (state.totalSharesStroops === 0n) return "1.0000";
   const num = Number(state.totalAssetsStroops);
   const den = Number(state.totalSharesStroops);
-  if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0)
-    return "1.0000";
+  if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return "1.0000";
   return (num / den).toFixed(4);
 }
 
@@ -81,7 +70,12 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
   const area = `M${first} L${polyline} L${last.split(",")[0]},${h - pad} L${pad},${h - pad} Z`;
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" preserveAspectRatio="none" style={{ height: 140 }}>
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      className="w-full"
+      preserveAspectRatio="none"
+      style={{ height: 140 }}
+    >
       <defs>
         <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -89,9 +83,22 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
         </linearGradient>
       </defs>
       <path d={area} fill="url(#sg)" />
-      <polyline points={polyline} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline
+        points={polyline}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       {/* dots at start and end */}
-      <circle cx={pts[0].split(",")[0]} cy={pts[0].split(",")[1]} r="4" fill={color} opacity="0.7" />
+      <circle
+        cx={pts[0].split(",")[0]}
+        cy={pts[0].split(",")[1]}
+        r="4"
+        fill={color}
+        opacity="0.7"
+      />
       <circle
         cx={pts[pts.length - 1].split(",")[0]}
         cy={pts[pts.length - 1].split(",")[1]}
@@ -132,9 +139,7 @@ function Sidebar({
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--orbit-accent)] shadow-[0_0_20px_var(--orbit-accent)]">
           <Globe className="h-4 w-4 text-black" />
         </div>
-        <span className="font-display text-lg font-semibold tracking-tight">
-          Orbit
-        </span>
+        <span className="font-display text-lg font-semibold tracking-tight">Orbit</span>
         <span className="ml-auto rounded-full border border-[var(--orbit-accent)]/30 bg-[var(--orbit-accent)]/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-accent)]">
           Testnet
         </span>
@@ -148,19 +153,13 @@ function Sidebar({
               <Wallet className="h-3.5 w-3.5 text-[var(--orbit-accent)]" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="font-mono text-[11px] text-[var(--orbit-mute)]">
-                Connected
-              </div>
-              <div className="font-mono text-xs text-[var(--orbit-ink)]">
-                {shortAddr(address)}
-              </div>
+              <div className="font-mono text-[11px] text-[var(--orbit-mute)]">Connected</div>
+              <div className="font-mono text-xs text-[var(--orbit-ink)]">{shortAddr(address)}</div>
             </div>
           </div>
           {balance && (
             <div className="mt-2 flex items-baseline justify-between">
-              <span className="font-mono text-[10px] text-[var(--orbit-mute)]">
-                XLM
-              </span>
+              <span className="font-mono text-[10px] text-[var(--orbit-mute)]">XLM</span>
               <span className="font-display text-base font-semibold text-[var(--orbit-accent)]">
                 {Number(balance.xlm).toFixed(4)}
               </span>
@@ -186,9 +185,7 @@ function Sidebar({
             >
               <Icon className="h-4 w-4 shrink-0" />
               <span>{item.label}</span>
-              {isActive && (
-                <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-60" />
-              )}
+              {isActive && <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-60" />}
             </button>
           );
         })}
@@ -216,7 +213,7 @@ function PortfolioTab({
   vault,
 }: {
   wallet: ReturnType<typeof useWallet>;
-  vault: { state: VaultState; loading: boolean; events: any[]; refresh: () => void };
+  vault: { state: VaultState; loading: boolean; events: ActivityEvent[]; refresh: () => void };
 }) {
   const price = parseFloat(pricePerShare(vault.state));
   const userShares = vault.state.userSharesStroops;
@@ -288,9 +285,7 @@ function PortfolioTab({
               >
                 {c.value}
               </div>
-              <div className="mt-1 font-mono text-[10px] text-[var(--orbit-mute)]">
-                {c.note}
-              </div>
+              <div className="mt-1 font-mono text-[10px] text-[var(--orbit-mute)]">{c.note}</div>
             </motion.div>
           );
         })}
@@ -321,7 +316,7 @@ function PortfolioTab({
 }
 
 // ──────────────────── History Tab ────────────────────
-function HistoryTab({ events }: { events: any[] }) {
+function HistoryTab({ events }: { events: ActivityEvent[] }) {
   if (events.length === 0) {
     return (
       <div className="glass rounded-2xl p-10 text-center">
@@ -391,13 +386,7 @@ function HistoryTab({ events }: { events: any[] }) {
 }
 
 // ──────────────────── Faucet Tab ────────────────────
-function FaucetTab({
-  address,
-  onFunded,
-}: {
-  address: string | null;
-  onFunded: () => void;
-}) {
+function FaucetTab({ address, onFunded }: { address: string | null; onFunded: () => void }) {
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState("");
@@ -406,9 +395,7 @@ function FaucetTab({
     if (!address) return;
     setStatus("loading");
     try {
-      const res = await fetch(
-        `${NETWORK.friendbotUrl}?addr=${encodeURIComponent(address)}`
-      );
+      const res = await fetch(`${NETWORK.friendbotUrl}?addr=${encodeURIComponent(address)}`);
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setTxHash(json.hash ?? null);
@@ -437,12 +424,8 @@ function FaucetTab({
 
         {address ? (
           <div className="mb-4 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2">
-            <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">
-              Your address
-            </div>
-            <div className="font-mono text-xs break-all text-[var(--orbit-ink)]">
-              {address}
-            </div>
+            <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">Your address</div>
+            <div className="font-mono text-xs break-all text-[var(--orbit-ink)]">{address}</div>
           </div>
         ) : (
           <div className="mb-4 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-4 py-3 font-mono text-xs text-[var(--orbit-mute)]">
@@ -504,8 +487,8 @@ function FaucetTab({
           <div>
             <div className="font-display text-sm font-medium">About Testnet Tokens</div>
             <p className="mt-1 text-sm text-[var(--orbit-mute)]">
-              Friendbot tokens have no real value. They exist purely to let you test
-              Stellar's Soroban smart contract functionality without spending real XLM.
+              Friendbot tokens have no real value. They exist purely to let you test Stellar's
+              Soroban smart contract functionality without spending real XLM.
             </p>
           </div>
         </div>
@@ -541,9 +524,7 @@ function ReceivePanel({ address }: { address: string | null }) {
             <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">
               Your wallet address
             </div>
-            <div className="font-mono text-xs break-all text-[var(--orbit-ink)]">
-              {address}
-            </div>
+            <div className="font-mono text-xs break-all text-[var(--orbit-ink)]">{address}</div>
           </div>
           <button onClick={copy} className="liquid-btn w-full justify-center">
             <Copy className="h-4 w-4" />
@@ -568,13 +549,9 @@ function ReceivePanel({ address }: { address: string | null }) {
 }
 
 // ──────────────────── Settings Tab ────────────────────
-function SettingsTab({
-  wallet,
-}: {
-  wallet: ReturnType<typeof useWallet>;
-}) {
+function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
   const [displayName, setDisplayName] = useState(
-    () => localStorage.getItem("orbit:display-name") ?? ""
+    () => localStorage.getItem("orbit:display-name") ?? "",
   );
   const [saved, setSaved] = useState(false);
 
@@ -588,9 +565,7 @@ function SettingsTab({
     <div className="space-y-4 max-w-lg">
       {/* Profile */}
       <div className="glass rounded-2xl p-6">
-        <h3 className="mb-5 font-display text-base font-semibold">
-          Profile Settings
-        </h3>
+        <h3 className="mb-5 font-display text-base font-semibold">Profile Settings</h3>
 
         <div className="space-y-4">
           <div>
@@ -614,10 +589,7 @@ function SettingsTab({
             </div>
           </div>
 
-          <button
-            onClick={saveProfile}
-            className="liquid-btn w-full justify-center"
-          >
+          <button onClick={saveProfile} className="liquid-btn w-full justify-center">
             {saved ? (
               <>
                 <CheckCircle2 className="h-4 w-4" /> Saved!
@@ -631,9 +603,7 @@ function SettingsTab({
 
       {/* Network Info */}
       <div className="glass rounded-2xl p-6">
-        <h3 className="mb-4 font-display text-base font-semibold">
-          Network Details
-        </h3>
+        <h3 className="mb-4 font-display text-base font-semibold">Network Details</h3>
         <div className="space-y-2">
           {[
             { k: "Network", v: NETWORK.name },
@@ -663,8 +633,7 @@ function SettingsTab({
             Disconnect Wallet
           </h3>
           <p className="mb-4 text-sm text-[var(--orbit-mute)]">
-            This removes your wallet connection from Orbit. You can reconnect at any
-            time.
+            This removes your wallet connection from Orbit. You can reconnect at any time.
           </p>
           <button
             onClick={wallet.disconnect}
@@ -690,12 +659,10 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--orbit-accent)]/15">
           <Wallet className="h-8 w-8 text-[var(--orbit-accent)]" />
         </div>
-        <div className="font-display text-2xl font-semibold">
-          Connect a Stellar Wallet
-        </div>
+        <div className="font-display text-2xl font-semibold">Connect a Stellar Wallet</div>
         <p className="mt-3 text-sm text-[var(--orbit-mute)]">
-          Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet.
-          New accounts can fund themselves with Friendbot.
+          Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can
+          fund themselves with Friendbot.
         </p>
         <button onClick={onConnect} className="liquid-btn mx-auto mt-7">
           <Wallet className="h-4 w-4" />
@@ -713,8 +680,7 @@ export function AppDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("portfolio");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const showFundBanner =
-    wallet.address && wallet.balance && !wallet.balance.funded;
+  const showFundBanner = wallet.address && wallet.balance && !wallet.balance.funded;
 
   function renderContent() {
     if (!wallet.address) {
@@ -739,11 +705,7 @@ export function AppDashboard() {
       case "withdraw":
         return (
           <div className="max-w-md">
-            <WithdrawCard
-              address={wallet.address}
-              state={vault.state}
-              onDone={vault.refresh}
-            />
+            <WithdrawCard address={wallet.address} state={vault.state} onDone={vault.refresh} />
           </div>
         );
       case "history":
@@ -828,10 +790,7 @@ export function AppDashboard() {
                 </span>
               </div>
             ) : (
-              <button
-                onClick={wallet.connect}
-                className="liquid-btn py-2 text-sm"
-              >
+              <button onClick={wallet.connect} className="liquid-btn py-2 text-sm">
                 <Wallet className="h-4 w-4" />
                 Connect
               </button>
