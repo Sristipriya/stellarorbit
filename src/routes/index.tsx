@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { OrbitMark } from "@/components/orbit/OrbitMark";
 import { TopNav } from "@/components/orbit/TopNav";
+import { EtherealShadow } from "@/components/ui/etheral-shadow";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,13 +20,108 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="relative min-h-screen overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <EtherealShadow
+          color="rgba(120, 180, 255, 0.65)"
+          animation={{ scale: 70, speed: 55 }}
+          noise={{ opacity: 0.4, scale: 1.2 }}
+          sizing="fill"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/80" />
+      </div>
       <TopNav />
       <Hero />
+      <Stats />
       <HowItWorks />
       <BuiltForStellar />
+      <Architecture />
+      <FAQ />
       <Roadmap />
       <Footer />
     </div>
+  );
+}
+
+function Stats() {
+  const stats = [
+    { v: "0.5s", k: "Avg block time" },
+    { v: "<$0.01", k: "Tx cost" },
+    { v: "100%", k: "On-chain shares" },
+    { v: "4", k: "Wallets supported" },
+  ];
+  return (
+    <section className="relative border-t border-[var(--orbit-edge)]">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px overflow-hidden border-x border-[var(--orbit-edge)] bg-[var(--orbit-edge)] md:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.k} className="bg-black/40 p-8 backdrop-blur-sm">
+            <div className="font-display text-4xl text-[var(--orbit-ink)]">{s.v}</div>
+            <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">{s.k}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Architecture() {
+  const layers = [
+    { t: "Frontend", d: "TanStack Start · React 19 · Tailwind v4 · Framer Motion. Type-safe routing and SSR-ready." },
+    { t: "Wallets", d: "StellarWalletsKit unifies Freighter, Albedo, xBull and Lobstr behind one signing flow." },
+    { t: "RPC + Horizon", d: "Soroban RPC for contract calls and simulation. Horizon for tx history and event reconciliation." },
+    { t: "Soroban Vault", d: "Rust contract with deposit / withdraw / share math. Unit-tested, ready for mainnet hardening." },
+  ];
+  return (
+    <section className="relative border-t border-[var(--orbit-edge)]">
+      <div className="mx-auto max-w-7xl px-6 py-24">
+        <SectionLabel>Architecture</SectionLabel>
+        <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold tracking-tight md:text-5xl">
+          Every layer is{" "}
+          <span className="text-[var(--orbit-accent)]">verifiable</span>.
+        </h2>
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
+          {layers.map((l, i) => (
+            <motion.div
+              key={l.t}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.45, delay: i * 0.06 }}
+              className="glass rounded-2xl p-6"
+            >
+              <div className="flex items-baseline justify-between">
+                <div className="font-display text-2xl">{l.t}</div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">Layer {i + 1}</div>
+              </div>
+              <p className="mt-3 text-sm text-[var(--orbit-mute)]">{l.d}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FAQ() {
+  const qs = [
+    { q: "Is this real money?", a: "No. Orbit runs on Stellar Testnet. All XLM is test-only and has no market value." },
+    { q: "How are shares priced?", a: "Share price = total_assets / total_shares. The first depositor sets parity 1:1; subsequent deposits mint shares proportional to vault NAV." },
+    { q: "Can I withdraw anytime?", a: "Yes. Burn your shares and receive the underlying XLM at current NAV. No lock-ups, no fees on the testnet contract." },
+    { q: "What's next?", a: "Multi-asset support via SEP-40 oracles, then index rebalancing strategies and RWA collateral integration." },
+  ];
+  return (
+    <section className="relative border-t border-[var(--orbit-edge)]">
+      <div className="mx-auto max-w-7xl px-6 py-24">
+        <SectionLabel>Frequently asked</SectionLabel>
+        <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-[var(--orbit-edge)] bg-[var(--orbit-edge)] md:grid-cols-2">
+          {qs.map((item) => (
+            <div key={item.q} className="bg-black/40 p-6 backdrop-blur-sm">
+              <div className="font-display text-lg text-[var(--orbit-ink)]">{item.q}</div>
+              <p className="mt-2 text-sm text-[var(--orbit-mute)]">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
