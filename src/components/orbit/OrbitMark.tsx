@@ -41,8 +41,8 @@ export function OrbitMark({ size = 480 }: { size?: number }) {
           >
             {Array.from({ length: ring.count }).map((_, n) => {
               const angle = (n / ring.count) * Math.PI * 2;
-              const x = Math.cos(angle) * ring.r;
-              const y = Math.sin(angle) * ring.r;
+              const x = Math.round(Math.cos(angle) * ring.r * 1000) / 1000;
+              const y = Math.round(Math.sin(angle) * ring.r * 1000) / 1000;
               return (
                 <div
                   key={n}
