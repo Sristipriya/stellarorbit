@@ -735,7 +735,7 @@ export function AppDashboard() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--orbit-bg)]">
+    <div className="flex h-screen overflow-hidden bg-transparent">
       {/* Shader-like ambient glow background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <EtheralShadow

@@ -162,9 +162,13 @@ export function EtheralShadow({
         <div
           style={{
             backgroundColor: color,
+            WebkitMaskImage: `url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png')`,
             maskImage: `url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png')`,
+            WebkitMaskSize: sizing === "stretch" ? "100% 100%" : "cover",
             maskSize: sizing === "stretch" ? "100% 100%" : "cover",
+            WebkitMaskRepeat: "no-repeat",
             maskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
             maskPosition: "center",
             width: "100%",
             height: "100%",
