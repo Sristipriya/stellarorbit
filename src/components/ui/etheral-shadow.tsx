@@ -1,9 +1,17 @@
 "use client";
 
-import React, { useRef, useId, useEffect, type CSSProperties } from "react";
-import { animate, useMotionValue, type AnimationPlaybackControls } from "framer-motion";
+import React, { useRef, useId, useEffect, CSSProperties } from "react";
+import { animate, useMotionValue, AnimationPlaybackControls } from "framer-motion";
+
+// Type definitions
+interface ResponsiveImage {
+  src: string;
+  alt?: string;
+  srcSet?: string;
+}
 
 interface AnimationConfig {
+  preview?: boolean;
   scale: number;
   speed: number;
 }
@@ -13,142 +21,171 @@ interface NoiseConfig {
   scale: number;
 }
 
-interface ShadowOverlayProps {
+export interface ShadowOverlayProps {
+  type?: "preset" | "custom";
+  presetIndex?: number;
+  customImage?: ResponsiveImage;
   sizing?: "fill" | "stretch";
   color?: string;
   animation?: AnimationConfig;
   noise?: NoiseConfig;
   style?: CSSProperties;
   className?: string;
+  children?: React.ReactNode;
 }
 
-function mapRange(value: number, fromLow: number, fromHigh: number, toLow: number, toHigh: number) {
-  if (fromLow === fromHigh) return toLow;
-  const pct = (value - fromLow) / (fromHigh - fromLow);
-  return toLow + pct * (toHigh - toLow);
+function mapRange(
+  value: number,
+  fromLow: number,
+  fromHigh: number,
+  toLow: number,
+  toHigh: number,
+): number {
+  if (fromLow === fromHigh) {
+    return toLow;
+  }
+  const percentage = (value - fromLow) / (fromHigh - fromLow);
+  return toLow + percentage * (toHigh - toLow);
 }
 
-const useInstanceId = () => {
+const useInstanceId = (): string => {
   const id = useId();
-  return `shadowoverlay-${id.replace(/:/g, "")}`;
+  const cleanId = id.replace(/:/g, "");
+  const instanceId = `shadowoverlay-${cleanId}`;
+  return instanceId;
 };
 
-export function Component({
+export function EtheralShadow({
   sizing = "fill",
   color = "rgba(128, 128, 128, 1)",
   animation,
   noise,
   style,
   className,
+  children,
 }: ShadowOverlayProps) {
   const id = useInstanceId();
-  const animationEnabled = !!(animation && animation.scale > 0);
-  const feColorMatrixRef = useRef<SVGFEColorMatrixElement | null>(null);
-  const hueRotate = useMotionValue(0);
-  const animRef = useRef<AnimationPlaybackControls | null>(null);
+  const animationEnabled = animation && animation.scale > 0;
+  const feColorMatrixRef = useRef<SVGFEColorMatrixElement>(null);
+  const hueRotateMotionValue = useMotionValue(180);
+  const hueRotateAnimation = useRef<AnimationPlaybackControls | null>(null);
 
   const displacementScale = animation ? mapRange(animation.scale, 1, 100, 20, 100) : 0;
   const animationDuration = animation ? mapRange(animation.speed, 1, 100, 1000, 50) : 1;
 
   useEffect(() => {
-    if (!animationEnabled) return;
-    animRef.current?.stop();
-    hueRotate.set(0);
-    animRef.current = animate(hueRotate, 360, {
-      duration: animationDuration / 25,
-      repeat: Infinity,
-      ease: "linear",
-      onUpdate: (v: number) => {
-        feColorMatrixRef.current?.setAttribute("values", String(v));
-      },
-    });
-    return () => animRef.current?.stop();
-  }, [animationEnabled, animationDuration, hueRotate]);
+    if (feColorMatrixRef.current && animationEnabled) {
+      if (hueRotateAnimation.current) {
+        hueRotateAnimation.current.stop();
+      }
+      hueRotateMotionValue.set(0);
+      hueRotateAnimation.current = animate(hueRotateMotionValue, 360, {
+        duration: animationDuration / 25,
+        repeat: Infinity,
+        repeatType: "loop",
+        repeatDelay: 0,
+        ease: "linear",
+        delay: 0,
+        onUpdate: (value: number) => {
+          if (feColorMatrixRef.current) {
+            feColorMatrixRef.current.setAttribute("values", String(value));
+          }
+        },
+      });
+
+      return () => {
+        if (hueRotateAnimation.current) {
+          hueRotateAnimation.current.stop();
+        }
+      };
+    }
+  }, [animationEnabled, animationDuration, hueRotateMotionValue]);
 
   return (
     <div
       className={className}
       style={{
-        position: "relative",
         overflow: "hidden",
+        position: "absolute",
+        inset: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: "rgb(10, 10, 14)",
         ...style,
       }}
     >
-      {/* SVG filter defs */}
-      <svg style={{ position: "absolute", width: 0, height: 0 }} aria-hidden>
-        <defs>
-          <filter id={`${id}-filter`} x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.008 0.012"
-              numOctaves="2"
-              seed="3"
-              result="turb"
-            />
-            {animationEnabled && (
-              <feColorMatrix
-                ref={feColorMatrixRef}
-                in="turb"
-                type="hueRotate"
-                values="0"
-                result="rot"
-              />
-            )}
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2={animationEnabled ? "rot" : "turb"}
-              scale={displacementScale}
-            />
-          </filter>
-          <radialGradient id={`${id}-grad`} cx="50%" cy="50%" r="65%">
-            <stop offset="0%" stopColor={color} stopOpacity="0.9" />
-            <stop offset="55%" stopColor={color} stopOpacity="0.35" />
-            <stop offset="100%" stopColor={color} stopOpacity="0" />
-          </radialGradient>
-        </defs>
-      </svg>
-
-      {/* shadow layer */}
       <div
         style={{
           position: "absolute",
-          inset: "-10%",
-          filter: `url(#${id}-filter)`,
-          opacity: 0.9,
+          inset: -displacementScale,
+          filter: animationEnabled ? `url(#${id}) blur(4px)` : "none",
         }}
       >
-        <svg
-          width="100%"
-          height="100%"
-          preserveAspectRatio={sizing === "stretch" ? "none" : "xMidYMid slice"}
-        >
-          <rect width="100%" height="100%" fill={`url(#${id}-grad)`} />
-          <circle cx="30%" cy="40%" r="28%" fill={color} opacity="0.35" />
-          <circle cx="72%" cy="65%" r="22%" fill={color} opacity="0.28" />
-          <circle cx="55%" cy="20%" r="18%" fill={color} opacity="0.22" />
-        </svg>
+        {animationEnabled && (
+          <svg style={{ position: "absolute", width: 0, height: 0 }}>
+            <defs>
+              <filter id={id}>
+                <feTurbulence
+                  result="undulation"
+                  numOctaves="2"
+                  baseFrequency={`${mapRange(animation.scale, 0, 100, 0.001, 0.0005)},${mapRange(animation.scale, 0, 100, 0.004, 0.002)}`}
+                  seed="0"
+                  type="turbulence"
+                />
+                <feColorMatrix
+                  ref={feColorMatrixRef}
+                  in="undulation"
+                  type="hueRotate"
+                  values="180"
+                />
+                <feColorMatrix
+                  in="dist"
+                  result="circulation"
+                  type="matrix"
+                  values="4 0 0 0 1  4 0 0 0 1  4 0 0 0 1  1 0 0 0 0"
+                />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="circulation"
+                  scale={displacementScale}
+                  result="dist"
+                />
+                <feDisplacementMap
+                  in="dist"
+                  in2="undulation"
+                  scale={displacementScale}
+                  result="output"
+                />
+              </filter>
+            </defs>
+          </svg>
+        )}
+        <div
+          style={{
+            backgroundColor: color,
+            maskImage: `url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png')`,
+            maskSize: sizing === "stretch" ? "100% 100%" : "cover",
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+            width: "100%",
+            height: "100%",
+          }}
+        />
       </div>
 
       {noise && noise.opacity > 0 && (
         <div
-          aria-hidden
           style={{
             position: "absolute",
             inset: 0,
-            opacity: noise.opacity,
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-            backgroundSize: `${Math.max(noise.scale * 60, 60)}px`,
-            mixBlendMode: "overlay",
-            pointerEvents: "none",
+            backgroundImage: `url("https://framerusercontent.com/images/g0QcWrxr87K0ufOxIUFBakwYA8.png")`,
+            backgroundSize: noise.scale * 200,
+            backgroundRepeat: "repeat",
+            opacity: noise.opacity / 2,
           }}
         />
       )}
+
+      {children}
     </div>
   );
 }
-
-export { Component as EtherealShadow };

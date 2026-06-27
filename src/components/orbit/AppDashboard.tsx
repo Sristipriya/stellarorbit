@@ -26,6 +26,7 @@ import { DepositCard } from "./DepositCard";
 import { WithdrawCard } from "./WithdrawCard";
 import { ActivityFeed } from "./ActivityFeed";
 import { FundBanner } from "./FundBanner";
+import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { useWallet } from "@/hooks/use-wallet";
 import { useVault } from "@/hooks/use-vault";
 import { type ActivityEvent } from "@/lib/stellar/events";
@@ -737,12 +738,11 @@ export function AppDashboard() {
     <div className="flex h-screen overflow-hidden bg-[var(--orbit-bg)]">
       {/* Shader-like ambient glow background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 10% 20%, oklch(0.82 0.16 195 / 0.08), transparent 60%), radial-gradient(ellipse 60% 50% at 90% 80%, oklch(0.78 0.16 65 / 0.07), transparent 60%)",
-          }}
+        <EtheralShadow
+          color="rgba(130, 26, 195, 0.4)"
+          animation={{ scale: 100, speed: 60 }}
+          noise={{ opacity: 0.8, scale: 1.2 }}
+          sizing="fill"
         />
       </div>
 
