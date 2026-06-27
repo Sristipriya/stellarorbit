@@ -38,9 +38,14 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
                       : `withdrew ${stroopsToXlm(e.sharesStroops)} shares → ${stroopsToXlm(e.amountStroops)} XLM`}
                   </span>
                 </div>
-                <a href={NETWORK.explorerTx(e.txHash)} target="_blank" rel="noreferrer" className="text-[var(--orbit-accent)] hover:underline">
-                  {e.txHash.slice(0, 6)}…
-                </a>
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-widest ${e.confirmed ? "border border-[var(--orbit-ok)]/40 text-[var(--orbit-ok)]" : "border border-[var(--orbit-warn)]/40 text-[var(--orbit-warn)]"}`}>
+                    {e.confirmed ? "confirmed" : "pending"}
+                  </span>
+                  <a href={NETWORK.explorerTx(e.txHash)} target="_blank" rel="noreferrer" className="text-[var(--orbit-accent)] hover:underline">
+                    {e.txHash.slice(0, 6)}…
+                  </a>
+                </div>
               </motion.li>
             ))}
           </AnimatePresence>
