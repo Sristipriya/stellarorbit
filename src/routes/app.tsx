@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { EtherealShadow } from "@/components/ui/etheral-shadow";
 import { TopNav } from "@/components/orbit/TopNav";
 import { WalletButton } from "@/components/orbit/WalletButton";
 import { NavPanel } from "@/components/orbit/NavPanel";
