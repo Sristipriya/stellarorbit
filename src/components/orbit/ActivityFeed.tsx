@@ -7,7 +7,7 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
     <div className="glass rounded-2xl p-5">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">Activity</h3>
-        <span className="font-mono text-[10px] text-[var(--orbit-mute)]">live · on-chain memo events</span>
+        <span className="font-mono text-[10px] text-[var(--orbit-mute)]">live · reconciled from on-chain</span>
       </div>
       {events.length === 0 ? (
         <p className="mt-4 font-mono text-xs text-[var(--orbit-mute)]">No activity yet. Be the first to deposit.</p>

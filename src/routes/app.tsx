@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { TopNav } from "@/components/orbit/TopNav";
 import { WalletButton } from "@/components/orbit/WalletButton";
-import { VaultOverview } from "@/components/orbit/VaultOverview";
+import { NavPanel } from "@/components/orbit/NavPanel";
 import { PositionCard } from "@/components/orbit/PositionCard";
 import { DepositCard } from "@/components/orbit/DepositCard";
 import { WithdrawCard } from "@/components/orbit/WithdrawCard";
@@ -78,7 +78,7 @@ function AppPage() {
         {wallet.address && (
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
             <div className="space-y-4 lg:col-span-2">
-              <VaultOverview state={vault.state} />
+              <NavPanel state={vault.state} loading={vault.loading} />
               <PositionCard
                 address={wallet.address}
                 state={vault.state}
