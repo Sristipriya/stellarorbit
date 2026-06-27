@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { EtherealShadow } from "@/components/ui/etheral-shadow";
 import { TopNav } from "@/components/orbit/TopNav";
 import { WalletButton } from "@/components/orbit/WalletButton";
 import { NavPanel } from "@/components/orbit/NavPanel";
@@ -31,6 +32,15 @@ function AppPage() {
 
   return (
     <div className="relative min-h-screen">
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <EtherealShadow
+          color="rgba(140, 200, 255, 0.55)"
+          animation={{ scale: 50, speed: 40 }}
+          noise={{ opacity: 0.35, scale: 1.1 }}
+          sizing="fill"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/85" />
+      </div>
       <TopNav inApp />
       <div className="mx-auto max-w-7xl px-6 pb-20">
         <div className="flex items-center justify-between gap-4">
