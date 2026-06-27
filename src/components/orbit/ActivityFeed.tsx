@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { NETWORK, shortAddr, stroopsToXlm } from "@/lib/stellar/network";
-import type { ActivityEvent } from "@/lib/stellar/vault";
+import type { ActivityEvent } from "@/lib/stellar/events";
 
 export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
   return (

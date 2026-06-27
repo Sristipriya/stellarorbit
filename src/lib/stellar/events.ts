@@ -47,7 +47,7 @@ async function pollRealEvents(): Promise<ActivityEvent[]> {
   const raw = await fetchContractEvents(realStartLedger);
   const out: ActivityEvent[] = [];
   for (const ev of raw) {
-    const key = `${ev.txHash}:${ev.pagingToken}`;
+    const key = ev.id;
     if (realSeen.has(key)) continue;
     realSeen.add(key);
 

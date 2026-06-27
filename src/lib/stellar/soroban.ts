@@ -120,11 +120,11 @@ export async function latestLedger(): Promise<number> {
 }
 
 export type ContractEvent = {
+  id: string; // unique paging id from RPC
   ledger: number;
   txHash: string;
   topic0: string; // symbol name, "Dep" | "Wd" | other
   values: unknown[]; // decoded values (for Orbit: [from, amount, shares])
-  pagingToken: string;
 };
 
 /** Fetch Orbit contract events from `startLedger` to head. */
@@ -144,11 +144,11 @@ export async function fetchContractEvents(startLedger: number): Promise<Contract
     try { parsedVal = scValToNative(e.value); } catch { /* noop */ }
     const values = Array.isArray(parsedVal) ? (parsedVal as unknown[]) : [parsedVal];
     return {
+      id: e.id,
       ledger: e.ledger,
       txHash: e.txHash,
       topic0: String(topics[0] ?? ""),
       values,
-      pagingToken: e.pagingToken,
     };
   });
 }
