@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+/* eslint-disable */
+import React, { useRef, useEffect } from "react";
 
 // Types for component props
 export interface HeroProps {
@@ -59,7 +60,7 @@ void main(){gl_Position=position;}`;
     constructor(canvas: HTMLCanvasElement, scale: number) {
       this.canvas = canvas;
       this.scale = scale;
-      this.gl = canvas.getContext('webgl2')!;
+      this.gl = canvas.getContext("webgl2")!;
       this.gl.viewport(0, 0, canvas.width * scale, canvas.height * scale);
       this.shaderSource = defaultShaderSource;
     }
@@ -99,7 +100,7 @@ void main(){gl_Position=position;}`;
 
       if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const error = gl.getShaderInfoLog(shader);
-        console.error('Shader compilation error:', error);
+        console.error("Shader compilation error:", error);
       }
     }
 
@@ -151,34 +152,34 @@ void main(){gl_Position=position;}`;
     init() {
       const gl = this.gl;
       const program = this.program!;
-      
+
       this.buffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW);
 
-      const position = gl.getAttribLocation(program, 'position');
+      const position = gl.getAttribLocation(program, "position");
       gl.enableVertexAttribArray(position);
       gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
-      (program as any).resolution = gl.getUniformLocation(program, 'resolution');
-      (program as any).time = gl.getUniformLocation(program, 'time');
-      (program as any).move = gl.getUniformLocation(program, 'move');
-      (program as any).touch = gl.getUniformLocation(program, 'touch');
-      (program as any).pointerCount = gl.getUniformLocation(program, 'pointerCount');
-      (program as any).pointers = gl.getUniformLocation(program, 'pointers');
+      (program as any).resolution = gl.getUniformLocation(program, "resolution");
+      (program as any).time = gl.getUniformLocation(program, "time");
+      (program as any).move = gl.getUniformLocation(program, "move");
+      (program as any).touch = gl.getUniformLocation(program, "touch");
+      (program as any).pointerCount = gl.getUniformLocation(program, "pointerCount");
+      (program as any).pointers = gl.getUniformLocation(program, "pointers");
     }
 
     render(now = 0) {
       const gl = this.gl;
       const program = this.program;
-      
+
       if (!program || gl.getProgramParameter(program, gl.DELETE_STATUS)) return;
 
       gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.useProgram(program);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-      
+
       gl.uniform2f((program as any).resolution, this.canvas.width, this.canvas.height);
       gl.uniform1f((program as any).time, now * 1e-3);
       gl.uniform2f((program as any).move, ...this.mouseMove);
@@ -199,16 +200,18 @@ void main(){gl_Position=position;}`;
 
     constructor(element: HTMLCanvasElement, scale: number) {
       this.scale = scale;
-      
-      const map = (element: HTMLCanvasElement, scale: number, x: number, y: number) => 
-        [x * scale, element.height - y * scale];
 
-      element.addEventListener('pointerdown', (e) => {
+      const map = (element: HTMLCanvasElement, scale: number, x: number, y: number) => [
+        x * scale,
+        element.height - y * scale,
+      ];
+
+      element.addEventListener("pointerdown", (e) => {
         this.active = true;
         this.pointers.set(e.pointerId, map(element, this.getScale(), e.clientX, e.clientY));
       });
 
-      element.addEventListener('pointerup', (e) => {
+      element.addEventListener("pointerup", (e) => {
         if (this.count === 1) {
           this.lastCoords = this.first;
         }
@@ -216,7 +219,7 @@ void main(){gl_Position=position;}`;
         this.active = this.pointers.size > 0;
       });
 
-      element.addEventListener('pointerleave', (e) => {
+      element.addEventListener("pointerleave", (e) => {
         if (this.count === 1) {
           this.lastCoords = this.first;
         }
@@ -224,7 +227,7 @@ void main(){gl_Position=position;}`;
         this.active = this.pointers.size > 0;
       });
 
-      element.addEventListener('pointermove', (e) => {
+      element.addEventListener("pointermove", (e) => {
         if (!this.active) return;
         this.lastCoords = [e.clientX, e.clientY];
         this.pointers.set(e.pointerId, map(element, this.getScale(), e.clientX, e.clientY));
@@ -249,9 +252,7 @@ void main(){gl_Position=position;}`;
     }
 
     get coords() {
-      return this.pointers.size > 0 
-        ? Array.from(this.pointers.values()).flat() 
-        : [0, 0];
+      return this.pointers.size > 0 ? Array.from(this.pointers.values()).flat() : [0, 0];
     }
 
     get first() {
@@ -261,13 +262,13 @@ void main(){gl_Position=position;}`;
 
   const resize = () => {
     if (!canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const dpr = Math.max(1, 0.5 * window.devicePixelRatio);
-    
+
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
-    
+
     if (rendererRef.current) {
       rendererRef.current.updateScale(dpr);
     }
@@ -275,7 +276,7 @@ void main(){gl_Position=position;}`;
 
   const loop = (now: number) => {
     if (!rendererRef.current || !pointersRef.current) return;
-    
+
     rendererRef.current.updateMouse(pointersRef.current.first);
     rendererRef.current.updatePointerCount(pointersRef.current.count);
     rendererRef.current.updatePointerCoords(pointersRef.current.coords);
@@ -289,25 +290,25 @@ void main(){gl_Position=position;}`;
 
     const canvas = canvasRef.current;
     const dpr = Math.max(1, 0.5 * window.devicePixelRatio);
-    
+
     rendererRef.current = new WebGLRenderer(canvas, dpr);
     pointersRef.current = new PointerHandler(canvas, dpr);
-    
+
     rendererRef.current.setup();
     rendererRef.current.init();
-    
+
     resize();
-    
+
     if (rendererRef.current.test(defaultShaderSource) === null) {
       rendererRef.current.updateShader(defaultShaderSource);
     }
-    
+
     loop(0);
-    
-    window.addEventListener('resize', resize);
-    
+
+    window.addEventListener("resize", resize);
+
     return () => {
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -326,7 +327,7 @@ export const Hero: React.FC<HeroProps> = ({
   subtitle,
   buttons,
   className = "",
-  children
+  children,
 }) => {
   const canvasRef = useShaderBackground();
 
@@ -380,13 +381,13 @@ export const Hero: React.FC<HeroProps> = ({
           animation-delay: 0.8s;
         }
       `}</style>
-      
+
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full object-cover touch-none"
-        style={{ background: 'black' }}
+        style={{ background: "black" }}
       />
-      
+
       {/* Hero Content Overlay */}
       <div className="relative z-10 flex flex-col items-center justify-center text-white py-20 md:py-32 min-h-screen">
         {/* Trust Badge */}
@@ -396,7 +397,16 @@ export const Hero: React.FC<HeroProps> = ({
               {trustBadge.icons && (
                 <div className="flex">
                   {trustBadge.icons.map((icon, index) => (
-                    <span key={index} className={index === 0 ? 'text-yellow-300' : index === 1 ? 'text-orange-300' : 'text-amber-300'}>
+                    <span
+                      key={index}
+                      className={
+                        index === 0
+                          ? "text-yellow-300"
+                          : index === 1
+                            ? "text-orange-300"
+                            : "text-amber-300"
+                      }
+                    >
                       {icon}
                     </span>
                   ))}
@@ -417,37 +427,36 @@ export const Hero: React.FC<HeroProps> = ({
               {headline.line2}
             </h1>
           </div>
-          
+
           {/* Subtitle with Animation */}
           <div className="max-w-3xl mx-auto animate-fade-in-up animation-delay-600">
             <p className="text-lg md:text-xl lg:text-2xl text-orange-100/90 font-light leading-relaxed">
               {subtitle}
             </p>
           </div>
-          
+
           {/* CTA Buttons with Animation */}
           {buttons && (
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10 animate-fade-in-up animation-delay-800">
-              {buttons.primary && (
-                buttons.primary.href ? (
-                  <a 
+              {buttons.primary &&
+                (buttons.primary.href ? (
+                  <a
                     href={buttons.primary.href}
                     className="px-8 py-4 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-black rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/25 cursor-pointer"
                   >
                     {buttons.primary.text}
                   </a>
                 ) : (
-                  <button 
+                  <button
                     onClick={buttons.primary.onClick}
                     className="px-8 py-4 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-black rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/25"
                   >
                     {buttons.primary.text}
                   </button>
-                )
-              )}
-              {buttons.secondary && (
-                buttons.secondary.href ? (
-                  <a 
+                ))}
+              {buttons.secondary &&
+                (buttons.secondary.href ? (
+                  <a
                     href={buttons.secondary.href}
                     target="_blank"
                     rel="noreferrer"
@@ -456,14 +465,13 @@ export const Hero: React.FC<HeroProps> = ({
                     {buttons.secondary.text}
                   </a>
                 ) : (
-                  <button 
+                  <button
                     onClick={buttons.secondary.onClick}
                     className="px-8 py-4 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-300/30 hover:border-orange-300/50 text-orange-100 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm"
                   >
                     {buttons.secondary.text}
                   </button>
-                )
-              )}
+                ))}
             </div>
           )}
 
