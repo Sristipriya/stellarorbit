@@ -83,5 +83,5 @@ fn preview_share_price_is_unity_before_first_deposit() {
 // Silence unused-import warning when MockAuth helpers aren't used directly.
 #[allow(dead_code)]
 fn _unused(_: MockAuth, _: MockAuthInvoke<'_>) {
-    let _ = ().into_val(&Env::default());
+    let _: soroban_sdk::Val = ().into_val(&Env::default());
 }

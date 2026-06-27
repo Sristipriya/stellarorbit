@@ -242,3 +242,8 @@
   background: oklch(1 0 0 / 0.06);
   border-color: oklch(1 0 0 / 0.18);
 }
+
+/* Hide Lovable Badge */
+#lovable-badge, .lovable-badge {
+  display: none !important;
+}

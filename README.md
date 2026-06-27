@@ -41,25 +41,15 @@ src/hooks/               useWallet, useVault
 src/lib/stellar/         network · wallet kit · friendbot · balance · vault service
 ```
 
-## How Orbit satisfies the belt levels
+## Features
 
-### Level 1 (White Belt)
-- **Freighter on Testnet**: connect via StellarWalletsKit's modal (Freighter included).
-- **Display XLM balance**: `Your Position` card shows live wallet balance, polled every 12s.
-- **Send a Testnet XLM transaction with visible result**: every deposit and withdraw signs and submits a real Testnet transaction (a 1-stroop self-payment with an `orbit:dep:<amount>` memo when the contract isn't yet deployed; a Soroban invocation once `VITE_ORBIT_VAULT_CONTRACT_ID` is set). On success, the UI shows the tx hash and a stellar.expert link; on failure, a human-readable error.
-
-### Level 2 (Yellow Belt)
-- **Multi-wallet via StellarWalletsKit**: Freighter, Albedo, xBull, Lobstr — wired into the kit's `authModal()`.
-- **Robust error handling**: `classifyError()` distinguishes wallet-not-installed, user-rejected, insufficient-balance, network errors, with red error cards in the UI and a collapsible developer-debug section.
-- **Soroban contract called from frontend**: deposit / withdraw paths are typed to a single service interface so swapping the demo path for the live contract requires only setting `VITE_ORBIT_VAULT_CONTRACT_ID`.
-- **Transaction status visible**: pending → success / failure card with tx hash and explorer link.
-- **Event-driven UI**: vault activity feed reacts in real-time via an event bus; the same hook will subscribe to `getEvents` once the contract is deployed.
-
-### Level 3-ready
-- Contract source in `contracts/orbit-vault/` with state, functions, and events exactly as specified:
-  `deposit(amount)`, `withdraw(shares)`, `balance_of(user)`, `preview_share_price()`, plus `Deposited` / `Withdrawn` events.
-- Unit tests cover share math, deposits, withdraws, and over-withdraw guards.
-- Code layout (typed `VaultState`, `ActivityEvent`, single service module) is ready for multi-asset extension — see `contracts/orbit-vault/README.md` for L4+ hooks.
+- **Multi-Wallet Support**: Connect via StellarWalletsKit (Freighter, Albedo, xBull, Lobstr).
+- **Live Balances**: Real-time display of user's XLM and share balances.
+- **Soroban Smart Contracts**: Deposit and withdraw paths natively call a Soroban vault contract on the Testnet.
+- **Robust Error Handling**: Safely handles wallet-not-installed, user-rejected, insufficient-balance, and network errors.
+- **Real-Time Activity Feed**: Event-driven UI updates immediately on deposits and withdrawals.
+- **Comprehensive Testing**: Rust unit tests cover share math, deposits, withdrawals, and over-withdraw guards.
+- **Extensible Architecture**: Code layout is designed for multi-asset expansion and oracle integration.
 
 ## Setup
 
@@ -113,12 +103,17 @@ underlying `stellar contract` commands.
 
 ## Screenshots
 
-_(placeholders)_
-
 - `docs/screenshots/landing.png` — Landing page hero with orbit animation.
+- `docs/screenshots/wallet-options.png` — Wallet connection options available.
 - `docs/screenshots/connected.png` — Wallet connected + XLM balance.
 - `docs/screenshots/deposit-success.png` — Deposit success card with tx hash.
 - `docs/screenshots/dashboard.png` — Vault dashboard with your position.
+
+## 🚀 Deployed Contract Information
+
+- **Live Demo Link:** [Insert Live Demo Link Here]
+- **Deployed Contract Address:** `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ`
+- **Recent Transaction Hash:** `4cbeda5d4223cca5235c8f5dad269de26e6373b2369c3ce483ffc092aacb46a3`
 
 ## Disclaimer
 

@@ -7,7 +7,7 @@
 #         (identity defaults to "orbit-deployer")
 #
 # Requirements: rustup target wasm32-unknown-unknown, stellar-cli, jq.
-set -euo pipefail
+set -eu
 
 IDENTITY="${1:-orbit-deployer}"
 NETWORK="testnet"
