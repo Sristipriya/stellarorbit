@@ -81,11 +81,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Orbit — Index Vault on Stellar Testnet" },
       { name: "description", content: "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles." },
       { name: "author", content: "Orbit" },
-      { property: "og:title", content: "Orbit — Index Vault on Stellar" },
-      { property: "og:description", content: "Deposit XLM, mint shares, withdraw based on share value. Built on Soroban Testnet." },
+      { property: "og:title", content: "Orbit — Index Vault on Stellar Testnet" },
+      { property: "og:description", content: "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Orbit — Index Vault on Stellar Testnet" },
+      { name: "twitter:description", content: "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ba49ff4f-4710-43a8-ae65-65a10aef5014/id-preview-a1054deb--4f04ced1-cdff-41fb-865d-247b6a39f98b.lovable.app-1782544388807.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ba49ff4f-4710-43a8-ae65-65a10aef5014/id-preview-a1054deb--4f04ced1-cdff-41fb-865d-247b6a39f98b.lovable.app-1782544388807.png" },
     ],
     links: [
       {
