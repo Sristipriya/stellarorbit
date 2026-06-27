@@ -11,7 +11,6 @@ import {
   Address as SdkAddress,
   BASE_FEE,
   Contract,
-  Keypair,
   Networks as SdkNetworks,
   TransactionBuilder,
   nativeToScVal,
@@ -33,8 +32,14 @@ export function rpcServer(): rpc.Server {
   return _server;
 }
 
-/** Throwaway source for read-only `simulateTransaction` calls. */
-const READ_SOURCE_PK = Keypair.random().publicKey();
+/**
+ * Throwaway source for read-only `simulateTransaction` calls.
+ *
+ * Keep this deterministic: `Keypair.random()` pulls Node-style Buffer/crypto
+ * paths into the browser bundle during module evaluation and crashes the
+ * published `/app` route before React can render.
+ */
+const READ_SOURCE_PK = "GAWGGVQZTAY77QSRUE74U4PNXTQ5J4PKWBQ2UNMONQFL32TODVK6ECWJ";
 
 export type ScArg = xdr.ScVal;
 
