@@ -66,35 +66,50 @@ src/lib/stellar/         network · wallet kit · friendbot · balance · vault 
 ### Prerequisites
 - Node 20+, `bun` (or `pnpm`)
 - Rust + `wasm32-unknown-unknown` target
-- `stellar-cli` (`cargo install --locked stellar-cli`)
+- `stellar-cli` (`cargo install --locked stellar-cli`) and `jq`
 - A Stellar wallet extension (Freighter recommended)
 
-### Run the frontend
+### One-command setup (fresh clone)
 
 ```bash
-bun install
-bun dev
-# open http://localhost:8080
+scripts/setup.sh
+bun run dev   # http://localhost:8080
 ```
 
-Until the contract is deployed, Orbit runs in **demo mode**: every deposit /
-withdraw produces a real, signed Testnet transaction (1-stroop self-payment
-with a memo) and vault share state is kept in `localStorage`. This is
-intentional — it lets the dApp ship end-to-end and satisfies the L1/L2
-"send a real Testnet transaction" requirement before the contract is live.
+`scripts/setup.sh` installs JS deps, runs the contract tests, deploys the
+Soroban vault to Stellar Testnet, and writes `VITE_ORBIT_VAULT_CONTRACT_ID`
+into `.env` so the frontend talks to the live contract on next start.
 
-### Deploy the contract
-
-See [`contracts/orbit-vault/README.md`](contracts/orbit-vault/README.md). Once
-deployed, set:
+If you only want to run the UI in demo mode (no contract deploy):
 
 ```bash
-# .env at repo root
-VITE_ORBIT_VAULT_CONTRACT_ID=C...
+scripts/setup.sh --skip-deploy
+bun run dev
 ```
 
-Restart `bun dev`. The dashboard subtitle will switch from "Demo mode" to
-"Soroban contract · Testnet".
+### Deploy / redeploy only the contract
+
+```bash
+scripts/deploy-vault.sh                 # uses identity "orbit-deployer"
+scripts/deploy-vault.sh my-identity     # use a different stellar-cli identity
+```
+
+This builds `contracts/orbit-vault`, funds the deployer via Friendbot,
+uploads + deploys the WASM with the native XLM SAC as the underlying asset,
+and updates `.env` in place. See
+[`contracts/orbit-vault/README.md`](contracts/orbit-vault/README.md) for the
+underlying `stellar contract` commands.
+
+### Modes
+
+- **Real mode** (`VITE_ORBIT_VAULT_CONTRACT_ID` set): the UI reads
+  `total_assets` / `total_shares` / `balance_of` directly from the contract,
+  deposits/withdrawals call the contract via Soroban RPC + wallet signing,
+  and the activity feed reconciles from Soroban contract events.
+- **Demo mode** (no contract ID): each deposit/withdraw is a real signed
+  Testnet payment with an `orbit:dep:<xlm>` / `orbit:wd:<xlm>` memo and the
+  activity feed reconciles from Horizon by reading those memos. Share state
+  is held in `localStorage` until the contract is live.
 
 ## Screenshots
 
