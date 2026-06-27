@@ -7,7 +7,9 @@ export async function fetchXlmBalance(address: string): Promise<{ funded: boolea
     if (res.status === 404) return { funded: false, xlm: "0" };
     if (!res.ok) throw new Error(`Horizon ${res.status}`);
     const data = await res.json();
-    const native = (data.balances ?? []).find((b: { asset_type: string }) => b.asset_type === "native");
+    const native = (data.balances ?? []).find(
+      (b: { asset_type: string }) => b.asset_type === "native",
+    );
     return { funded: true, xlm: native?.balance ?? "0" };
   } catch {
     return { funded: false, xlm: "0" };

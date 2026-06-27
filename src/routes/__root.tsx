@@ -79,14 +79,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Orbit — Index Vault on Stellar Testnet" },
-      { name: "description", content: "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles." },
+      {
+        name: "description",
+        content:
+          "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles.",
+      },
       { name: "author", content: "Orbit" },
       { property: "og:title", content: "Orbit — Index Vault on Stellar Testnet" },
-      { property: "og:description", content: "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles." },
+      {
+        property: "og:description",
+        content:
+          "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Orbit — Index Vault on Stellar Testnet" },
-      { name: "twitter:description", content: "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles." },
+      {
+        name: "twitter:description",
+        content:
+          "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles.",
+      },
     ],
     links: [
       {
@@ -122,7 +134,18 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <Toaster theme="dark" position="top-right" toastOptions={{ style: { background: "rgba(20,22,30,0.9)", border: "1px solid rgba(255,255,255,0.08)", color: "#eaeaf0", backdropFilter: "blur(10px)" } }} />
+      <Toaster
+        theme="dark"
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "rgba(20,22,30,0.9)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "#eaeaf0",
+            backdropFilter: "blur(10px)",
+          },
+        }}
+      />
     </QueryClientProvider>
   );
 }

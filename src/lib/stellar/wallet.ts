@@ -10,13 +10,15 @@ export async function ensureKit(): Promise<void> {
   if (inited) return;
   if (!initPromise) {
     initPromise = (async () => {
-      const [{ StellarWalletsKit, Networks }, freighter, albedo, xbull, lobstr] = await Promise.all([
-        import("@creit.tech/stellar-wallets-kit"),
-        import("@creit.tech/stellar-wallets-kit/modules/freighter"),
-        import("@creit.tech/stellar-wallets-kit/modules/albedo"),
-        import("@creit.tech/stellar-wallets-kit/modules/xbull"),
-        import("@creit.tech/stellar-wallets-kit/modules/lobstr"),
-      ]);
+      const [{ StellarWalletsKit, Networks }, freighter, albedo, xbull, lobstr] = await Promise.all(
+        [
+          import("@creit.tech/stellar-wallets-kit"),
+          import("@creit.tech/stellar-wallets-kit/modules/freighter"),
+          import("@creit.tech/stellar-wallets-kit/modules/albedo"),
+          import("@creit.tech/stellar-wallets-kit/modules/xbull"),
+          import("@creit.tech/stellar-wallets-kit/modules/lobstr"),
+        ],
+      );
       StellarWalletsKit.init({
         network: Networks.TESTNET,
         selectedWalletId: freighter.FREIGHTER_ID,
@@ -61,14 +63,30 @@ export type WalletError =
 export function classifyError(err: unknown): WalletError {
   const msg = err instanceof Error ? err.message : String(err);
   const lower = msg.toLowerCase();
-  if (lower.includes("not installed") || lower.includes("not found") || lower.includes("no wallet")) {
+  if (
+    lower.includes("not installed") ||
+    lower.includes("not found") ||
+    lower.includes("no wallet")
+  ) {
     return { kind: "not_installed", message: "Wallet not installed or unavailable." };
   }
-  if (lower.includes("reject") || lower.includes("declined") || lower.includes("user denied") || lower.includes("cancel")) {
+  if (
+    lower.includes("reject") ||
+    lower.includes("declined") ||
+    lower.includes("user denied") ||
+    lower.includes("cancel")
+  ) {
     return { kind: "rejected", message: "Transaction rejected in wallet." };
   }
-  if (lower.includes("insufficient") || lower.includes("underfunded") || lower.includes("op_underfunded")) {
-    return { kind: "insufficient", message: "Insufficient balance to cover amount + network fees." };
+  if (
+    lower.includes("insufficient") ||
+    lower.includes("underfunded") ||
+    lower.includes("op_underfunded")
+  ) {
+    return {
+      kind: "insufficient",
+      message: "Insufficient balance to cover amount + network fees.",
+    };
   }
   if (lower.includes("network") || lower.includes("fetch") || lower.includes("timeout")) {
     return { kind: "network", message: "Network error — check Testnet connectivity." };

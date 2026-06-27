@@ -9,9 +9,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Orbit — Index Vault on Stellar Testnet" },
-      { name: "description", content: "Deposit XLM into Orbit's Soroban-powered index vault on Stellar Testnet. Built to grow into a multi-asset RWA index using SEP-40 oracles." },
+      {
+        name: "description",
+        content:
+          "Deposit XLM into Orbit's Soroban-powered index vault on Stellar Testnet. Built to grow into a multi-asset RWA index using SEP-40 oracles.",
+      },
       { property: "og:title", content: "Orbit — Index Vault on Stellar" },
-      { property: "og:description", content: "On-chain index vault on Stellar Testnet. Soroban contract, multi-wallet, real-time activity feed." },
+      {
+        property: "og:description",
+        content:
+          "On-chain index vault on Stellar Testnet. Soroban contract, multi-wallet, real-time activity feed.",
+      },
     ],
   }),
   component: Index,
@@ -55,7 +63,9 @@ function Stats() {
         {stats.map((s) => (
           <div key={s.k} className="bg-black/40 p-8 backdrop-blur-sm">
             <div className="font-display text-4xl text-[var(--orbit-ink)]">{s.v}</div>
-            <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">{s.k}</div>
+            <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">
+              {s.k}
+            </div>
           </div>
         ))}
       </div>
@@ -65,18 +75,29 @@ function Stats() {
 
 function Architecture() {
   const layers = [
-    { t: "Frontend", d: "TanStack Start · React 19 · Tailwind v4 · Framer Motion. Type-safe routing and SSR-ready." },
-    { t: "Wallets", d: "StellarWalletsKit unifies Freighter, Albedo, xBull and Lobstr behind one signing flow." },
-    { t: "RPC + Horizon", d: "Soroban RPC for contract calls and simulation. Horizon for tx history and event reconciliation." },
-    { t: "Soroban Vault", d: "Rust contract with deposit / withdraw / share math. Unit-tested, ready for mainnet hardening." },
+    {
+      t: "Frontend",
+      d: "TanStack Start · React 19 · Tailwind v4 · Framer Motion. Type-safe routing and SSR-ready.",
+    },
+    {
+      t: "Wallets",
+      d: "StellarWalletsKit unifies Freighter, Albedo, xBull and Lobstr behind one signing flow.",
+    },
+    {
+      t: "RPC + Horizon",
+      d: "Soroban RPC for contract calls and simulation. Horizon for tx history and event reconciliation.",
+    },
+    {
+      t: "Soroban Vault",
+      d: "Rust contract with deposit / withdraw / share math. Unit-tested, ready for mainnet hardening.",
+    },
   ];
   return (
     <section className="relative border-t border-[var(--orbit-edge)]">
       <div className="mx-auto max-w-7xl px-6 py-24">
         <SectionLabel>Architecture</SectionLabel>
         <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold tracking-tight md:text-5xl">
-          Every layer is{" "}
-          <span className="text-[var(--orbit-accent)]">verifiable</span>.
+          Every layer is <span className="text-[var(--orbit-accent)]">verifiable</span>.
         </h2>
         <div className="mt-12 grid gap-4 md:grid-cols-2">
           {layers.map((l, i) => (
@@ -90,7 +111,9 @@ function Architecture() {
             >
               <div className="flex items-baseline justify-between">
                 <div className="font-display text-2xl">{l.t}</div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">Layer {i + 1}</div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">
+                  Layer {i + 1}
+                </div>
               </div>
               <p className="mt-3 text-sm text-[var(--orbit-mute)]">{l.d}</p>
             </motion.div>
@@ -103,10 +126,22 @@ function Architecture() {
 
 function FAQ() {
   const qs = [
-    { q: "Is this real money?", a: "No. Orbit runs on Stellar Testnet. All XLM is test-only and has no market value." },
-    { q: "How are shares priced?", a: "Share price = total_assets / total_shares. The first depositor sets parity 1:1; subsequent deposits mint shares proportional to vault NAV." },
-    { q: "Can I withdraw anytime?", a: "Yes. Burn your shares and receive the underlying XLM at current NAV. No lock-ups, no fees on the testnet contract." },
-    { q: "What's next?", a: "Multi-asset support via SEP-40 oracles, then index rebalancing strategies and RWA collateral integration." },
+    {
+      q: "Is this real money?",
+      a: "No. Orbit runs on Stellar Testnet. All XLM is test-only and has no market value.",
+    },
+    {
+      q: "How are shares priced?",
+      a: "Share price = total_assets / total_shares. The first depositor sets parity 1:1; subsequent deposits mint shares proportional to vault NAV.",
+    },
+    {
+      q: "Can I withdraw anytime?",
+      a: "Yes. Burn your shares and receive the underlying XLM at current NAV. No lock-ups, no fees on the testnet contract.",
+    },
+    {
+      q: "What's next?",
+      a: "Multi-asset support via SEP-40 oracles, then index rebalancing strategies and RWA collateral integration.",
+    },
   ];
   return (
     <section className="relative border-t border-[var(--orbit-edge)]">
@@ -146,11 +181,13 @@ function Hero() {
             transition={{ duration: 0.7, delay: 0.05 }}
             className="mt-6 font-display text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl"
           >
-            Index vault for<br />
+            Index vault for
+            <br />
             <span className="bg-gradient-to-r from-[var(--orbit-accent)] via-white to-[var(--orbit-warn)] bg-clip-text text-transparent">
               on-chain assets
             </span>
-            <br />on Stellar.
+            <br />
+            on Stellar.
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -158,8 +195,8 @@ function Hero() {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="mt-5 max-w-lg text-base text-[var(--orbit-mute)]"
           >
-            Orbit is a Soroban-powered index vault. Deposit XLM, receive shares, withdraw at share value.
-            Architected to grow into a multi-asset RWA index using SEP-40 oracles.
+            Orbit is a Soroban-powered index vault. Deposit XLM, receive shares, withdraw at share
+            value. Architected to grow into a multi-asset RWA index using SEP-40 oracles.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -170,7 +207,12 @@ function Hero() {
             <Link to="/app" className="liquid-btn">
               Enter App <span aria-hidden>→</span>
             </Link>
-            <a href="https://developers.stellar.org/docs/build/smart-contracts" target="_blank" rel="noreferrer" className="liquid-btn-ghost">
+            <a
+              href="https://developers.stellar.org/docs/build/smart-contracts"
+              target="_blank"
+              rel="noreferrer"
+              className="liquid-btn-ghost"
+            >
               View Docs
             </a>
           </motion.div>
@@ -205,9 +247,21 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function HowItWorks() {
   const steps = [
-    { n: "01", title: "Connect & fund", body: "Connect Freighter, Albedo, xBull, or Lobstr. New accounts can fund themselves with Friendbot in one click." },
-    { n: "02", title: "Deposit, receive shares", body: "Deposit XLM into the Orbit vault. The Soroban contract mints shares proportional to your deposit." },
-    { n: "03", title: "Withdraw at NAV", body: "Burn shares to withdraw your portion of the vault. As assets grow, share price grows with them." },
+    {
+      n: "01",
+      title: "Connect & fund",
+      body: "Connect Freighter, Albedo, xBull, or Lobstr. New accounts can fund themselves with Friendbot in one click.",
+    },
+    {
+      n: "02",
+      title: "Deposit, receive shares",
+      body: "Deposit XLM into the Orbit vault. The Soroban contract mints shares proportional to your deposit.",
+    },
+    {
+      n: "03",
+      title: "Withdraw at NAV",
+      body: "Burn shares to withdraw your portion of the vault. As assets grow, share price grows with them.",
+    },
   ];
   return (
     <section className="relative border-t border-[var(--orbit-edge)]">
@@ -297,8 +351,7 @@ function Roadmap() {
       <div className="mx-auto max-w-7xl px-6 py-24">
         <SectionLabel>Trajectory</SectionLabel>
         <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold tracking-tight md:text-5xl">
-          From vault to{" "}
-          <span className="text-[var(--orbit-warn)]">on-chain index</span>.
+          From vault to <span className="text-[var(--orbit-warn)]">on-chain index</span>.
         </h2>
 
         <div className="relative mt-16">
@@ -359,7 +412,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3">
       <span className="h-px w-10 bg-[var(--orbit-edge)]" />
-      <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-[var(--orbit-mute)]">{children}</span>
+      <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-[var(--orbit-mute)]">
+        {children}
+      </span>
     </div>
   );
 }

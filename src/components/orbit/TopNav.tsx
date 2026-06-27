@@ -13,9 +13,25 @@ export function TopNav({ inApp = false }: { inApp?: boolean }) {
           </span>
         </Link>
         <nav className="hidden items-center gap-7 text-sm text-[var(--orbit-mute)] md:flex">
-          <Link to="/" className="hover:text-[var(--orbit-ink)]">Home</Link>
-          <a href="https://developers.stellar.org/docs" target="_blank" rel="noreferrer" className="hover:text-[var(--orbit-ink)]">Docs</a>
-          <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-[var(--orbit-ink)]">GitHub</a>
+          <Link to="/" className="hover:text-[var(--orbit-ink)]">
+            Home
+          </Link>
+          <a
+            href="https://developers.stellar.org/docs"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-[var(--orbit-ink)]"
+          >
+            Docs
+          </a>
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-[var(--orbit-ink)]"
+          >
+            GitHub
+          </a>
         </nav>
         {!inApp ? (
           <Link to="/app" className="liquid-btn text-sm">
@@ -23,7 +39,9 @@ export function TopNav({ inApp = false }: { inApp?: boolean }) {
             <span aria-hidden>→</span>
           </Link>
         ) : (
-          <Link to="/" className="liquid-btn-ghost text-sm">← Home</Link>
+          <Link to="/" className="liquid-btn-ghost text-sm">
+            ← Home
+          </Link>
         )}
       </div>
     </header>

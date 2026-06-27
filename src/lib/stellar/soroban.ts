@@ -94,7 +94,9 @@ export async function invokeContract<T = unknown>(
 
   const send = await server.sendTransaction(signed);
   if (send.status === "ERROR") {
-    throw new Error(`sendTransaction failed: ${JSON.stringify(send.errorResult?.result() ?? send)}`);
+    throw new Error(
+      `sendTransaction failed: ${JSON.stringify(send.errorResult?.result() ?? send)}`,
+    );
   }
   const hash = send.hash;
 
@@ -143,10 +145,18 @@ export async function fetchContractEvents(startLedger: number): Promise<Contract
   });
   return res.events.map((e) => {
     const topics = e.topic.map((t) => {
-      try { return scValToNative(t) as unknown; } catch { return null; }
+      try {
+        return scValToNative(t) as unknown;
+      } catch {
+        return null;
+      }
     });
     let parsedVal: unknown = null;
-    try { parsedVal = scValToNative(e.value); } catch { /* noop */ }
+    try {
+      parsedVal = scValToNative(e.value);
+    } catch {
+      /* noop */
+    }
     const values = Array.isArray(parsedVal) ? (parsedVal as unknown[]) : [parsedVal];
     return {
       id: e.id,

@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { openWalletModal, disconnectWallet, ensureKit, classifyError, type WalletError } from "@/lib/stellar/wallet";
+import {
+  openWalletModal,
+  disconnectWallet,
+  ensureKit,
+  classifyError,
+  type WalletError,
+} from "@/lib/stellar/wallet";
 import { fetchXlmBalance } from "@/lib/stellar/balance";
 
 const LS_ADDR = "orbit:wallet:address";
@@ -46,7 +52,9 @@ export function useWallet() {
   }, [refreshBalance]);
 
   const disconnect = useCallback(async () => {
-    try { await disconnectWallet(); } catch {}
+    try {
+      await disconnectWallet();
+    } catch {}
     localStorage.removeItem(LS_ADDR);
     setAddress(null);
     setBalance(null);

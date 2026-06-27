@@ -10,7 +10,14 @@ export function OrbitLogo({ size = 28, className = "" }: { size?: number; classN
       aria-hidden
     >
       <defs>
-        <linearGradient id="orbit-ring" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="orbit-ring"
+          x1="0"
+          y1="0"
+          x2="32"
+          y2="32"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="var(--orbit-accent)" />
           <stop offset="100%" stopColor="var(--orbit-warn)" />
         </linearGradient>

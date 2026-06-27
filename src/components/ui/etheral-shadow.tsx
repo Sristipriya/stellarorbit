@@ -81,9 +81,21 @@ export function Component({
       <svg style={{ position: "absolute", width: 0, height: 0 }} aria-hidden>
         <defs>
           <filter id={`${id}-filter`} x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="3" result="turb" />
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.008 0.012"
+              numOctaves="2"
+              seed="3"
+              result="turb"
+            />
             {animationEnabled && (
-              <feColorMatrix ref={feColorMatrixRef} in="turb" type="hueRotate" values="0" result="rot" />
+              <feColorMatrix
+                ref={feColorMatrixRef}
+                in="turb"
+                type="hueRotate"
+                values="0"
+                result="rot"
+              />
             )}
             <feDisplacementMap
               in="SourceGraphic"
@@ -92,9 +104,9 @@ export function Component({
             />
           </filter>
           <radialGradient id={`${id}-grad`} cx="50%" cy="50%" r="65%">
-              <stop offset="0%" stopColor={color} stopOpacity="0.9" />
-              <stop offset="55%" stopColor={color} stopOpacity="0.35" />
-              <stop offset="100%" stopColor={color} stopOpacity="0" />
+            <stop offset="0%" stopColor={color} stopOpacity="0.9" />
+            <stop offset="55%" stopColor={color} stopOpacity="0.35" />
+            <stop offset="100%" stopColor={color} stopOpacity="0" />
           </radialGradient>
         </defs>
       </svg>
@@ -108,7 +120,11 @@ export function Component({
           opacity: 0.9,
         }}
       >
-        <svg width="100%" height="100%" preserveAspectRatio={sizing === "stretch" ? "none" : "xMidYMid slice"}>
+        <svg
+          width="100%"
+          height="100%"
+          preserveAspectRatio={sizing === "stretch" ? "none" : "xMidYMid slice"}
+        >
           <rect width="100%" height="100%" fill={`url(#${id}-grad)`} />
           <circle cx="30%" cy="40%" r="28%" fill={color} opacity="0.35" />
           <circle cx="72%" cy="65%" r="22%" fill={color} opacity="0.28" />

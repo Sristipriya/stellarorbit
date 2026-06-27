@@ -19,7 +19,9 @@ export function FundBanner({ address, onFunded }: { address: string; onFunded: (
     <div className="glass flex items-center justify-between gap-4 rounded-2xl p-4">
       <div>
         <div className="font-display text-sm">Your Testnet account is empty.</div>
-        <div className="font-mono text-xs text-[var(--orbit-mute)]">Fund it with Friendbot to start using Orbit.</div>
+        <div className="font-mono text-xs text-[var(--orbit-mute)]">
+          Fund it with Friendbot to start using Orbit.
+        </div>
       </div>
       <button onClick={go} disabled={loading} className="liquid-btn text-sm">
         {loading ? "Funding…" : "Fund with Friendbot"}

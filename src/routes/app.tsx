@@ -17,9 +17,16 @@ export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
       { title: "Orbit · Vault Dashboard" },
-      { name: "description", content: "Deposit, withdraw, and track your position in the Orbit index vault on Stellar Testnet." },
+      {
+        name: "description",
+        content:
+          "Deposit, withdraw, and track your position in the Orbit index vault on Stellar Testnet.",
+      },
       { property: "og:title", content: "Orbit · Vault Dashboard" },
-      { property: "og:description", content: "Soroban-powered index vault dashboard on Stellar Testnet." },
+      {
+        property: "og:description",
+        content: "Soroban-powered index vault dashboard on Stellar Testnet.",
+      },
     ],
   }),
   component: AppPage,
@@ -69,7 +76,10 @@ function AppPage() {
 
         {showFundBanner && wallet.address && (
           <div className="mt-6">
-            <FundBanner address={wallet.address} onFunded={() => wallet.refreshBalance(wallet.address!)} />
+            <FundBanner
+              address={wallet.address}
+              onFunded={() => wallet.refreshBalance(wallet.address!)}
+            />
           </div>
         )}
 
@@ -78,9 +88,12 @@ function AppPage() {
             <div className="glass max-w-md rounded-2xl p-8 text-center">
               <div className="font-display text-xl">Connect a Stellar wallet</div>
               <p className="mt-2 text-sm text-[var(--orbit-mute)]">
-                Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can fund themselves with Friendbot.
+                Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts
+                can fund themselves with Friendbot.
               </p>
-              <button onClick={wallet.connect} className="liquid-btn mt-5">Connect Wallet</button>
+              <button onClick={wallet.connect} className="liquid-btn mt-5">
+                Connect Wallet
+              </button>
             </div>
           </div>
         )}
@@ -103,11 +116,7 @@ function AppPage() {
                 walletBalance={wallet.balance?.xlm ?? null}
                 onDone={vault.refresh}
               />
-              <WithdrawCard
-                address={wallet.address}
-                state={vault.state}
-                onDone={vault.refresh}
-              />
+              <WithdrawCard address={wallet.address} state={vault.state} onDone={vault.refresh} />
             </div>
           </div>
         )}

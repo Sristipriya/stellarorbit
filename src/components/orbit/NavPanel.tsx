@@ -16,7 +16,11 @@ export function NavPanel({ state, loading }: { state: VaultState; loading: boole
       : (state.userSharesStroops * state.totalAssetsStroops) / state.totalSharesStroops;
 
   const stats: Array<{ label: string; value: string; accent?: boolean; mono?: boolean }> = [
-    { label: "NAV (Total Assets)", value: `${stroopsToXlm(state.totalAssetsStroops)} XLM`, accent: true },
+    {
+      label: "NAV (Total Assets)",
+      value: `${stroopsToXlm(state.totalAssetsStroops)} XLM`,
+      accent: true,
+    },
     { label: "Total Shares", value: stroopsToXlm(state.totalSharesStroops) },
     { label: "Price / Share", value: `${fmtPrice(state.pricePerShareScaled)} XLM`, mono: true },
     { label: "Your Value", value: `${stroopsToXlm(userValue)} XLM`, accent: true },
@@ -43,7 +47,10 @@ export function NavPanel({ state, loading }: { state: VaultState; loading: boole
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3">
+          <div
+            key={s.label}
+            className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3"
+          >
             <div className="text-[10px] uppercase tracking-widest text-[var(--orbit-mute)]">
               {s.label}
             </div>

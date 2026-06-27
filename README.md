@@ -54,6 +54,7 @@ src/lib/stellar/         network · wallet kit · friendbot · balance · vault 
 ## Setup
 
 ### Prerequisites
+
 - Node 20+, `bun` (or `pnpm`)
 - Rust + `wasm32-unknown-unknown` target
 - `stellar-cli` (`cargo install --locked stellar-cli`) and `jq`

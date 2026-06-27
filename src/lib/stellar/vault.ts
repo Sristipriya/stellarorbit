@@ -20,13 +20,7 @@ import {
   TransactionBuilder,
   BASE_FEE,
 } from "@stellar/stellar-sdk";
-import {
-  NETWORK,
-  HAS_REAL_CONTRACT,
-  xlmToStroops,
-  stroopsToXlm,
-  STROOPS_PER_XLM,
-} from "./network";
+import { NETWORK, HAS_REAL_CONTRACT, xlmToStroops, stroopsToXlm, STROOPS_PER_XLM } from "./network";
 import { signTx } from "./wallet";
 import { addrArg, i128Arg, invokeContract, readContract } from "./soroban";
 
@@ -56,7 +50,11 @@ function readDemoState(): DemoState {
   try {
     const raw = localStorage.getItem(LS_STATE);
     if (!raw) return { totalAssets: 0n, totalShares: 0n, balances: {} };
-    const j = JSON.parse(raw) as { totalAssets: string; totalShares: string; balances: Record<string, string> };
+    const j = JSON.parse(raw) as {
+      totalAssets: string;
+      totalShares: string;
+      balances: Record<string, string>;
+    };
     return {
       totalAssets: BigInt(j.totalAssets),
       totalShares: BigInt(j.totalShares),
@@ -95,10 +93,18 @@ function previewRedeem(shares: bigint, totalAssets: bigint, totalShares: bigint)
 }
 
 export function quoteSharesForDeposit(amountXlm: string, state: VaultState): bigint {
-  return previewDeposit(xlmToStroops(amountXlm || "0"), state.totalAssetsStroops, state.totalSharesStroops);
+  return previewDeposit(
+    xlmToStroops(amountXlm || "0"),
+    state.totalAssetsStroops,
+    state.totalSharesStroops,
+  );
 }
 export function quoteAssetsForShares(sharesXlm: string, state: VaultState): bigint {
-  return previewRedeem(xlmToStroops(sharesXlm || "0"), state.totalAssetsStroops, state.totalSharesStroops);
+  return previewRedeem(
+    xlmToStroops(sharesXlm || "0"),
+    state.totalAssetsStroops,
+    state.totalSharesStroops,
+  );
 }
 
 /* ───────────────────────────── Read state ─────────────────────────────── */
@@ -124,7 +130,7 @@ export async function getVaultState(address: string | null): Promise<VaultState>
   return {
     totalAssetsStroops: s.totalAssets,
     totalSharesStroops: s.totalShares,
-    userSharesStroops: address ? s.balances[address] ?? 0n : 0n,
+    userSharesStroops: address ? (s.balances[address] ?? 0n) : 0n,
     pricePerShareScaled: priceScaled(s.totalAssets, s.totalShares),
   };
 }
@@ -165,11 +171,10 @@ export async function deposit(
   if (amountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
 
   if (HAS_REAL_CONTRACT) {
-    const { txHash, retval } = await invokeContract<bigint>(
-      address,
-      "deposit",
-      [addrArg(address), i128Arg(amountStroops)],
-    );
+    const { txHash, retval } = await invokeContract<bigint>(address, "deposit", [
+      addrArg(address),
+      i128Arg(amountStroops),
+    ]);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     return { txHash, sharesMinted, amountStroops };
   }
@@ -195,11 +200,10 @@ export async function withdraw(
   if (sharesStroops <= 0n) throw new Error("Enter shares greater than zero.");
 
   if (HAS_REAL_CONTRACT) {
-    const { txHash, retval } = await invokeContract<bigint>(
-      address,
-      "withdraw",
-      [addrArg(address), i128Arg(sharesStroops)],
-    );
+    const { txHash, retval } = await invokeContract<bigint>(address, "withdraw", [
+      addrArg(address),
+      i128Arg(sharesStroops),
+    ]);
     const assetsOut = retval == null ? 0n : BigInt(retval);
     return { txHash, assetsOut, sharesBurned: sharesStroops };
   }
