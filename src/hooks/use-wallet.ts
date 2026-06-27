@@ -54,7 +54,9 @@ export function useWallet() {
   const disconnect = useCallback(async () => {
     try {
       await disconnectWallet();
-    } catch {}
+    } catch (e) {
+      console.error("Disconnect error:", e);
+    }
     localStorage.removeItem(LS_ADDR);
     setAddress(null);
     setBalance(null);
