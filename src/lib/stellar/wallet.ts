@@ -1,40 +1,54 @@
 /**
- * StellarWalletsKit singleton — multi-wallet support on Testnet.
- * Lazy-loaded so SSR doesn't try to touch window.
+ * StellarWalletsKit (v2.x static API) — multi-wallet support on Testnet.
+ * Lazy-initialised so SSR never touches window.
  */
-import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
+let inited = false;
+let initPromise: Promise<void> | null = null;
 
-let kitPromise: Promise<StellarWalletsKit> | null = null;
-
-export async function getKit(): Promise<StellarWalletsKit> {
-  if (typeof window === "undefined") {
-    throw new Error("Wallet kit is browser-only");
-  }
-  if (!kitPromise) {
-    kitPromise = (async () => {
-      const mod = await import("@creit.tech/stellar-wallets-kit");
-      const {
-        StellarWalletsKit: Kit,
-        WalletNetwork,
-        FREIGHTER_ID,
-        FreighterModule,
-        AlbedoModule,
-        xBullModule,
-        LobstrModule,
-      } = mod;
-      return new Kit({
-        network: WalletNetwork.TESTNET,
-        selectedWalletId: FREIGHTER_ID,
+export async function ensureKit(): Promise<void> {
+  if (typeof window === "undefined") throw new Error("Wallet kit is browser-only");
+  if (inited) return;
+  if (!initPromise) {
+    initPromise = (async () => {
+      const [{ StellarWalletsKit, Networks }, freighter, albedo, xbull, lobstr] = await Promise.all([
+        import("@creit.tech/stellar-wallets-kit"),
+        import("@creit.tech/stellar-wallets-kit/modules/freighter"),
+        import("@creit.tech/stellar-wallets-kit/modules/albedo"),
+        import("@creit.tech/stellar-wallets-kit/modules/xbull"),
+        import("@creit.tech/stellar-wallets-kit/modules/lobstr"),
+      ]);
+      StellarWalletsKit.init({
+        network: Networks.TESTNET,
+        selectedWalletId: freighter.FREIGHTER_ID,
         modules: [
-          new FreighterModule(),
-          new AlbedoModule(),
-          new xBullModule(),
-          new LobstrModule(),
+          new freighter.FreighterModule(),
+          new albedo.AlbedoModule(),
+          new xbull.xBullModule(),
+          new lobstr.LobstrModule(),
         ],
       });
+      inited = true;
     })();
   }
-  return kitPromise;
+  return initPromise;
+}
+
+export async function openWalletModal(): Promise<{ address: string }> {
+  await ensureKit();
+  const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
+  return StellarWalletsKit.authModal();
+}
+
+export async function signTx(xdr: string, networkPassphrase: string, address: string) {
+  await ensureKit();
+  const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
+  return StellarWalletsKit.signTransaction(xdr, { networkPassphrase, address });
+}
+
+export async function disconnectWallet() {
+  await ensureKit();
+  const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
+  await StellarWalletsKit.disconnect();
 }
 
 export type WalletError =
