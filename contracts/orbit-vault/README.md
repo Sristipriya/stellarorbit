@@ -22,28 +22,38 @@ cargo test                                          # run unit tests
 stellar contract build                              # produces target/wasm32-unknown-unknown/release/orbit_vault.wasm
 ```
 
-## Deploy to Testnet
+## Deploy to Testnet (one command)
+
+From the repo root:
 
 ```bash
-# 1. Identity
-stellar keys generate --network testnet orbit-deployer
-stellar keys fund orbit-deployer --network testnet
+scripts/deploy-vault.sh
+```
 
-# 2. Upload + deploy
-WASM_HASH=$(stellar contract install \
-  --network testnet \
-  --source orbit-deployer \
+This script builds the WASM, ensures the `orbit-deployer` identity is funded
+via Friendbot, uploads + deploys the contract with the native XLM SAC as the
+underlying asset, and writes `VITE_ORBIT_VAULT_CONTRACT_ID` into the repo
+`.env` so the frontend switches from DEMO to REAL mode on next start.
+
+### Manual deploy (what the script does)
+
+```bash
+stellar keys generate --network testnet orbit-deployer
+stellar keys fund     --network testnet orbit-deployer
+
+cd contracts/orbit-vault
+stellar contract build
+
+WASM_HASH=$(stellar contract upload \
+  --network testnet --source orbit-deployer \
   --wasm target/wasm32-unknown-unknown/release/orbit_vault.wasm)
 
-# Native XLM SAC on Testnet:
 XLM_SAC=$(stellar contract asset id --network testnet --asset native)
 
 CONTRACT_ID=$(stellar contract deploy \
-  --network testnet \
-  --source orbit-deployer \
+  --network testnet --source orbit-deployer \
   --wasm-hash $WASM_HASH \
-  -- \
-  --asset $XLM_SAC)
+  -- --asset $XLM_SAC)
 
 echo "Orbit Vault: $CONTRACT_ID"
 ```

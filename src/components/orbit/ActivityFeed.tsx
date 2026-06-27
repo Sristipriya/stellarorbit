@@ -1,13 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { NETWORK, shortAddr, stroopsToXlm } from "@/lib/stellar/network";
-import type { ActivityEvent } from "@/lib/stellar/vault";
+import type { ActivityEvent } from "@/lib/stellar/events";
 
 export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
   return (
     <div className="glass rounded-2xl p-5">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">Activity</h3>
-        <span className="font-mono text-[10px] text-[var(--orbit-mute)]">live · on-chain memo events</span>
+        <span className="font-mono text-[10px] text-[var(--orbit-mute)]">live · reconciled from on-chain</span>
       </div>
       {events.length === 0 ? (
         <p className="mt-4 font-mono text-xs text-[var(--orbit-mute)]">No activity yet. Be the first to deposit.</p>
@@ -38,9 +38,14 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
                       : `withdrew ${stroopsToXlm(e.sharesStroops)} shares → ${stroopsToXlm(e.amountStroops)} XLM`}
                   </span>
                 </div>
-                <a href={NETWORK.explorerTx(e.txHash)} target="_blank" rel="noreferrer" className="text-[var(--orbit-accent)] hover:underline">
-                  {e.txHash.slice(0, 6)}…
-                </a>
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-widest ${e.confirmed ? "border border-[var(--orbit-ok)]/40 text-[var(--orbit-ok)]" : "border border-[var(--orbit-warn)]/40 text-[var(--orbit-warn)]"}`}>
+                    {e.confirmed ? "confirmed" : "pending"}
+                  </span>
+                  <a href={NETWORK.explorerTx(e.txHash)} target="_blank" rel="noreferrer" className="text-[var(--orbit-accent)] hover:underline">
+                    {e.txHash.slice(0, 6)}…
+                  </a>
+                </div>
               </motion.li>
             ))}
           </AnimatePresence>
