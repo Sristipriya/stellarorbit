@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { OrbitMark } from "@/components/orbit/OrbitMark";
 import { TopNav } from "@/components/orbit/TopNav";
 import { EtherealShadow } from "@/components/ui/etheral-shadow";
+import AnimatedHero from "@/components/ui/animated-shader-hero";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,7 +39,20 @@ function Index() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/80" />
       </div>
       <TopNav />
-      <Hero />
+      <AnimatedHero
+        trustBadge={{ text: "Soroban · Testnet · Single-Asset Vault" }}
+        headline={{ line1: "Index vault for", line2: "on-chain assets" }}
+        subtitle="Orbit is a Soroban-powered index vault. Deposit XLM, receive shares, withdraw at share value. Architected to grow into a multi-asset RWA index using SEP-40 oracles."
+        buttons={{
+          primary: { text: "Enter App →", href: "/app" },
+          secondary: {
+            text: "View Docs",
+            href: "https://developers.stellar.org/docs/build/smart-contracts",
+          },
+        }}
+      >
+        <OrbitMark size={480} />
+      </AnimatedHero>
       <Stats />
       <HowItWorks />
       <BuiltForStellar />
@@ -160,81 +174,7 @@ function FAQ() {
   );
 }
 
-function Hero() {
-  return (
-    <section className="relative">
-      <div className="absolute inset-0 orbit-grid opacity-40" aria-hidden />
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-28">
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--orbit-edge)] bg-black/30 px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)]"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--orbit-accent)] shadow-[0_0_10px_var(--orbit-accent)]" />
-            Soroban · Testnet · Single-Asset Vault
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.05 }}
-            className="mt-6 font-display text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl"
-          >
-            Index vault for
-            <br />
-            <span className="bg-gradient-to-r from-[var(--orbit-accent)] via-white to-[var(--orbit-warn)] bg-clip-text text-transparent">
-              on-chain assets
-            </span>
-            <br />
-            on Stellar.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="mt-5 max-w-lg text-base text-[var(--orbit-mute)]"
-          >
-            Orbit is a Soroban-powered index vault. Deposit XLM, receive shares, withdraw at share
-            value. Architected to grow into a multi-asset RWA index using SEP-40 oracles.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            className="mt-8 flex flex-wrap items-center gap-3"
-          >
-            <Link to="/app" className="liquid-btn">
-              Enter App <span aria-hidden>→</span>
-            </Link>
-            <a
-              href="https://developers.stellar.org/docs/build/smart-contracts"
-              target="_blank"
-              rel="noreferrer"
-              className="liquid-btn-ghost"
-            >
-              View Docs
-            </a>
-          </motion.div>
-          <div className="mt-10 grid max-w-md grid-cols-3 gap-4 font-mono text-xs text-[var(--orbit-mute)]">
-            <Metric label="Network" value="Testnet" />
-            <Metric label="Runtime" value="Soroban" />
-            <Metric label="Wallets" value="4+" />
-          </div>
-        </div>
-        <div className="relative flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <OrbitMark size={520} />
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
+// The old Hero component was completely replaced by AnimatedHero in this file.
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
