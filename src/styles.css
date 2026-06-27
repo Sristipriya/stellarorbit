@@ -182,14 +182,14 @@
   html, body, #root { min-height: 100vh; }
 }
 
-@utility orbit-grid {
+.orbit-grid {
   background-image:
     linear-gradient(to right, oklch(0.97 0.01 240 / 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, oklch(0.97 0.01 240 / 0.04) 1px, transparent 1px);
   background-size: 56px 56px;
 }
 
-@utility glass {
+.glass {
   background: color-mix(in oklab, var(--orbit-panel) 80%, transparent);
   border: 1px solid var(--orbit-edge);
   backdrop-filter: blur(14px) saturate(140%);
@@ -198,7 +198,7 @@
     0 30px 60px -30px oklch(0 0 0 / 0.6);
 }
 
-@utility liquid-btn {
+.liquid-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -218,13 +218,13 @@
     inset 0 1px 0 oklch(1 0 0 / 0.18),
     inset 0 -10px 24px -10px color-mix(in oklab, var(--orbit-accent) 30%, transparent),
     0 10px 30px -10px color-mix(in oklab, var(--orbit-accent) 50%, transparent);
-  &:hover { transform: translateY(-1px); }
-  &:active { transform: translateY(0); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  cursor: pointer;
 }
+.liquid-btn:hover { transform: translateY(-1px); }
+.liquid-btn:active { transform: translateY(0); }
+.liquid-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-@utility liquid-btn-ghost {
-  position: relative;
+.liquid-btn-ghost {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -236,6 +236,9 @@
   font-weight: 500;
   backdrop-filter: blur(8px);
   transition: background 200ms ease, border-color 200ms ease;
-  &:hover { background: oklch(1 0 0 / 0.06); border-color: oklch(1 0 0 / 0.18); }
-  }
+  cursor: pointer;
+}
+.liquid-btn-ghost:hover {
+  background: oklch(1 0 0 / 0.06);
+  border-color: oklch(1 0 0 / 0.18);
 }
