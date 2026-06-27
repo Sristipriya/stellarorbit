@@ -115,6 +115,8 @@ underlying `stellar contract` commands.
 - **Live Demo Link:** [https://stellarorbit.vercel.app/](https://stellarorbit.vercel.app/)
 - **Deployed Contract Address:** `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ`
 - **Recent Transaction Hash:** `4cbeda5d4223cca5235c8f5dad269de26e6373b2369c3ce483ffc092aacb46a3`
+- **Network:** Stellar Testnet
+- **Soroban RPC URL:** `https://soroban-testnet.stellar.org`
 
 ## Disclaimer
 
