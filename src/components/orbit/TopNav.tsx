@@ -1,15 +1,12 @@
 import { Link } from "@tanstack/react-router";
+import { OrbitLogo } from "@/components/orbit/OrbitLogo";
 
 export function TopNav({ inApp = false }: { inApp?: boolean }) {
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link to="/" className="group flex items-center gap-2">
-          <div className="relative h-7 w-7">
-            <div className="absolute inset-0 rounded-full border border-[var(--orbit-edge)]" />
-            <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--orbit-accent)] shadow-[0_0_18px_var(--orbit-accent)]" />
-            <div className="absolute -right-0.5 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-[var(--orbit-warn)]" />
-          </div>
+        <Link to="/" className="group flex items-center gap-2.5">
+          <OrbitLogo size={28} className="transition-transform group-hover:rotate-12" />
           <span className="font-display text-xl font-semibold tracking-tight">orbit</span>
           <span className="ml-2 rounded-full border border-[var(--orbit-edge)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)]">
             testnet

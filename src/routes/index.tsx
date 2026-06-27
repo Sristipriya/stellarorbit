@@ -139,45 +139,50 @@ function HowItWorks() {
 }
 
 function BuiltForStellar() {
+  const specs = [
+    { k: "Runtime", v: "Soroban" },
+    { k: "Network", v: "Testnet" },
+    { k: "Wallets", v: "4" },
+    { k: "Oracle", v: "SEP-40" },
+  ];
   return (
     <section className="relative border-t border-[var(--orbit-edge)]">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-[1.1fr_1fr] md:items-center">
-        <div>
-          <SectionLabel>Built for Stellar</SectionLabel>
-          <h2 className="mt-4 font-display text-4xl font-semibold tracking-tight md:text-5xl">
-            One contract today.<br />
-            <span className="text-[var(--orbit-accent)]">A real RWA index</span> tomorrow.
-          </h2>
-          <p className="mt-4 max-w-xl text-[var(--orbit-mute)]">
-            Orbit ships a single-asset vault on Soroban Testnet today, with a contract shape and frontend
-            architecture deliberately chosen so multi-asset RWA tokens and SEP-40 oracle reads slot in
-            without rewrites.
-          </p>
-          <ul className="mt-6 space-y-2 font-mono text-sm text-[var(--orbit-mute)]">
-            <li>· Soroban Rust contract — deposit / withdraw / preview_share_price</li>
-            <li>· StellarWalletsKit · Freighter, Albedo, xBull, Lobstr</li>
-            <li>· Friendbot funding · live activity events · explorer links</li>
-            <li>· SEP-40 oracle hook points reserved for L3 NAV computation</li>
-          </ul>
+      <div className="mx-auto max-w-7xl px-6 py-24">
+        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <SectionLabel>Built for Stellar</SectionLabel>
+            <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold tracking-tight md:text-5xl">
+              One contract today.{" "}
+              <span className="text-[var(--orbit-accent)]">RWA index tomorrow.</span>
+            </h2>
+          </div>
+          <Link to="/app" className="liquid-btn-ghost text-sm">
+            Open vault <span aria-hidden>→</span>
+          </Link>
         </div>
-        <div className="glass rounded-3xl p-8">
-          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-[var(--orbit-mute)]">
-{`#[contractimpl]
-impl OrbitVault {
-  pub fn deposit(env: Env, from: Address, amount: i128) -> i128 {
-    from.require_auth();
-    let shares = preview_deposit(&env, amount);
-    mint(&env, &from, shares);
-    state::add_assets(&env, amount);
-    env.events().publish((symbol_short!("Dep"),), (from, amount, shares));
-    shares
-  }
 
-  pub fn withdraw(env: Env, from: Address, shares: i128) -> i128 { /* … */ }
-  pub fn balance_of(env: Env, who: Address) -> i128 { /* … */ }
-  pub fn preview_share_price(env: Env) -> i128 { /* … */ }
-}`}
-          </pre>
+        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-[var(--orbit-edge)] bg-[var(--orbit-edge)] md:grid-cols-4">
+          {specs.map((s) => (
+            <div key={s.k} className="bg-[var(--background)] p-6">
+              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">
+                {s.k}
+              </div>
+              <div className="mt-2 font-display text-3xl">{s.v}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-px grid gap-px overflow-hidden rounded-2xl border border-[var(--orbit-edge)] bg-[var(--orbit-edge)] md:grid-cols-3">
+          {[
+            { t: "Rust + Soroban", b: "deposit · withdraw · share price" },
+            { t: "StellarWalletsKit", b: "Freighter · Albedo · xBull · Lobstr" },
+            { t: "Live activity", b: "Horizon events · explorer links" },
+          ].map((f) => (
+            <div key={f.t} className="bg-[var(--background)] p-6">
+              <div className="font-display text-lg">{f.t}</div>
+              <div className="mt-1 font-mono text-xs text-[var(--orbit-mute)]">{f.b}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -186,33 +191,57 @@ impl OrbitVault {
 
 function Roadmap() {
   const items = [
-    { level: "L1 · L2", title: "Wallet + Vault on Testnet", body: "Multi-wallet connect, Friendbot funding, Soroban deposit/withdraw, live events.", state: "Now" },
-    { level: "L3", title: "Full Soroban Vault", body: "On-chain share math, contract-emitted events, indexed activity feed.", state: "Next" },
-    { level: "L4–5", title: "Multi-asset RWA index", body: "BENJI / treasuries, SEP-40 oracle NAV, rebalancing.", state: "Roadmap" },
-    { level: "L6", title: "Mainnet", body: "Audits, capacity caps, mainnet deployment.", state: "Future" },
+    { level: "L1·L2", title: "Wallet + Vault", state: "Now", done: true },
+    { level: "L3", title: "Full Soroban", state: "Next", done: true },
+    { level: "L4·L5", title: "RWA Index", state: "Soon", done: false },
+    { level: "L6", title: "Mainnet", state: "Future", done: false },
   ];
   return (
     <section className="relative border-t border-[var(--orbit-edge)]">
-      <div className="mx-auto max-w-7xl px-6 py-20">
-        <SectionLabel>Roadmap</SectionLabel>
-        <div className="mt-10 grid gap-3 md:grid-cols-4">
-          {items.map((it, i) => (
-            <motion.div
-              key={it.level}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
-              className="glass rounded-2xl p-5"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)]">{it.level}</span>
-                <span className="rounded-full border border-[var(--orbit-edge)] px-2 py-0.5 font-mono text-[10px] text-[var(--orbit-accent)]">{it.state}</span>
-              </div>
-              <div className="mt-3 font-display text-lg">{it.title}</div>
-              <p className="mt-1 text-sm text-[var(--orbit-mute)]">{it.body}</p>
-            </motion.div>
-          ))}
+      <div className="mx-auto max-w-7xl px-6 py-24">
+        <SectionLabel>Trajectory</SectionLabel>
+        <h2 className="mt-4 max-w-2xl font-display text-4xl font-semibold tracking-tight md:text-5xl">
+          From vault to{" "}
+          <span className="text-[var(--orbit-warn)]">on-chain index</span>.
+        </h2>
+
+        <div className="relative mt-16">
+          {/* horizontal track */}
+          <div className="absolute left-0 right-0 top-3 h-px bg-[var(--orbit-edge)]" />
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 0.5 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            style={{ transformOrigin: "left" }}
+            className="absolute left-0 right-0 top-3 h-px bg-gradient-to-r from-[var(--orbit-accent)] to-[var(--orbit-warn)]"
+          />
+
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            {items.map((it, i) => (
+              <motion.div
+                key={it.level}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="relative"
+              >
+                {/* node */}
+                <div
+                  className={`relative z-10 h-6 w-6 rounded-full border ${
+                    it.done
+                      ? "border-[var(--orbit-accent)] bg-[var(--orbit-accent)] shadow-[0_0_20px_var(--orbit-accent)]"
+                      : "border-[var(--orbit-edge)] bg-[var(--background)]"
+                  }`}
+                />
+                <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)]">
+                  {it.level} · {it.state}
+                </div>
+                <div className="mt-1 font-display text-xl">{it.title}</div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
