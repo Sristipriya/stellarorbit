@@ -321,6 +321,17 @@ void main(){gl_Position=position;}`;
   return canvasRef;
 };
 
+export const ShaderBackground = () => {
+  const canvasRef = useShaderBackground();
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full object-cover touch-none -z-10"
+      style={{ background: "black" }}
+    />
+  );
+};
+
 export const Hero: React.FC<HeroProps> = ({
   trustBadge,
   headline,
@@ -329,10 +340,8 @@ export const Hero: React.FC<HeroProps> = ({
   className = "",
   children,
 }) => {
-  const canvasRef = useShaderBackground();
-
   return (
-    <div className={`relative w-full overflow-hidden bg-black ${className}`}>
+    <div className={`relative w-full ${className}`}>
       <style>{`
         @keyframes fade-in-down {
           from {
@@ -381,12 +390,6 @@ export const Hero: React.FC<HeroProps> = ({
           animation-delay: 0.8s;
         }
       `}</style>
-
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full object-cover touch-none"
-        style={{ background: "black" }}
-      />
 
       {/* Hero Content Overlay */}
       <div className="relative z-10 flex flex-col items-center justify-center text-white py-20 md:py-32 min-h-screen">

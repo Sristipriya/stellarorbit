@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { OrbitMark } from "@/components/orbit/OrbitMark";
 import { TopNav } from "@/components/orbit/TopNav";
 import { EtherealShadow } from "@/components/ui/etheral-shadow";
-import AnimatedHero from "@/components/ui/animated-shader-hero";
+import { Hero as AnimatedHero, ShaderBackground } from "@/components/ui/animated-shader-hero";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,38 +27,30 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <EtherealShadow
-          color="rgba(120, 180, 255, 0.65)"
-          animation={{ scale: 70, speed: 55 }}
-          noise={{ opacity: 0.4, scale: 1.2 }}
-          sizing="fill"
+    <div className="relative min-h-screen">
+      <ShaderBackground />
+      <div className="relative z-10">
+        <TopNav />
+        <AnimatedHero
+          trustBadge={{ text: "Soroban · Testnet · Single-Asset Vault" }}
+          headline={{ line1: "Index vault for", line2: "on-chain assets" }}
+          subtitle="Orbit is a Soroban-powered index vault. Deposit XLM, receive shares, withdraw at share value. Architected to grow into a multi-asset RWA index using SEP-40 oracles."
+          buttons={{
+            primary: { text: "Enter App →", href: "/app" },
+            secondary: {
+              text: "View Docs",
+              href: "https://developers.stellar.org/docs/build/smart-contracts",
+            },
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/80" />
+        <Stats />
+        <HowItWorks />
+        <BuiltForStellar />
+        <Architecture />
+        <FAQ />
+        <Roadmap />
+        <Footer />
       </div>
-      <TopNav />
-      <AnimatedHero
-        trustBadge={{ text: "Soroban · Testnet · Single-Asset Vault" }}
-        headline={{ line1: "Index vault for", line2: "on-chain assets" }}
-        subtitle="Orbit is a Soroban-powered index vault. Deposit XLM, receive shares, withdraw at share value. Architected to grow into a multi-asset RWA index using SEP-40 oracles."
-        buttons={{
-          primary: { text: "Enter App →", href: "/app" },
-          secondary: {
-            text: "View Docs",
-            href: "https://developers.stellar.org/docs/build/smart-contracts",
-          },
-        }}
-      >
-        <OrbitMark size={480} />
-      </AnimatedHero>
-      <Stats />
-      <HowItWorks />
-      <BuiltForStellar />
-      <Architecture />
-      <FAQ />
-      <Roadmap />
-      <Footer />
     </div>
   );
 }
