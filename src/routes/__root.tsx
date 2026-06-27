@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -77,11 +78,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Orbit — Index Vault on Stellar Testnet" },
+      { name: "description", content: "Orbit is an on-chain index vault on Stellar Testnet, architected to grow into a multi-asset RWA index using Soroban + SEP-40 oracles." },
+      { name: "author", content: "Orbit" },
+      { property: "og:title", content: "Orbit — Index Vault on Stellar" },
+      { property: "og:description", content: "Deposit XLM, mint shares, withdraw based on share value. Built on Soroban Testnet." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -120,6 +121,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <Toaster theme="dark" position="top-right" toastOptions={{ style: { background: "rgba(20,22,30,0.9)", border: "1px solid rgba(255,255,255,0.08)", color: "#eaeaf0", backdropFilter: "blur(10px)" } }} />
     </QueryClientProvider>
   );
 }
