@@ -104,11 +104,31 @@ underlying `stellar contract` commands.
 
 ## Screenshots
 
-- `docs/screenshots/landing.png` — Landing page hero with orbit animation.
-- `docs/screenshots/wallet-options.png` — Wallet connection options available.
-- `docs/screenshots/connected.png` — Wallet connected + XLM balance.
-- `docs/screenshots/deposit-success.png` — Deposit success card with tx hash.
-- `docs/screenshots/dashboard.png` — Vault dashboard with your position.
+Here are a few inline screenshots to give a quick feel for the app UI.
+
+### Landing
+
+![Landing](docs/screenshots/Landing.png)
+
+Shows the landing page hero with the orbit animation and primary CTA.
+
+### Deposit / Success
+
+![Deposit Success](docs/screenshots/Deposit.png)
+
+Deposit flow and success card — this includes the transaction hash shown on success.
+
+### Dashboard
+
+![Dashboard](docs/screenshots/Dashboard.png)
+
+The vault dashboard showing balances, share position, and recent activity.
+
+### Transaction Hash
+
+![Transaction Hash](docs/screenshots/Transaction%20Hash.png)
+
+A crop of the transaction hash / details as shown after a deposit.
 
 ## 🚀 Deployed Contract Information
 
