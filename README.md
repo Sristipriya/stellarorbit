@@ -130,7 +130,7 @@ The vault dashboard showing balances, share position, and recent activity.
 
 A crop of the transaction hash / details as shown after a deposit.
 
-## 🚀 Deployed Contract Information
+##  Deployed Contract Information
 
 - **Live Demo Link:** [https://stellarorbit.vercel.app/](https://stellarorbit.vercel.app/)
 - **Deployed Contract Address:** `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ`
