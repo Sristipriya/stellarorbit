@@ -16,18 +16,18 @@ vault contract, receive shares, and withdraw at share value.
  │  Albedo, xBull,│                    │  /  + /app routes    │
  │  Lobstr)       │                    └──────────┬───────────┘
  └────────────────┘                               │ Horizon / Soroban RPC
-                                                  ▼
-                                       ┌──────────────────────┐
-                                       │  Soroban contract    │
-                                       │  contracts/orbit-vault│
-                                       │  deposit / withdraw   │
-                                       │  balance_of / price   │
-                                       └──────────┬───────────┘
-                                                  ▼
-                                       ┌──────────────────────┐
-                                       │  L4+ : SEP-40 oracles│
-                                       │  multi-asset RWA NAV │
-                                       └──────────────────────┘
+                                                   ▼
+                                        ┌──────────────────────┐
+                                        │  Soroban contract    │
+                                        │  contracts/orbit-vault│
+                                        │  deposit / withdraw   │
+                                        │  balance_of / price   │
+                                        └──────────┬───────────┘
+                                                   ▼
+                                        ┌──────────────────────┐
+                                        │  L4+ : SEP-40 oracles│
+                                        │  multi-asset RWA NAV │
+                                        └──────────────────────┘
 ```
 
 ## Repository layout
@@ -129,6 +129,12 @@ The vault dashboard showing balances, share position, and recent activity.
 ![Transaction Hash](docs/screenshots/Transaction%20Hash.png)
 
 A crop of the transaction hash / details as shown after a deposit.
+
+### CI/CD pipeline
+
+![CI/CD pipeline](docs/screenshots/CI%20CD%20pipeline.png)
+
+Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for building, testing, and deploying the contract and frontend.
 
 ##  Deployed Contract Information
 
