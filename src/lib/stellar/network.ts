@@ -14,7 +14,7 @@ export const NETWORK = {
 
 /** Set this once you've deployed contracts/orbit-vault to Testnet. */
 export const ORBIT_VAULT_CONTRACT_ID: string | undefined =
-  (import.meta.env.VITE_ORBIT_VAULT_CONTRACT_ID as string | undefined) || undefined;
+  "CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN";
 
 export const HAS_REAL_CONTRACT = Boolean(ORBIT_VAULT_CONTRACT_ID);
 
