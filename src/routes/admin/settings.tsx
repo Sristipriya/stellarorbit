@@ -6,7 +6,10 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { VaultHealthCard } from "@/components/admin/VaultHealthCard";
 import { useVault } from "@/hooks/use-vault";
 import { checkRpcHealth, type HealthResult } from "@/lib/stellar/health";
-import { RefreshCcw, Info } from "lucide-react";
+import { RefreshCcw, Info, Zap } from "lucide-react";
+import { harvest } from "@/lib/stellar/vault";
+import { useWallet } from "@/hooks/use-wallet";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/settings")({
   head: () => ({
@@ -20,6 +23,9 @@ function AdminSettings() {
   const vault = useVault(null);
   const [health, setHealth] = useState<HealthResult | null>(null);
   const [checking, setChecking] = useState(false);
+  const [yieldAmount, setYieldAmount] = useState("50");
+  const [harvesting, setHarvesting] = useState(false);
+  const { address } = useWallet();
 
   useEffect(() => {
     setAuthed(isAdminAuthenticated());
@@ -37,6 +43,26 @@ function AdminSettings() {
   }, []);
 
   if (!authed) return <AdminLoginPage onSuccess={() => setAuthed(true)} />;
+
+  async function handleHarvest() {
+    if (!address) {
+      toast.error("Wallet disconnected", { description: "Please connect the Admin wallet first." });
+      return;
+    }
+    setHarvesting(true);
+    try {
+      const { txHash } = await harvest(address, yieldAmount);
+      toast.success("Yield Injected!", {
+        description: `Successfully added ${yieldAmount} XLM profit to the vault.`,
+      });
+      console.log("Harvest TX:", txHash);
+      vault.refresh();
+    } catch (err: any) {
+      toast.error("Harvest Failed", { description: err.message || String(err) });
+    } finally {
+      setHarvesting(false);
+    }
+  }
 
   return (
     <AdminLayout>
@@ -104,6 +130,49 @@ function AdminSettings() {
         </div>
 
         <VaultHealthCard state={vault.state} />
+
+        {/* Live Presentation Tools */}
+        <div className="glass rounded-2xl p-5 border border-[var(--orbit-accent)]/20 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-3 opacity-10">
+            <Zap className="w-24 h-24 text-[var(--orbit-accent)]" />
+          </div>
+          <div className="relative">
+            <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-accent)] mb-2 flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Live Presentation Tools
+            </h3>
+            <p className="font-mono text-xs text-[var(--orbit-mute)] mb-4 max-w-sm">
+              Instantly inject simulated profit (XLM) into the vault to demonstrate yield generation and share price growth live.
+            </p>
+            <div className="flex gap-3 items-center">
+              <div className="relative">
+                <input
+                  type="number"
+                  value={yieldAmount}
+                  onChange={(e) => setYieldAmount(e.target.value)}
+                  className="w-32 bg-black/40 border border-[var(--orbit-edge)] rounded-xl py-2 px-3 text-sm font-mono focus:outline-none focus:border-[var(--orbit-accent)]"
+                  placeholder="Amount"
+                  min="1"
+                />
+                <span className="absolute right-3 top-2.5 text-xs font-mono text-[var(--orbit-mute)]">
+                  XLM
+                </span>
+              </div>
+              <button
+                onClick={handleHarvest}
+                disabled={harvesting || !address || !yieldAmount}
+                className="btn-primary py-2 px-4 rounded-xl font-display font-semibold text-sm disabled:opacity-50"
+              >
+                {harvesting ? "Injecting..." : "Inject Yield"}
+              </button>
+            </div>
+            {!address && (
+              <p className="text-[10px] text-[var(--orbit-warn)] mt-2 font-mono">
+                * Please connect your Admin wallet in the sidebar to sign this transaction.
+              </p>
+            )}
+          </div>
+        </div>
 
         {/* Info note */}
         <div className="flex items-start gap-3 rounded-2xl border border-[var(--orbit-edge)] bg-white/[0.02] p-5">

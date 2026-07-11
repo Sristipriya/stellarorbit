@@ -220,3 +220,29 @@ export async function withdraw(
   writeDemoState(s);
   return { txHash, assetsOut, sharesBurned: sharesStroops };
 }
+
+/* ───────────────────────────── Yield (Admin) ───────────────────────────── */
+
+export async function harvest(
+  adminAddress: string,
+  yieldAmountXlm: string,
+): Promise<{ txHash: string; yieldAmountStroops: bigint }> {
+  const yieldAmountStroops = xlmToStroops(yieldAmountXlm);
+  if (yieldAmountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
+
+  if (HAS_REAL_CONTRACT) {
+    const { txHash } = await invokeContract<bigint>(adminAddress, "harvest", [
+      addrArg(adminAddress),
+      i128Arg(yieldAmountStroops),
+    ]);
+    return { txHash, yieldAmountStroops };
+  }
+
+  // Demo mode
+  const memo = `orbit:hrv:${stroopsToXlm(yieldAmountStroops, 4)}`;
+  const txHash = await submitMarkerTx(adminAddress, memo);
+  const s = readDemoState();
+  s.totalAssets += yieldAmountStroops;
+  writeDemoState(s);
+  return { txHash, yieldAmountStroops };
+}
