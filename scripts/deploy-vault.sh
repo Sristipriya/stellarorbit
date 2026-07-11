@@ -41,12 +41,14 @@ WASM_HASH="$(stellar contract upload --network "$NETWORK" --source "$IDENTITY" -
 echo "   wasm_hash = $WASM_HASH"
 
 echo "→ Deploying contract instance"
+ADMIN_ADDRESS="$(stellar keys address "$IDENTITY")"
 CONTRACT_ID="$(stellar contract deploy \
   --network "$NETWORK" \
   --source "$IDENTITY" \
   --wasm-hash "$WASM_HASH" \
   -- \
-  --asset "$XLM_SAC")"
+  --asset "$XLM_SAC" \
+  --admin "$ADMIN_ADDRESS")"
 
 echo
 echo "✓ Orbit Vault deployed"
