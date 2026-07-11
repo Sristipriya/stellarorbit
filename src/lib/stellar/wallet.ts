@@ -58,6 +58,13 @@ export async function restoreWalletConnection(walletId: string) {
 export async function signTx(xdr: string, networkPassphrase: string, address: string) {
   await ensureKit();
   const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
+  // Ensure the wallet connection is active and authorized.
+  // Calling this here (during a user gesture like clicking 'Deposit') prevents popup blocking.
+  try {
+    await StellarWalletsKit.getAddress();
+  } catch (e) {
+    console.warn("Wallet warmup before signTx failed:", e);
+  }
   return StellarWalletsKit.signTransaction(xdr, { networkPassphrase, address });
 }
 
