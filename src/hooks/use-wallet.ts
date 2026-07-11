@@ -4,6 +4,7 @@ import {
   disconnectWallet,
   ensureKit,
   restoreWalletConnection,
+  verifyWalletConnection,
   classifyError,
   type WalletError,
 } from "@/lib/stellar/wallet";
@@ -23,12 +24,26 @@ export function useWallet() {
     if (typeof window === "undefined") return;
     const savedAddr = localStorage.getItem(LS_ADDR);
     const savedWallet = localStorage.getItem(LS_WALLET);
-    if (savedAddr) setAddress(savedAddr);
-    if (savedWallet) {
-      restoreWalletConnection(savedWallet).catch(() => void 0);
-    } else {
-      ensureKit().catch(() => void 0);
-    }
+    if (!savedAddr || !savedWallet) return;
+
+    // Try to restore the wallet connection and verify it's truly alive.
+    // If the wallet (e.g. Freighter) has dropped its session, clear state
+    // so the UI shows "disconnected" instead of a broken connected state.
+    restoreWalletConnection(savedWallet)
+      .then(() => verifyWalletConnection())
+      .then((alive) => {
+        if (alive) {
+          setAddress(savedAddr);
+        } else {
+          // Session is dead — clear everything so the user must reconnect
+          localStorage.removeItem(LS_ADDR);
+          localStorage.removeItem(LS_WALLET);
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem(LS_ADDR);
+        localStorage.removeItem(LS_WALLET);
+      });
   }, []);
 
   const refreshBalance = useCallback(async (addr: string) => {

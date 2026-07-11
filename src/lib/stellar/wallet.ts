@@ -47,24 +47,27 @@ export async function restoreWalletConnection(walletId: string) {
   await ensureKit();
   const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
   StellarWalletsKit.setWallet(walletId);
+}
+
+/**
+ * Returns true if the currently selected wallet module is alive and has
+ * granted access to this dApp. Returns false if the session has expired
+ * (e.g. Freighter returns "Freighter is not connected" after a page refresh).
+ */
+export async function verifyWalletConnection(): Promise<boolean> {
   try {
-    // Warm up the connection to ensure the wallet extension grants access for signing
-    await StellarWalletsKit.getAddress();
-  } catch (e) {
-    console.warn("Failed to warm up wallet connection:", e);
+    await ensureKit();
+    const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
+    await StellarWalletsKit.getAddress({ skipRequestAccess: true });
+    return true;
+  } catch {
+    return false;
   }
 }
 
 export async function signTx(xdr: string, networkPassphrase: string, address: string) {
   await ensureKit();
   const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
-  // Ensure the wallet connection is active and authorized.
-  // Calling this here (during a user gesture like clicking 'Deposit') prevents popup blocking.
-  try {
-    await StellarWalletsKit.getAddress();
-  } catch (e) {
-    console.warn("Wallet warmup before signTx failed:", e);
-  }
   return StellarWalletsKit.signTransaction(xdr, { networkPassphrase, address });
 }
 
