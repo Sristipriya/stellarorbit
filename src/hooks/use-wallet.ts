@@ -3,12 +3,14 @@ import {
   openWalletModal,
   disconnectWallet,
   ensureKit,
+  restoreWalletConnection,
   classifyError,
   type WalletError,
 } from "@/lib/stellar/wallet";
 import { fetchXlmBalance } from "@/lib/stellar/balance";
 
 const LS_ADDR = "orbit:wallet:address";
+const LS_WALLET = "orbit:wallet:id";
 
 export function useWallet() {
   const [address, setAddress] = useState<string | null>(null);
@@ -16,12 +18,17 @@ export function useWallet() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<WalletError | null>(null);
 
-  // Hydrate persisted address (no signing yet — just remember the connection)
+  // Hydrate persisted address and wallet connection state
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const saved = localStorage.getItem(LS_ADDR);
-    if (saved) setAddress(saved);
-    ensureKit().catch(() => void 0);
+    const savedAddr = localStorage.getItem(LS_ADDR);
+    const savedWallet = localStorage.getItem(LS_WALLET);
+    if (savedAddr) setAddress(savedAddr);
+    if (savedWallet) {
+      restoreWalletConnection(savedWallet).catch(() => void 0);
+    } else {
+      ensureKit().catch(() => void 0);
+    }
   }, []);
 
   const refreshBalance = useCallback(async (addr: string) => {
@@ -40,9 +47,10 @@ export function useWallet() {
     setError(null);
     setLoading(true);
     try {
-      const { address: addr } = await openWalletModal();
+      const { address: addr, walletId } = await openWalletModal();
       setAddress(addr);
       localStorage.setItem(LS_ADDR, addr);
+      if (walletId) localStorage.setItem(LS_WALLET, walletId);
       await refreshBalance(addr);
     } catch (e) {
       setError(classifyError(e));
@@ -58,6 +66,7 @@ export function useWallet() {
       console.error("Disconnect error:", e);
     }
     localStorage.removeItem(LS_ADDR);
+    localStorage.removeItem(LS_WALLET);
     setAddress(null);
     setBalance(null);
   }, []);

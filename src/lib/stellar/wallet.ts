@@ -35,10 +35,18 @@ export async function ensureKit(): Promise<void> {
   return initPromise;
 }
 
-export async function openWalletModal(): Promise<{ address: string }> {
+export async function openWalletModal(): Promise<{ address: string; walletId?: string }> {
   await ensureKit();
   const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
-  return StellarWalletsKit.authModal();
+  const res = await StellarWalletsKit.authModal();
+  const walletId = StellarWalletsKit.selectedModule?.productId;
+  return { address: res.address, walletId };
+}
+
+export async function restoreWalletConnection(walletId: string) {
+  await ensureKit();
+  const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
+  StellarWalletsKit.setWallet(walletId);
 }
 
 export async function signTx(xdr: string, networkPassphrase: string, address: string) {
