@@ -60,7 +60,13 @@ export function DepositCard({
     } catch (e) {
       const w = classifyError(e);
       setTx({ kind: "error", title: "Deposit failed", message: w.message });
-      setRaw(e instanceof Error ? (e.stack ?? e.message) : String(e));
+      setRaw(
+        e instanceof Error
+          ? (e.stack ?? e.message)
+          : typeof e === "object" && e !== null
+            ? JSON.stringify(e, Object.getOwnPropertyNames(e))
+            : String(e),
+      );
       toast.error("Deposit failed", { description: w.message });
       onNotify?.({ kind: "error", title: "Deposit Failed", message: w.message });
     }

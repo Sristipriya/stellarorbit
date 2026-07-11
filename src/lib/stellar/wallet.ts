@@ -47,6 +47,12 @@ export async function restoreWalletConnection(walletId: string) {
   await ensureKit();
   const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
   StellarWalletsKit.setWallet(walletId);
+  try {
+    // Warm up the connection to ensure the wallet extension grants access for signing
+    await StellarWalletsKit.getAddress();
+  } catch (e) {
+    console.warn("Failed to warm up wallet connection:", e);
+  }
 }
 
 export async function signTx(xdr: string, networkPassphrase: string, address: string) {
@@ -69,7 +75,19 @@ export type WalletError =
   | { kind: "unknown"; message: string };
 
 export function classifyError(err: unknown): WalletError {
-  const msg = err instanceof Error ? err.message : String(err);
+  let msg = "";
+  if (err instanceof Error) {
+    msg = err.message;
+  } else if (typeof err === "object" && err !== null) {
+    try {
+      msg = JSON.stringify(err, Object.getOwnPropertyNames(err));
+    } catch {
+      msg = String(err);
+    }
+  } else {
+    msg = String(err);
+  }
+
   const lower = msg.toLowerCase();
   if (
     lower.includes("not installed") ||

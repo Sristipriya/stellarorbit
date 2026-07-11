@@ -66,7 +66,13 @@ export function WithdrawCard({
     } catch (e) {
       const w = classifyError(e);
       setTx({ kind: "error", title: "Withdraw failed", message: w.message });
-      setRaw(e instanceof Error ? (e.stack ?? e.message) : String(e));
+      setRaw(
+        e instanceof Error
+          ? (e.stack ?? e.message)
+          : typeof e === "object" && e !== null
+            ? JSON.stringify(e, Object.getOwnPropertyNames(e))
+            : String(e),
+      );
       toast.error("Withdraw failed", { description: w.message });
       onNotify?.({ kind: "error", title: "Withdrawal Failed", message: w.message });
     }
