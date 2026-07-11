@@ -818,7 +818,7 @@ export function AppDashboard() {
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <div className="flex items-center justify-between border-b border-[var(--orbit-edge)] bg-black/40 px-4 py-3 backdrop-blur-xl">
+        <div className="relative z-50 flex items-center justify-between border-b border-[var(--orbit-edge)] bg-black/40 px-4 py-3 backdrop-blur-xl">
           {/* Mobile hamburger */}
           <button
             className="md:hidden mr-3 flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--orbit-edge)] text-[var(--orbit-mute)] hover:text-[var(--orbit-ink)]"
