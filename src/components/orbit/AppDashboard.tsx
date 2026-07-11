@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -21,6 +21,9 @@ import {
   QrCode,
   RefreshCcw,
   Info,
+  Trophy,
+  Calculator,
+  Menu,
 } from "lucide-react";
 import { DepositCard } from "./DepositCard";
 import { WithdrawCard } from "./WithdrawCard";
@@ -32,9 +35,16 @@ import { useVault } from "@/hooks/use-vault";
 import { type ActivityEvent } from "@/lib/stellar/events";
 import { NETWORK, shortAddr, stroopsToXlm, HAS_REAL_CONTRACT } from "@/lib/stellar/network";
 import { type VaultState } from "@/lib/stellar/vault";
-
-// ──────────────────── Types ────────────────────
-type Tab = "portfolio" | "deposit" | "withdraw" | "history" | "faucet" | "settings";
+import { ShareCertificate } from "./ShareCertificate";
+import { OraclePricePanel } from "./OraclePricePanel";
+import { SimulatorTab } from "./SimulatorTab";
+import { LeaderboardTab } from "./LeaderboardTab";
+import { NetworkStatusBar } from "./NetworkStatusBar";
+import { NotificationCenter } from "./NotificationCenter";
+import { MobileBottomNav, type Tab } from "./MobileBottomNav";
+import { SkeletonStatCards, SkeletonChart, SkeletonRows } from "./SkeletonCards";
+import { fetchXlmUsdPrice } from "@/lib/oracle-price";
+import { useNotifications } from "@/lib/notifications";
 
 // ──────────────────── Helpers ──────────────────
 function pricePerShare(state: VaultState): string {
@@ -65,18 +75,12 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
     return `${x},${y}`;
   });
   const polyline = pts.join(" ");
-  // Area path: go down to bottom-right, across bottom, up to start
   const first = pts[0];
   const last = pts[pts.length - 1];
   const area = `M${first} L${polyline} L${last.split(",")[0]},${h - pad} L${pad},${h - pad} Z`;
 
   return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      className="w-full"
-      preserveAspectRatio="none"
-      style={{ height: 140 }}
-    >
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" preserveAspectRatio="none" style={{ height: 140 }}>
       <defs>
         <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -84,22 +88,8 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
         </linearGradient>
       </defs>
       <path d={area} fill="url(#sg)" />
-      <polyline
-        points={polyline}
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* dots at start and end */}
-      <circle
-        cx={pts[0].split(",")[0]}
-        cy={pts[0].split(",")[1]}
-        r="4"
-        fill={color}
-        opacity="0.7"
-      />
+      <polyline points={polyline} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={pts[0].split(",")[0]} cy={pts[0].split(",")[1]} r="4" fill={color} opacity="0.7" />
       <circle
         cx={pts[pts.length - 1].split(",")[0]}
         cy={pts[pts.length - 1].split(",")[1]}
@@ -112,12 +102,14 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
 }
 
 const NAV_ITEMS: { id: Tab; label: string; icon: React.FC<{ className?: string }> }[] = [
-  { id: "portfolio", label: "Portfolio", icon: LayoutDashboard },
-  { id: "deposit", label: "Deposit", icon: ArrowDownToLine },
-  { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
-  { id: "history", label: "History", icon: History },
-  { id: "faucet", label: "Faucet", icon: Zap },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "portfolio",   label: "Portfolio",   icon: LayoutDashboard },
+  { id: "deposit",     label: "Deposit",     icon: ArrowDownToLine },
+  { id: "withdraw",    label: "Withdraw",    icon: ArrowUpFromLine },
+  { id: "history",     label: "History",     icon: History },
+  { id: "leaderboard", label: "Leaderboard", icon: Trophy },
+  { id: "simulate",    label: "Simulate",    icon: Calculator },
+  { id: "faucet",      label: "Faucet",      icon: Zap },
+  { id: "settings",    label: "Settings",    icon: Settings },
 ];
 
 function Sidebar({
@@ -170,7 +162,7 @@ function Sidebar({
       )}
 
       {/* Nav */}
-      <nav className="flex-1 space-y-1 px-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;
@@ -192,6 +184,17 @@ function Sidebar({
         })}
       </nav>
 
+      {/* Admin link */}
+      <div className="px-3 pb-2">
+        <a
+          href="/admin/"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs text-[var(--orbit-mute)] transition-all hover:bg-white/[0.04] hover:text-[var(--orbit-ink)]"
+        >
+          <Shield className="h-3.5 w-3.5" />
+          Admin Panel
+        </a>
+      </div>
+
       {/* Disconnect */}
       {address && (
         <div className="px-3 pb-5">
@@ -212,21 +215,22 @@ function Sidebar({
 function PortfolioTab({
   wallet,
   vault,
+  xlmUsdPrice,
 }: {
   wallet: ReturnType<typeof useWallet>;
   vault: { state: VaultState; loading: boolean; events: ActivityEvent[]; refresh: () => void };
+  xlmUsdPrice: number | null;
 }) {
   const price = parseFloat(pricePerShare(vault.state));
-  const userShares = vault.state.userSharesStroops;
   const totalAssetsStr = stroopsToXlm(vault.state.totalAssetsStroops);
   const totalSharesStr = stroopsToXlm(vault.state.totalSharesStroops);
-  const userSharesStr = stroopsToXlm(userShares);
+  const userSharesStr = stroopsToXlm(vault.state.userSharesStroops);
   const underlying =
     vault.state.totalSharesStroops === 0n
       ? 0n
-      : (userShares * vault.state.totalAssetsStroops) / vault.state.totalSharesStroops;
+      : (vault.state.userSharesStroops * vault.state.totalAssetsStroops) /
+        vault.state.totalSharesStroops;
 
-  // Fake but plausible mock chart that reflects real price direction
   const chartData = Array.from({ length: 12 }, (_, i) => ({
     t: `${i + 1}h`,
     price: +(price * (1 - 0.02 + (i / 12) * 0.03 + Math.sin(i) * 0.005)).toFixed(5),
@@ -260,6 +264,16 @@ function PortfolioTab({
     },
   ];
 
+  if (vault.loading && vault.state.totalAssetsStroops === 0n) {
+    return (
+      <div className="space-y-6">
+        <SkeletonStatCards />
+        <SkeletonChart />
+        <SkeletonRows />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Stat grid */}
@@ -274,16 +288,12 @@ function PortfolioTab({
               className="glass rounded-2xl p-4"
             >
               <div className="flex items-start justify-between">
-                <div
-                  className={`text-[10px] font-mono uppercase tracking-widest ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-mute)]"}`}
-                >
+                <div className={`text-[10px] font-mono uppercase tracking-widest ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-mute)]"}`}>
                   {c.label}
                 </div>
                 <Icon className="h-4 w-4 shrink-0 text-[var(--orbit-mute)]/60" />
               </div>
-              <div
-                className={`mt-2 font-display text-2xl font-semibold ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}
-              >
+              <div className={`mt-2 font-display text-2xl font-semibold ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}>
                 {c.value}
               </div>
               <div className="mt-1 font-mono text-[10px] text-[var(--orbit-mute)]">{c.note}</div>
@@ -291,6 +301,18 @@ function PortfolioTab({
           );
         })}
       </div>
+
+      {/* Oracle price panel */}
+      <OraclePricePanel state={vault.state} />
+
+      {/* Share certificate */}
+      {wallet.address && vault.state.userSharesStroops > 0n && (
+        <ShareCertificate
+          address={wallet.address}
+          state={vault.state}
+          xlmUsdPrice={xlmUsdPrice}
+        />
+      )}
 
       {/* Chart */}
       <motion.div
@@ -317,7 +339,9 @@ function PortfolioTab({
 }
 
 // ──────────────────── History Tab ────────────────────
-function HistoryTab({ events }: { events: ActivityEvent[] }) {
+function HistoryTab({ events, loading }: { events: ActivityEvent[]; loading: boolean }) {
+  if (loading && events.length === 0) return <SkeletonRows count={5} />;
+
   if (events.length === 0) {
     return (
       <div className="glass rounded-2xl p-10 text-center">
@@ -391,6 +415,7 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
   const [txHash, setTxHash] = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState("");
+  const { add } = useNotifications();
 
   async function fund() {
     if (!address) return;
@@ -402,9 +427,12 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
       setTxHash(json.hash ?? null);
       setStatus("ok");
       onFunded();
+      add({ kind: "success", title: "Funded!", message: "10,000 XLM added to your account.", txHash: json.hash ?? undefined });
     } catch (e) {
-      setErrMsg(e instanceof Error ? e.message : String(e));
+      const msg = e instanceof Error ? e.message : String(e);
+      setErrMsg(msg);
       setStatus("err");
+      add({ kind: "error", title: "Friendbot failed", message: msg });
     }
   }
 
@@ -417,9 +445,7 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
           </div>
           <div>
             <h3 className="font-display text-base font-semibold">Stellar Friendbot</h3>
-            <p className="font-mono text-[11px] text-[var(--orbit-mute)]">
-              Fund your Testnet account with 10,000 XLM
-            </p>
+            <p className="font-mono text-[11px] text-[var(--orbit-mute)]">Fund your Testnet account with 10,000 XLM</p>
           </div>
         </div>
 
@@ -438,35 +464,22 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
           onClick={fund}
           disabled={!address || status === "loading"}
           className="liquid-btn w-full justify-center"
-          style={{
-            background:
-              "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)",
-          }}
+          style={{ background: "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)" }}
         >
           {status === "loading" ? (
-            <>
-              <RefreshCcw className="h-4 w-4 animate-spin" /> Requesting XLM…
-            </>
+            <><RefreshCcw className="h-4 w-4 animate-spin" /> Requesting XLM…</>
           ) : (
-            <>
-              <Zap className="h-4 w-4" /> Fund with Friendbot
-            </>
+            <><Zap className="h-4 w-4" /> Fund with Friendbot</>
           )}
         </button>
 
         {status === "ok" && (
           <div className="mt-4 rounded-xl border border-[var(--orbit-ok)]/30 bg-[var(--orbit-ok)]/10 p-3">
             <div className="flex items-center gap-2 font-mono text-xs text-[var(--orbit-ok)]">
-              <CheckCircle2 className="h-4 w-4 shrink-0" />
-              Funded! 10,000 XLM added to your account.
+              <CheckCircle2 className="h-4 w-4 shrink-0" /> Funded! 10,000 XLM added to your account.
             </div>
             {txHash && (
-              <a
-                href={NETWORK.explorerTx(txHash)}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-2 flex items-center gap-1.5 font-mono text-[10px] text-[var(--orbit-accent)] hover:underline"
-              >
+              <a href={NETWORK.explorerTx(txHash)} target="_blank" rel="noreferrer" className="mt-2 flex items-center gap-1.5 font-mono text-[10px] text-[var(--orbit-accent)] hover:underline">
                 View on Explorer <ExternalLink className="h-3 w-3" />
               </a>
             )}
@@ -488,8 +501,7 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
           <div>
             <div className="font-display text-sm font-medium">About Testnet Tokens</div>
             <p className="mt-1 text-sm text-[var(--orbit-mute)]">
-              Friendbot tokens have no real value. They exist purely to let you test Stellar's
-              Soroban smart contract functionality without spending real XLM.
+              Friendbot tokens have no real value. They exist purely to let you test Stellar's Soroban smart contract functionality without spending real XLM.
             </p>
           </div>
         </div>
@@ -498,22 +510,18 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
   );
 }
 
-// ──────────────────── Receive Tab (shown inside deposit tab) ────────────────────
+// ──────────────────── Receive Panel ────────────────────
 function ReceivePanel({ address }: { address: string | null }) {
   const [copied, setCopied] = useState(false);
-
   function copy() {
     if (!address) return;
     navigator.clipboard.writeText(address);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
-
   return (
     <div className="glass rounded-2xl p-5">
-      <h3 className="mb-4 font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
-        Receive XLM
-      </h3>
+      <h3 className="mb-4 font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">Receive XLM</h3>
       {address ? (
         <>
           <div className="flex items-center justify-center mb-4">
@@ -522,28 +530,19 @@ function ReceivePanel({ address }: { address: string | null }) {
             </div>
           </div>
           <div className="mb-3 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5">
-            <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">
-              Your wallet address
-            </div>
+            <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">Your wallet address</div>
             <div className="font-mono text-xs break-all text-[var(--orbit-ink)]">{address}</div>
           </div>
           <button onClick={copy} className="liquid-btn w-full justify-center">
             <Copy className="h-4 w-4" />
             {copied ? "Copied!" : "Copy Address"}
           </button>
-          <a
-            href={NETWORK.explorerAccount(address)}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 flex w-full items-center justify-center gap-2 font-mono text-xs text-[var(--orbit-accent)] hover:underline"
-          >
+          <a href={NETWORK.explorerAccount(address)} target="_blank" rel="noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 font-mono text-xs text-[var(--orbit-accent)] hover:underline">
             View on Stellar Explorer <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </>
       ) : (
-        <p className="font-mono text-xs text-[var(--orbit-mute)]">
-          Connect your wallet to see your address.
-        </p>
+        <p className="font-mono text-xs text-[var(--orbit-mute)]">Connect your wallet to see your address.</p>
       )}
     </div>
   );
@@ -551,9 +550,7 @@ function ReceivePanel({ address }: { address: string | null }) {
 
 // ──────────────────── Settings Tab ────────────────────
 function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
-  const [displayName, setDisplayName] = useState(
-    () => localStorage.getItem("orbit:display-name") ?? "",
-  );
+  const [displayName, setDisplayName] = useState(() => localStorage.getItem("orbit:display-name") ?? "");
   const [saved, setSaved] = useState(false);
 
   function saveProfile() {
@@ -564,15 +561,11 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
 
   return (
     <div className="space-y-4 max-w-lg">
-      {/* Profile */}
       <div className="glass rounded-2xl p-6">
         <h3 className="mb-5 font-display text-base font-semibold">Profile Settings</h3>
-
         <div className="space-y-4">
           <div>
-            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
-              Display Name
-            </label>
+            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">Display Name</label>
             <input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
@@ -580,29 +573,18 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
               className="w-full rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5 font-mono text-sm outline-none focus:border-[var(--orbit-accent)] transition-colors text-[var(--orbit-ink)] placeholder:text-[var(--orbit-mute)]"
             />
           </div>
-
           <div>
-            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
-              Connected Wallet
-            </label>
+            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">Connected Wallet</label>
             <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5 font-mono text-xs text-[var(--orbit-mute)] break-all">
               {wallet.address ?? "Not connected"}
             </div>
           </div>
-
           <button onClick={saveProfile} className="liquid-btn w-full justify-center">
-            {saved ? (
-              <>
-                <CheckCircle2 className="h-4 w-4" /> Saved!
-              </>
-            ) : (
-              "Save Profile"
-            )}
+            {saved ? <><CheckCircle2 className="h-4 w-4" /> Saved!</> : "Save Profile"}
           </button>
         </div>
       </div>
 
-      {/* Network Info */}
       <div className="glass rounded-2xl p-6">
         <h3 className="mb-4 font-display text-base font-semibold">Network Details</h3>
         <div className="space-y-2">
@@ -612,30 +594,18 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
             { k: "Soroban RPC", v: NETWORK.sorobanRpcUrl },
             { k: "Contract Mode", v: HAS_REAL_CONTRACT ? "Live Contract" : "Demo Mode" },
           ].map(({ k, v }) => (
-            <div
-              key={k}
-              className="flex items-start justify-between gap-4 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3"
-            >
-              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] shrink-0">
-                {k}
-              </span>
-              <span className="font-mono text-[10px] text-right text-[var(--orbit-ink)] break-all">
-                {v}
-              </span>
+            <div key={k} className="flex items-start justify-between gap-4 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] shrink-0">{k}</span>
+              <span className="font-mono text-[10px] text-right text-[var(--orbit-ink)] break-all">{v}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Danger zone */}
       {wallet.address && (
         <div className="glass rounded-2xl border border-[var(--orbit-danger)]/20 p-6">
-          <h3 className="mb-3 font-display text-base font-semibold text-[var(--orbit-danger)]">
-            Disconnect Wallet
-          </h3>
-          <p className="mb-4 text-sm text-[var(--orbit-mute)]">
-            This removes your wallet connection from Orbit. You can reconnect at any time.
-          </p>
+          <h3 className="mb-3 font-display text-base font-semibold text-[var(--orbit-danger)]">Disconnect Wallet</h3>
+          <p className="mb-4 text-sm text-[var(--orbit-mute)]">This removes your wallet connection from Orbit. You can reconnect at any time.</p>
           <button
             onClick={wallet.disconnect}
             className="flex items-center gap-2 rounded-xl border border-[var(--orbit-danger)]/40 bg-[var(--orbit-danger)]/10 px-4 py-2.5 font-mono text-sm text-[var(--orbit-danger)] transition-all hover:bg-[var(--orbit-danger)]/20"
@@ -648,7 +618,7 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
   );
 }
 
-// ──────────────────── Unauthenticated Banner ────────────────────
+// ──────────────────── Connect Prompt ────────────────────
 function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -662,12 +632,10 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
         </div>
         <div className="font-display text-2xl font-semibold">Connect a Stellar Wallet</div>
         <p className="mt-3 text-sm text-[var(--orbit-mute)]">
-          Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can
-          fund themselves with Friendbot.
+          Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can fund themselves with Friendbot.
         </p>
         <button onClick={onConnect} className="liquid-btn mx-auto mt-7">
-          <Wallet className="h-4 w-4" />
-          Connect Wallet
+          <Wallet className="h-4 w-4" /> Connect Wallet
         </button>
       </motion.div>
     </div>
@@ -678,19 +646,34 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
 export function AppDashboard() {
   const wallet = useWallet();
   const vault = useVault(wallet.address);
+  const { add } = useNotifications();
   const [activeTab, setActiveTab] = useState<Tab>("portfolio");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [xlmUsdPrice, setXlmUsdPrice] = useState<number | null>(null);
+
+  // Fetch oracle price once
+  useEffect(() => {
+    fetchXlmUsdPrice().then(setXlmUsdPrice);
+  }, []);
 
   const showFundBanner = wallet.address && wallet.balance && !wallet.balance.funded;
 
-  function renderContent() {
-    if (!wallet.address) {
-      return <ConnectPrompt onConnect={wallet.connect} />;
-    }
+  const pageTitle: Record<Tab, string> = {
+    portfolio:   "Portfolio",
+    deposit:     "Deposit & Receive",
+    withdraw:    "Withdraw",
+    history:     "Transaction History",
+    leaderboard: "Leaderboard",
+    simulate:    "Vault Simulator",
+    faucet:      "Testnet Faucet",
+    settings:    "Settings",
+  };
 
+  function renderContent() {
+    if (!wallet.address) return <ConnectPrompt onConnect={wallet.connect} />;
     switch (activeTab) {
       case "portfolio":
-        return <PortfolioTab wallet={wallet} vault={vault} />;
+        return <PortfolioTab wallet={wallet} vault={vault} xlmUsdPrice={xlmUsdPrice} />;
       case "deposit":
         return (
           <div className="grid gap-4 lg:grid-cols-2">
@@ -699,6 +682,7 @@ export function AppDashboard() {
               state={vault.state}
               walletBalance={wallet.balance?.xlm ?? null}
               onDone={vault.refresh}
+              onNotify={add}
             />
             <ReceivePanel address={wallet.address} />
           </div>
@@ -706,18 +690,17 @@ export function AppDashboard() {
       case "withdraw":
         return (
           <div className="max-w-md">
-            <WithdrawCard address={wallet.address} state={vault.state} onDone={vault.refresh} />
+            <WithdrawCard address={wallet.address} state={vault.state} onDone={vault.refresh} onNotify={add} />
           </div>
         );
       case "history":
-        return <HistoryTab events={vault.events} />;
+        return <HistoryTab events={vault.events} loading={vault.loading} />;
+      case "leaderboard":
+        return <LeaderboardTab events={vault.events} currentAddress={wallet.address} />;
+      case "simulate":
+        return <SimulatorTab state={vault.state} xlmUsdPrice={xlmUsdPrice} />;
       case "faucet":
-        return (
-          <FaucetTab
-            address={wallet.address}
-            onFunded={() => wallet.refreshBalance(wallet.address!)}
-          />
-        );
+        return <FaucetTab address={wallet.address} onFunded={() => wallet.refreshBalance(wallet.address!)} />;
       case "settings":
         return <SettingsTab wallet={wallet} />;
       default:
@@ -725,25 +708,11 @@ export function AppDashboard() {
     }
   }
 
-  const pageTitle: Record<Tab, string> = {
-    portfolio: "Portfolio",
-    deposit: "Deposit & Receive",
-    withdraw: "Withdraw",
-    history: "Transaction History",
-    faucet: "Testnet Faucet",
-    settings: "Settings",
-  };
-
   return (
     <div className="flex h-screen overflow-hidden bg-transparent">
-      {/* Shader-like ambient glow background */}
+      {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <EtheralShadow
-          color="rgba(130, 26, 195, 0.4)"
-          animation={{ scale: 100, speed: 60 }}
-          noise={{ opacity: 0.8, scale: 1.2 }}
-          sizing="fill"
-        />
+        <EtheralShadow color="rgba(130, 26, 195, 0.4)" animation={{ scale: 100, speed: 60 }} noise={{ opacity: 0.8, scale: 1.2 }} sizing="fill" />
       </div>
 
       {/* Sidebar (desktop) */}
@@ -760,39 +729,44 @@ export function AppDashboard() {
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <div className="flex items-center justify-between border-b border-[var(--orbit-edge)] bg-black/40 px-6 py-4 backdrop-blur-xl">
+        <div className="flex items-center justify-between border-b border-[var(--orbit-edge)] bg-black/40 px-4 py-3 backdrop-blur-xl">
           {/* Mobile hamburger */}
           <button
-            className="md:hidden mr-3 flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--orbit-edge)] text-[var(--orbit-mute)]"
+            className="md:hidden mr-3 flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--orbit-edge)] text-[var(--orbit-mute)] hover:text-[var(--orbit-ink)]"
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            aria-label="Open navigation"
           >
-            ≡
+            <Menu className="h-4 w-4" />
           </button>
-          <div>
-            <h1 className="font-display text-xl font-semibold tracking-tight">
-              {pageTitle[activeTab]}
-            </h1>
-            <p className="font-mono text-[10px] text-[var(--orbit-mute)]">
-              {HAS_REAL_CONTRACT
-                ? "Soroban contract · Testnet"
-                : "Demo mode · real Testnet payments + local share ledger"}
+
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-lg font-semibold tracking-tight truncate">{pageTitle[activeTab]}</h1>
+            <p className="font-mono text-[10px] text-[var(--orbit-mute)] hidden sm:block">
+              {HAS_REAL_CONTRACT ? "Soroban contract · Testnet" : "Demo mode · real Testnet payments + local share ledger"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {vault.loading && (
-              <RefreshCcw className="h-4 w-4 animate-spin text-[var(--orbit-mute)]" />
-            )}
+
+          <div className="flex items-center gap-2 ml-2">
+            {/* Network status */}
+            <div className="hidden sm:block">
+              <NetworkStatusBar />
+            </div>
+
+            {/* Refresh spinner */}
+            {vault.loading && <RefreshCcw className="h-4 w-4 animate-spin text-[var(--orbit-mute)]" />}
+
+            {/* Notification bell */}
+            <NotificationCenter />
+
+            {/* Wallet pill / connect button */}
             {wallet.address ? (
               <div className="flex items-center gap-2 rounded-xl border border-[var(--orbit-edge)] bg-white/[0.04] px-3 py-2">
                 <div className="h-2 w-2 rounded-full bg-[var(--orbit-ok)] shadow-[0_0_8px_var(--orbit-ok)]" />
-                <span className="font-mono text-xs text-[var(--orbit-ink)]">
-                  {shortAddr(wallet.address)}
-                </span>
+                <span className="font-mono text-xs text-[var(--orbit-ink)]">{shortAddr(wallet.address)}</span>
               </div>
             ) : (
               <button onClick={wallet.connect} className="liquid-btn py-2 text-sm">
-                <Wallet className="h-4 w-4" />
-                Connect
+                <Wallet className="h-4 w-4" /> Connect
               </button>
             )}
           </div>
@@ -801,15 +775,12 @@ export function AppDashboard() {
         {/* Fund banner */}
         {showFundBanner && wallet.address && (
           <div className="px-6 pt-4">
-            <FundBanner
-              address={wallet.address}
-              onFunded={() => wallet.refreshBalance(wallet.address!)}
-            />
+            <FundBanner address={wallet.address} onFunded={() => wallet.refreshBalance(wallet.address!)} />
           </div>
         )}
 
-        {/* Page content */}
-        <div className="flex-1 overflow-y-auto px-6 py-6">
+        {/* Page content — with bottom padding for mobile nav */}
+        <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6 pb-24 md:pb-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -824,7 +795,7 @@ export function AppDashboard() {
         </div>
       </div>
 
-      {/* Mobile sidebar overlay */}
+      {/* Desktop sidebar overlay (mobile hamburger) */}
       <AnimatePresence>
         {mobileNavOpen && (
           <>
@@ -844,10 +815,7 @@ export function AppDashboard() {
             >
               <Sidebar
                 active={activeTab}
-                onSelect={(t) => {
-                  setActiveTab(t);
-                  setMobileNavOpen(false);
-                }}
+                onSelect={(t) => { setActiveTab(t); setMobileNavOpen(false); }}
                 address={wallet.address}
                 balance={wallet.balance}
                 onDisconnect={wallet.disconnect}
@@ -856,6 +824,9 @@ export function AppDashboard() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Mobile bottom nav */}
+      <MobileBottomNav active={activeTab} onSelect={setActiveTab} />
     </div>
   );
 }

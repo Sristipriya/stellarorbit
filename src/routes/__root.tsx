@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
+import { NotificationProvider } from "../lib/notifications";
+
 
 function NotFoundComponent() {
   return (
@@ -131,21 +133,23 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster
-        theme="dark"
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: "rgba(20,22,30,0.9)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "#eaeaf0",
-            backdropFilter: "blur(10px)",
-          },
-        }}
-      />
-    </QueryClientProvider>
+    <NotificationProvider>
+      <QueryClientProvider client={queryClient}>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster
+          theme="dark"
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "rgba(20,22,30,0.9)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "#eaeaf0",
+              backdropFilter: "blur(10px)",
+            },
+          }}
+        />
+      </QueryClientProvider>
+    </NotificationProvider>
   );
 }
