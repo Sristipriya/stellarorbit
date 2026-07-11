@@ -25,7 +25,11 @@ export function DepositCard({
 
   const previewShares = useMemo(() => {
     if (!amount) return 0n;
-    try { return quoteSharesForDeposit(amount, state); } catch { return 0n; }
+    try {
+      return quoteSharesForDeposit(amount, state);
+    } catch {
+      return 0n;
+    }
   }, [amount, state]);
 
   const insufficient = Boolean(walletBalance && Number(amount || 0) + 0.5 > Number(walletBalance));
@@ -40,13 +44,18 @@ export function DepositCard({
       setTx({
         kind: "success",
         title: "Deposited",
-        lines: [`Amount: ${stroopsToXlm(amountStroops)} XLM`, `Shares minted: ${stroopsToXlm(sharesMinted)}`],
+        lines: [
+          `Amount: ${stroopsToXlm(amountStroops)} XLM`,
+          `Shares minted: ${stroopsToXlm(sharesMinted)}`,
+        ],
         txHash,
       });
       setRaw(`tx_hash=${txHash}`);
       setAmount("");
       onDone();
-      toast.success(`Deposited ${stroopsToXlm(amountStroops)} XLM`, { description: `Shares: ${stroopsToXlm(sharesMinted)}` });
+      toast.success(`Deposited ${stroopsToXlm(amountStroops)} XLM`, {
+        description: `Shares: ${stroopsToXlm(sharesMinted)}`,
+      });
       onNotify?.({ kind: "success", title: "Deposit Successful", message: msg, txHash });
     } catch (e) {
       const w = classifyError(e);
@@ -60,7 +69,9 @@ export function DepositCard({
   return (
     <div className="glass rounded-2xl p-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">Deposit</h3>
+        <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
+          Deposit
+        </h3>
         <span className="font-mono text-[10px] text-[var(--orbit-mute)]">XLM → shares</span>
       </div>
       <label className="mt-4 block text-xs text-[var(--orbit-mute)]">Amount (XLM)</label>
@@ -75,7 +86,9 @@ export function DepositCard({
           className="w-full bg-transparent font-mono text-2xl outline-none placeholder:text-[var(--orbit-mute)] disabled:opacity-50"
         />
         <button
-          onClick={() => walletBalance && setAmount(Math.max(0, Number(walletBalance) - 1).toFixed(4))}
+          onClick={() =>
+            walletBalance && setAmount(Math.max(0, Number(walletBalance) - 1).toFixed(4))
+          }
           disabled={tx.kind === "pending"}
           className="rounded-md border border-[var(--orbit-edge)] px-2 py-0.5 font-mono text-[10px] uppercase text-[var(--orbit-mute)] hover:text-[var(--orbit-ink)] disabled:opacity-40"
         >
@@ -94,7 +107,11 @@ export function DepositCard({
         disabled={!address || !amount || insufficient || tx.kind === "pending"}
         className="liquid-btn mt-4 w-full justify-center"
       >
-        {tx.kind === "pending" ? "Signing…" : insufficient ? "Insufficient balance" : "Deposit into Orbit"}
+        {tx.kind === "pending"
+          ? "Signing…"
+          : insufficient
+            ? "Insufficient balance"
+            : "Deposit into Orbit"}
       </button>
       <div className="mt-3">
         <TxStatus state={tx} raw={raw} />

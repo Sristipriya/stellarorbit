@@ -33,7 +33,9 @@ export function NetworkStatusBar() {
   return (
     <div className="flex items-center gap-2">
       <div className={`net-dot ${dot}`} />
-      <span className="font-mono text-[10px] text-[var(--orbit-mute)] hidden sm:inline">{label}</span>
+      <span className="font-mono text-[10px] text-[var(--orbit-mute)] hidden sm:inline">
+        {label}
+      </span>
       {ledger != null && (
         <span className="font-mono text-[10px] text-[var(--orbit-mute)]/60 hidden md:inline">
           · #{ledger.toLocaleString()}

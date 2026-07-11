@@ -10,10 +10,7 @@ import { RefreshCcw, Info } from "lucide-react";
 
 export const Route = createFileRoute("/admin/settings")({
   head: () => ({
-    meta: [
-      { title: "Orbit Admin — Settings" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Orbit Admin — Settings" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminSettings,
 });
@@ -24,7 +21,9 @@ function AdminSettings() {
   const [health, setHealth] = useState<HealthResult | null>(null);
   const [checking, setChecking] = useState(false);
 
-  useEffect(() => { setAuthed(isAdminAuthenticated()); }, []);
+  useEffect(() => {
+    setAuthed(isAdminAuthenticated());
+  }, []);
 
   async function pingRpc() {
     setChecking(true);
@@ -33,7 +32,9 @@ function AdminSettings() {
     setChecking(false);
   }
 
-  useEffect(() => { void pingRpc(); }, []);
+  useEffect(() => {
+    void pingRpc();
+  }, []);
 
   if (!authed) return <AdminLoginPage onSuccess={() => setAuthed(true)} />;
 
@@ -86,7 +87,10 @@ function AdminSettings() {
                   color: "text-[var(--orbit-ink)]",
                 },
               ].map((c) => (
-                <div key={c.label} className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3">
+                <div
+                  key={c.label}
+                  className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3"
+                >
                   <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">
                     {c.label}
                   </div>
@@ -109,8 +113,8 @@ function AdminSettings() {
             <p className="font-mono text-xs text-[var(--orbit-mute)] leading-relaxed">
               This admin panel reads live data from the Stellar Testnet. No write operations are
               performed here. To change contract parameters, use the stellar-cli scripts in{" "}
-              <code className="text-[var(--orbit-accent)]">scripts/</code>. Admin credentials are set via{" "}
-              <code className="text-[var(--orbit-accent)]">VITE_ADMIN_USER</code> and{" "}
+              <code className="text-[var(--orbit-accent)]">scripts/</code>. Admin credentials are
+              set via <code className="text-[var(--orbit-accent)]">VITE_ADMIN_USER</code> and{" "}
               <code className="text-[var(--orbit-accent)]">VITE_ADMIN_PASS</code> in your{" "}
               <code className="text-[var(--orbit-accent)]">.env</code> file.
             </p>

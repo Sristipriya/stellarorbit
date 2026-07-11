@@ -1,15 +1,28 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, CheckCircle2, XCircle, Info, AlertTriangle, X, Trash2, ExternalLink } from "lucide-react";
+import {
+  Bell,
+  CheckCircle2,
+  XCircle,
+  Info,
+  AlertTriangle,
+  X,
+  Trash2,
+  ExternalLink,
+} from "lucide-react";
 import { useNotifications, type Notification } from "@/lib/notifications";
 import { NETWORK } from "@/lib/stellar/network";
 
 function kindIcon(kind: Notification["kind"]) {
   switch (kind) {
-    case "success": return <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--orbit-ok)]" />;
-    case "error":   return <XCircle className="h-4 w-4 shrink-0 text-[var(--orbit-danger)]" />;
-    case "warning": return <AlertTriangle className="h-4 w-4 shrink-0 text-[var(--orbit-warn)]" />;
-    default:        return <Info className="h-4 w-4 shrink-0 text-[var(--orbit-accent)]" />;
+    case "success":
+      return <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--orbit-ok)]" />;
+    case "error":
+      return <XCircle className="h-4 w-4 shrink-0 text-[var(--orbit-danger)]" />;
+    case "warning":
+      return <AlertTriangle className="h-4 w-4 shrink-0 text-[var(--orbit-warn)]" />;
+    default:
+      return <Info className="h-4 w-4 shrink-0 text-[var(--orbit-accent)]" />;
   }
 }
 
@@ -63,7 +76,12 @@ export function NotificationCenter() {
             exit={{ opacity: 0, scale: 0.95, y: -8 }}
             transition={{ duration: 0.15 }}
             className="absolute right-0 top-11 z-50 w-80 rounded-2xl border border-[var(--orbit-edge)] bg-black/80 shadow-2xl backdrop-blur-xl"
-            style={{ maxHeight: "70vh", overflow: "hidden", display: "flex", flexDirection: "column" }}
+            style={{
+              maxHeight: "70vh",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+            }}
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[var(--orbit-edge)] px-4 py-3">

@@ -66,14 +66,20 @@ export function ShareCertificate({
           </div>
           <div>
             <div className="font-display text-base font-semibold">Share Certificate</div>
-            <div className="font-mono text-[10px] text-[var(--orbit-mute)]">Orbit Vault · Stellar Testnet</div>
+            <div className="font-mono text-[10px] text-[var(--orbit-mute)]">
+              Orbit Vault · Stellar Testnet
+            </div>
           </div>
         </div>
         <button
           onClick={copyPosition}
           className="flex items-center gap-1.5 rounded-lg border border-[var(--orbit-edge)] bg-white/[0.04] px-2.5 py-1.5 font-mono text-[10px] text-[var(--orbit-mute)] hover:text-[var(--orbit-ink)] transition-colors"
         >
-          {copied ? <CheckCircle2 className="h-3 w-3 text-[var(--orbit-ok)]" /> : <Copy className="h-3 w-3" />}
+          {copied ? (
+            <CheckCircle2 className="h-3 w-3 text-[var(--orbit-ok)]" />
+          ) : (
+            <Copy className="h-3 w-3" />
+          )}
           {copied ? "Copied!" : "Copy"}
         </button>
       </div>
@@ -81,12 +87,20 @@ export function ShareCertificate({
       {/* Main figures */}
       <div className="grid grid-cols-2 gap-4 mb-5">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">Your Shares</div>
-          <div className="font-display text-3xl font-semibold text-[var(--orbit-accent)]">{sharesStr}</div>
+          <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">
+            Your Shares
+          </div>
+          <div className="font-display text-3xl font-semibold text-[var(--orbit-accent)]">
+            {sharesStr}
+          </div>
         </div>
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">Underlying Value</div>
-          <div className="font-display text-3xl font-semibold text-[var(--orbit-ink)]">{underlyingStr}</div>
+          <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">
+            Underlying Value
+          </div>
+          <div className="font-display text-3xl font-semibold text-[var(--orbit-ink)]">
+            {underlyingStr}
+          </div>
           <div className="font-mono text-xs text-[var(--orbit-mute)]">{usdVal}</div>
         </div>
       </div>
@@ -99,9 +113,16 @@ export function ShareCertificate({
         </div>
         <div className="text-right">
           <div className="font-mono text-[10px] text-[var(--orbit-mute)]">P&L from Parity</div>
-          <div className={`flex items-center justify-end gap-1 font-mono text-sm font-semibold ${isUp ? "text-[var(--orbit-ok)]" : "text-[var(--orbit-danger)]"}`}>
-            {isUp ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-            {isUp ? "+" : ""}{pnl.toFixed(2)}%
+          <div
+            className={`flex items-center justify-end gap-1 font-mono text-sm font-semibold ${isUp ? "text-[var(--orbit-ok)]" : "text-[var(--orbit-danger)]"}`}
+          >
+            {isUp ? (
+              <TrendingUp className="h-3.5 w-3.5" />
+            ) : (
+              <TrendingDown className="h-3.5 w-3.5" />
+            )}
+            {isUp ? "+" : ""}
+            {pnl.toFixed(2)}%
           </div>
         </div>
         <div className="text-right">

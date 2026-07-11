@@ -35,9 +35,12 @@ export async function fetchXlmUsdPrice(): Promise<number | null> {
   } catch {
     // Fallback to a secondary source
     try {
-      const res2 = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd", {
-        signal: AbortSignal.timeout(5000),
-      });
+      const res2 = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd",
+        {
+          signal: AbortSignal.timeout(5000),
+        },
+      );
       if (!res2.ok) throw new Error("coingecko failed");
       const j2 = (await res2.json()) as { stellar?: { usd?: number } };
       const p2 = j2.stellar?.usd ?? null;

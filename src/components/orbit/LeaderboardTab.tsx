@@ -87,11 +87,15 @@ export function LeaderboardTab({
                     </span>
                   )}
                 </div>
-                <div className="font-mono text-xs text-[var(--orbit-ink)]">{shortAddr(entry.address)}</div>
+                <div className="font-mono text-xs text-[var(--orbit-ink)]">
+                  {shortAddr(entry.address)}
+                </div>
                 <div className="mt-2 font-display text-xl font-semibold text-[var(--orbit-accent)]">
                   {stroopsToXlm(entry.totalDeposited)} XLM
                 </div>
-                <div className="font-mono text-[10px] text-[var(--orbit-mute)]">Total deposited</div>
+                <div className="font-mono text-[10px] text-[var(--orbit-mute)]">
+                  Total deposited
+                </div>
               </motion.div>
             );
           })}

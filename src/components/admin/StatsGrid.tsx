@@ -38,7 +38,9 @@ export function StatsGrid({ cards }: { cards: StatCard[] }) {
               <Icon className="h-4 w-4 shrink-0 text-[var(--orbit-mute)]/50" />
             </div>
             <div className={`font-display text-2xl font-semibold ${color}`}>{c.value}</div>
-            {c.sub && <div className="mt-1 font-mono text-[10px] text-[var(--orbit-mute)]">{c.sub}</div>}
+            {c.sub && (
+              <div className="mt-1 font-mono text-[10px] text-[var(--orbit-mute)]">{c.sub}</div>
+            )}
           </motion.div>
         );
       })}

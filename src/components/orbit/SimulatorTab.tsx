@@ -30,7 +30,12 @@ function MiniChart({ values, color }: { values: number[]; color: string }) {
   const area = `M${first} L${pts} L${last.split(",")[0]},${h} L${pad},${h} Z`;
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height: 80 }} preserveAspectRatio="none">
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      className="w-full"
+      style={{ height: 80 }}
+      preserveAspectRatio="none"
+    >
       <defs>
         <linearGradient id={`sg-sim-${color.slice(1, 5)}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -38,7 +43,14 @@ function MiniChart({ values, color }: { values: number[]; color: string }) {
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#sg-sim-${color.slice(1, 5)})`} />
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline
+        points={pts}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -169,7 +181,9 @@ export function SimulatorTab({
               {
                 label: "Projected Value",
                 value: `${result.projectedValue.toFixed(4)} XLM`,
-                sub: xlmUsdPrice ? `≈ ${xlmToUsd(result.projectedValue.toFixed(4), xlmUsdPrice)}` : undefined,
+                sub: xlmUsdPrice
+                  ? `≈ ${xlmToUsd(result.projectedValue.toFixed(4), xlmUsdPrice)}`
+                  : undefined,
                 accent: true,
               },
               {
@@ -180,12 +194,21 @@ export function SimulatorTab({
                 red: result.projectedPnl < 0,
               },
             ].map((c) => (
-              <div key={c.label} className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 p-3">
-                <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">{c.label}</div>
-                <div className={`font-display text-base font-semibold ${c.accent ? "text-[var(--orbit-accent)]" : c.green ? "text-[var(--orbit-ok)]" : c.red ? "text-[var(--orbit-danger)]" : "text-[var(--orbit-ink)]"}`}>
+              <div
+                key={c.label}
+                className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 p-3"
+              >
+                <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">
+                  {c.label}
+                </div>
+                <div
+                  className={`font-display text-base font-semibold ${c.accent ? "text-[var(--orbit-accent)]" : c.green ? "text-[var(--orbit-ok)]" : c.red ? "text-[var(--orbit-danger)]" : "text-[var(--orbit-ink)]"}`}
+                >
                   {c.value}
                 </div>
-                {c.sub && <div className="font-mono text-[9px] text-[var(--orbit-mute)]">{c.sub}</div>}
+                {c.sub && (
+                  <div className="font-mono text-[9px] text-[var(--orbit-mute)]">{c.sub}</div>
+                )}
               </div>
             ))}
           </div>
@@ -202,7 +225,8 @@ export function SimulatorTab({
           </div>
 
           <p className="font-mono text-[9px] text-[var(--orbit-mute)]">
-            ⚠ Simulation only. Not financial advice. Uses current live share price ({currentPrice.toFixed(6)} XLM). Testnet assets only.
+            ⚠ Simulation only. Not financial advice. Uses current live share price (
+            {currentPrice.toFixed(6)} XLM). Testnet assets only.
           </p>
         </motion.div>
       )}

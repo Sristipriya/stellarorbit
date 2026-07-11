@@ -11,7 +11,11 @@ function pricePerShare(state: VaultState): string {
 
 export function VaultHealthCard({ state }: { state: VaultState }) {
   const rows = [
-    { k: "Contract Mode", v: HAS_REAL_CONTRACT ? "Live Soroban Contract" : "Demo Mode", ok: HAS_REAL_CONTRACT },
+    {
+      k: "Contract Mode",
+      v: HAS_REAL_CONTRACT ? "Live Soroban Contract" : "Demo Mode",
+      ok: HAS_REAL_CONTRACT,
+    },
     { k: "Network", v: NETWORK.name },
     { k: "Soroban RPC", v: NETWORK.sorobanRpcUrl, link: NETWORK.sorobanRpcUrl },
     { k: "Horizon URL", v: NETWORK.horizonUrl, link: NETWORK.horizonUrl },

@@ -23,7 +23,11 @@ export function WithdrawCard({
 
   const previewAssets = useMemo(() => {
     if (!shares) return 0n;
-    try { return quoteAssetsForShares(shares, state); } catch { return 0n; }
+    try {
+      return quoteAssetsForShares(shares, state);
+    } catch {
+      return 0n;
+    }
   }, [shares, state]);
 
   const tooMany = useMemo(() => {
@@ -31,7 +35,9 @@ export function WithdrawCard({
     try {
       const s = BigInt(Math.round(Number(shares) * 1e7));
       return s > state.userSharesStroops;
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   }, [shares, state.userSharesStroops]);
 
   async function submit() {
@@ -44,13 +50,18 @@ export function WithdrawCard({
       setTx({
         kind: "success",
         title: "Withdrawn",
-        lines: [`Shares burned: ${stroopsToXlm(sharesBurned)}`, `Assets out: ${stroopsToXlm(assetsOut)} XLM`],
+        lines: [
+          `Shares burned: ${stroopsToXlm(sharesBurned)}`,
+          `Assets out: ${stroopsToXlm(assetsOut)} XLM`,
+        ],
         txHash,
       });
       setRaw(`tx_hash=${txHash}`);
       setShares("");
       onDone();
-      toast.success(`Withdrew ${stroopsToXlm(assetsOut)} XLM`, { description: `Shares burned: ${stroopsToXlm(sharesBurned)}` });
+      toast.success(`Withdrew ${stroopsToXlm(assetsOut)} XLM`, {
+        description: `Shares burned: ${stroopsToXlm(sharesBurned)}`,
+      });
       onNotify?.({ kind: "success", title: "Withdrawal Successful", message: msg, txHash });
     } catch (e) {
       const w = classifyError(e);
@@ -64,7 +75,9 @@ export function WithdrawCard({
   return (
     <div className="glass rounded-2xl p-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">Withdraw</h3>
+        <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
+          Withdraw
+        </h3>
         <span className="font-mono text-[10px] text-[var(--orbit-mute)]">shares → XLM</span>
       </div>
       <label className="mt-4 block text-xs text-[var(--orbit-mute)]">Shares to burn</label>
@@ -97,9 +110,16 @@ export function WithdrawCard({
         onClick={submit}
         disabled={!address || !shares || tooMany || tx.kind === "pending"}
         className="liquid-btn mt-4 w-full justify-center"
-        style={{ background: "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)" }}
+        style={{
+          background:
+            "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)",
+        }}
       >
-        {tx.kind === "pending" ? "Signing…" : tooMany ? "More than you hold" : "Withdraw from Orbit"}
+        {tx.kind === "pending"
+          ? "Signing…"
+          : tooMany
+            ? "More than you hold"
+            : "Withdraw from Orbit"}
       </button>
       <div className="mt-3">
         <TxStatus state={tx} raw={raw} />

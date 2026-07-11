@@ -12,10 +12,10 @@ import {
 import { adminLogout } from "@/lib/admin-auth";
 
 const NAV = [
-  { href: "/admin",              label: "Dashboard",    icon: LayoutDashboard },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/transactions", label: "Transactions", icon: History },
-  { href: "/admin/users",        label: "Users",        icon: Users },
-  { href: "/admin/settings",     label: "Settings",     icon: Settings },
+  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -37,7 +37,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </div>
           <div>
             <div className="font-display text-sm font-semibold">Orbit</div>
-            <div className="font-mono text-[9px] text-[var(--orbit-mute)] uppercase tracking-widest">Admin Panel</div>
+            <div className="font-mono text-[9px] text-[var(--orbit-mute)] uppercase tracking-widest">
+              Admin Panel
+            </div>
           </div>
         </div>
 
@@ -91,7 +93,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center gap-2">
             {NAV.map(({ href, icon: Icon }) => (
-              <Link key={href} to={href} className={`flex h-8 w-8 items-center justify-center rounded-lg border ${location.pathname === href ? "border-[var(--orbit-accent)]/40 text-[var(--orbit-accent)]" : "border-[var(--orbit-edge)] text-[var(--orbit-mute)]"}`}>
+              <Link
+                key={href}
+                to={href}
+                className={`flex h-8 w-8 items-center justify-center rounded-lg border ${location.pathname === href ? "border-[var(--orbit-accent)]/40 text-[var(--orbit-accent)]" : "border-[var(--orbit-edge)] text-[var(--orbit-mute)]"}`}
+              >
                 <Icon className="h-3.5 w-3.5" />
               </Link>
             ))}

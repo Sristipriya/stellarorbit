@@ -18,21 +18,15 @@ export type Tab =
   | "settings";
 
 const MOBILE_TABS: { id: Tab; label: string; icon: React.FC<{ className?: string }> }[] = [
-  { id: "portfolio",   label: "Home",       icon: LayoutDashboard },
-  { id: "deposit",     label: "Deposit",    icon: ArrowDownToLine },
-  { id: "withdraw",    label: "Withdraw",   icon: ArrowUpFromLine },
-  { id: "history",     label: "History",    icon: History },
-  { id: "leaderboard", label: "Ranks",      icon: Trophy },
-  { id: "simulate",    label: "Simulate",   icon: Calculator },
+  { id: "portfolio", label: "Home", icon: LayoutDashboard },
+  { id: "deposit", label: "Deposit", icon: ArrowDownToLine },
+  { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
+  { id: "history", label: "History", icon: History },
+  { id: "leaderboard", label: "Ranks", icon: Trophy },
+  { id: "simulate", label: "Simulate", icon: Calculator },
 ];
 
-export function MobileBottomNav({
-  active,
-  onSelect,
-}: {
-  active: Tab;
-  onSelect: (t: Tab) => void;
-}) {
+export function MobileBottomNav({ active, onSelect }: { active: Tab; onSelect: (t: Tab) => void }) {
   return (
     <nav className="mobile-bottom-nav md:hidden">
       {MOBILE_TABS.map(({ id, label, icon: Icon }) => (

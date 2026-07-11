@@ -80,7 +80,12 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
   const area = `M${first} L${polyline} L${last.split(",")[0]},${h - pad} L${pad},${h - pad} Z`;
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" preserveAspectRatio="none" style={{ height: 140 }}>
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      className="w-full"
+      preserveAspectRatio="none"
+      style={{ height: 140 }}
+    >
       <defs>
         <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.3" />
@@ -88,8 +93,21 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
         </linearGradient>
       </defs>
       <path d={area} fill="url(#sg)" />
-      <polyline points={polyline} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={pts[0].split(",")[0]} cy={pts[0].split(",")[1]} r="4" fill={color} opacity="0.7" />
+      <polyline
+        points={polyline}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx={pts[0].split(",")[0]}
+        cy={pts[0].split(",")[1]}
+        r="4"
+        fill={color}
+        opacity="0.7"
+      />
       <circle
         cx={pts[pts.length - 1].split(",")[0]}
         cy={pts[pts.length - 1].split(",")[1]}
@@ -102,14 +120,14 @@ function SparkLine({ data, color = "oklch(0.82 0.16 195)" }: { data: number[]; c
 }
 
 const NAV_ITEMS: { id: Tab; label: string; icon: React.FC<{ className?: string }> }[] = [
-  { id: "portfolio",   label: "Portfolio",   icon: LayoutDashboard },
-  { id: "deposit",     label: "Deposit",     icon: ArrowDownToLine },
-  { id: "withdraw",    label: "Withdraw",    icon: ArrowUpFromLine },
-  { id: "history",     label: "History",     icon: History },
+  { id: "portfolio", label: "Portfolio", icon: LayoutDashboard },
+  { id: "deposit", label: "Deposit", icon: ArrowDownToLine },
+  { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
+  { id: "history", label: "History", icon: History },
   { id: "leaderboard", label: "Leaderboard", icon: Trophy },
-  { id: "simulate",    label: "Simulate",    icon: Calculator },
-  { id: "faucet",      label: "Faucet",      icon: Zap },
-  { id: "settings",    label: "Settings",    icon: Settings },
+  { id: "simulate", label: "Simulate", icon: Calculator },
+  { id: "faucet", label: "Faucet", icon: Zap },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 function Sidebar({
@@ -288,12 +306,16 @@ function PortfolioTab({
               className="glass rounded-2xl p-4"
             >
               <div className="flex items-start justify-between">
-                <div className={`text-[10px] font-mono uppercase tracking-widest ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-mute)]"}`}>
+                <div
+                  className={`text-[10px] font-mono uppercase tracking-widest ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-mute)]"}`}
+                >
                   {c.label}
                 </div>
                 <Icon className="h-4 w-4 shrink-0 text-[var(--orbit-mute)]/60" />
               </div>
-              <div className={`mt-2 font-display text-2xl font-semibold ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}>
+              <div
+                className={`mt-2 font-display text-2xl font-semibold ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}
+              >
                 {c.value}
               </div>
               <div className="mt-1 font-mono text-[10px] text-[var(--orbit-mute)]">{c.note}</div>
@@ -307,11 +329,7 @@ function PortfolioTab({
 
       {/* Share certificate */}
       {wallet.address && vault.state.userSharesStroops > 0n && (
-        <ShareCertificate
-          address={wallet.address}
-          state={vault.state}
-          xlmUsdPrice={xlmUsdPrice}
-        />
+        <ShareCertificate address={wallet.address} state={vault.state} xlmUsdPrice={xlmUsdPrice} />
       )}
 
       {/* Chart */}
@@ -427,7 +445,12 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
       setTxHash(json.hash ?? null);
       setStatus("ok");
       onFunded();
-      add({ kind: "success", title: "Funded!", message: "10,000 XLM added to your account.", txHash: json.hash ?? undefined });
+      add({
+        kind: "success",
+        title: "Funded!",
+        message: "10,000 XLM added to your account.",
+        txHash: json.hash ?? undefined,
+      });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       setErrMsg(msg);
@@ -445,7 +468,9 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
           </div>
           <div>
             <h3 className="font-display text-base font-semibold">Stellar Friendbot</h3>
-            <p className="font-mono text-[11px] text-[var(--orbit-mute)]">Fund your Testnet account with 10,000 XLM</p>
+            <p className="font-mono text-[11px] text-[var(--orbit-mute)]">
+              Fund your Testnet account with 10,000 XLM
+            </p>
           </div>
         </div>
 
@@ -464,22 +489,35 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
           onClick={fund}
           disabled={!address || status === "loading"}
           className="liquid-btn w-full justify-center"
-          style={{ background: "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)" }}
+          style={{
+            background:
+              "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)",
+          }}
         >
           {status === "loading" ? (
-            <><RefreshCcw className="h-4 w-4 animate-spin" /> Requesting XLM…</>
+            <>
+              <RefreshCcw className="h-4 w-4 animate-spin" /> Requesting XLM…
+            </>
           ) : (
-            <><Zap className="h-4 w-4" /> Fund with Friendbot</>
+            <>
+              <Zap className="h-4 w-4" /> Fund with Friendbot
+            </>
           )}
         </button>
 
         {status === "ok" && (
           <div className="mt-4 rounded-xl border border-[var(--orbit-ok)]/30 bg-[var(--orbit-ok)]/10 p-3">
             <div className="flex items-center gap-2 font-mono text-xs text-[var(--orbit-ok)]">
-              <CheckCircle2 className="h-4 w-4 shrink-0" /> Funded! 10,000 XLM added to your account.
+              <CheckCircle2 className="h-4 w-4 shrink-0" /> Funded! 10,000 XLM added to your
+              account.
             </div>
             {txHash && (
-              <a href={NETWORK.explorerTx(txHash)} target="_blank" rel="noreferrer" className="mt-2 flex items-center gap-1.5 font-mono text-[10px] text-[var(--orbit-accent)] hover:underline">
+              <a
+                href={NETWORK.explorerTx(txHash)}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 flex items-center gap-1.5 font-mono text-[10px] text-[var(--orbit-accent)] hover:underline"
+              >
                 View on Explorer <ExternalLink className="h-3 w-3" />
               </a>
             )}
@@ -501,7 +539,8 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
           <div>
             <div className="font-display text-sm font-medium">About Testnet Tokens</div>
             <p className="mt-1 text-sm text-[var(--orbit-mute)]">
-              Friendbot tokens have no real value. They exist purely to let you test Stellar's Soroban smart contract functionality without spending real XLM.
+              Friendbot tokens have no real value. They exist purely to let you test Stellar's
+              Soroban smart contract functionality without spending real XLM.
             </p>
           </div>
         </div>
@@ -521,7 +560,9 @@ function ReceivePanel({ address }: { address: string | null }) {
   }
   return (
     <div className="glass rounded-2xl p-5">
-      <h3 className="mb-4 font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">Receive XLM</h3>
+      <h3 className="mb-4 font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
+        Receive XLM
+      </h3>
       {address ? (
         <>
           <div className="flex items-center justify-center mb-4">
@@ -530,19 +571,28 @@ function ReceivePanel({ address }: { address: string | null }) {
             </div>
           </div>
           <div className="mb-3 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5">
-            <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">Your wallet address</div>
+            <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">
+              Your wallet address
+            </div>
             <div className="font-mono text-xs break-all text-[var(--orbit-ink)]">{address}</div>
           </div>
           <button onClick={copy} className="liquid-btn w-full justify-center">
             <Copy className="h-4 w-4" />
             {copied ? "Copied!" : "Copy Address"}
           </button>
-          <a href={NETWORK.explorerAccount(address)} target="_blank" rel="noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 font-mono text-xs text-[var(--orbit-accent)] hover:underline">
+          <a
+            href={NETWORK.explorerAccount(address)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 flex w-full items-center justify-center gap-2 font-mono text-xs text-[var(--orbit-accent)] hover:underline"
+          >
             View on Stellar Explorer <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </>
       ) : (
-        <p className="font-mono text-xs text-[var(--orbit-mute)]">Connect your wallet to see your address.</p>
+        <p className="font-mono text-xs text-[var(--orbit-mute)]">
+          Connect your wallet to see your address.
+        </p>
       )}
     </div>
   );
@@ -550,7 +600,9 @@ function ReceivePanel({ address }: { address: string | null }) {
 
 // ──────────────────── Settings Tab ────────────────────
 function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
-  const [displayName, setDisplayName] = useState(() => localStorage.getItem("orbit:display-name") ?? "");
+  const [displayName, setDisplayName] = useState(
+    () => localStorage.getItem("orbit:display-name") ?? "",
+  );
   const [saved, setSaved] = useState(false);
 
   function saveProfile() {
@@ -565,7 +617,9 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
         <h3 className="mb-5 font-display text-base font-semibold">Profile Settings</h3>
         <div className="space-y-4">
           <div>
-            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">Display Name</label>
+            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
+              Display Name
+            </label>
             <input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
@@ -574,13 +628,21 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
             />
           </div>
           <div>
-            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">Connected Wallet</label>
+            <label className="block font-mono text-[11px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
+              Connected Wallet
+            </label>
             <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5 font-mono text-xs text-[var(--orbit-mute)] break-all">
               {wallet.address ?? "Not connected"}
             </div>
           </div>
           <button onClick={saveProfile} className="liquid-btn w-full justify-center">
-            {saved ? <><CheckCircle2 className="h-4 w-4" /> Saved!</> : "Save Profile"}
+            {saved ? (
+              <>
+                <CheckCircle2 className="h-4 w-4" /> Saved!
+              </>
+            ) : (
+              "Save Profile"
+            )}
           </button>
         </div>
       </div>
@@ -594,9 +656,16 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
             { k: "Soroban RPC", v: NETWORK.sorobanRpcUrl },
             { k: "Contract Mode", v: HAS_REAL_CONTRACT ? "Live Contract" : "Demo Mode" },
           ].map(({ k, v }) => (
-            <div key={k} className="flex items-start justify-between gap-4 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] shrink-0">{k}</span>
-              <span className="font-mono text-[10px] text-right text-[var(--orbit-ink)] break-all">{v}</span>
+            <div
+              key={k}
+              className="flex items-start justify-between gap-4 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] shrink-0">
+                {k}
+              </span>
+              <span className="font-mono text-[10px] text-right text-[var(--orbit-ink)] break-all">
+                {v}
+              </span>
             </div>
           ))}
         </div>
@@ -604,8 +673,12 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
 
       {wallet.address && (
         <div className="glass rounded-2xl border border-[var(--orbit-danger)]/20 p-6">
-          <h3 className="mb-3 font-display text-base font-semibold text-[var(--orbit-danger)]">Disconnect Wallet</h3>
-          <p className="mb-4 text-sm text-[var(--orbit-mute)]">This removes your wallet connection from Orbit. You can reconnect at any time.</p>
+          <h3 className="mb-3 font-display text-base font-semibold text-[var(--orbit-danger)]">
+            Disconnect Wallet
+          </h3>
+          <p className="mb-4 text-sm text-[var(--orbit-mute)]">
+            This removes your wallet connection from Orbit. You can reconnect at any time.
+          </p>
           <button
             onClick={wallet.disconnect}
             className="flex items-center gap-2 rounded-xl border border-[var(--orbit-danger)]/40 bg-[var(--orbit-danger)]/10 px-4 py-2.5 font-mono text-sm text-[var(--orbit-danger)] transition-all hover:bg-[var(--orbit-danger)]/20"
@@ -632,7 +705,8 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
         </div>
         <div className="font-display text-2xl font-semibold">Connect a Stellar Wallet</div>
         <p className="mt-3 text-sm text-[var(--orbit-mute)]">
-          Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can fund themselves with Friendbot.
+          Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can
+          fund themselves with Friendbot.
         </p>
         <button onClick={onConnect} className="liquid-btn mx-auto mt-7">
           <Wallet className="h-4 w-4" /> Connect Wallet
@@ -659,14 +733,14 @@ export function AppDashboard() {
   const showFundBanner = wallet.address && wallet.balance && !wallet.balance.funded;
 
   const pageTitle: Record<Tab, string> = {
-    portfolio:   "Portfolio",
-    deposit:     "Deposit & Receive",
-    withdraw:    "Withdraw",
-    history:     "Transaction History",
+    portfolio: "Portfolio",
+    deposit: "Deposit & Receive",
+    withdraw: "Withdraw",
+    history: "Transaction History",
     leaderboard: "Leaderboard",
-    simulate:    "Vault Simulator",
-    faucet:      "Testnet Faucet",
-    settings:    "Settings",
+    simulate: "Vault Simulator",
+    faucet: "Testnet Faucet",
+    settings: "Settings",
   };
 
   function renderContent() {
@@ -690,7 +764,12 @@ export function AppDashboard() {
       case "withdraw":
         return (
           <div className="max-w-md">
-            <WithdrawCard address={wallet.address} state={vault.state} onDone={vault.refresh} onNotify={add} />
+            <WithdrawCard
+              address={wallet.address}
+              state={vault.state}
+              onDone={vault.refresh}
+              onNotify={add}
+            />
           </div>
         );
       case "history":
@@ -700,7 +779,12 @@ export function AppDashboard() {
       case "simulate":
         return <SimulatorTab state={vault.state} xlmUsdPrice={xlmUsdPrice} />;
       case "faucet":
-        return <FaucetTab address={wallet.address} onFunded={() => wallet.refreshBalance(wallet.address!)} />;
+        return (
+          <FaucetTab
+            address={wallet.address}
+            onFunded={() => wallet.refreshBalance(wallet.address!)}
+          />
+        );
       case "settings":
         return <SettingsTab wallet={wallet} />;
       default:
@@ -712,7 +796,12 @@ export function AppDashboard() {
     <div className="flex h-screen overflow-hidden bg-transparent">
       {/* Ambient background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <EtheralShadow color="rgba(130, 26, 195, 0.4)" animation={{ scale: 100, speed: 60 }} noise={{ opacity: 0.8, scale: 1.2 }} sizing="fill" />
+        <EtheralShadow
+          color="rgba(130, 26, 195, 0.4)"
+          animation={{ scale: 100, speed: 60 }}
+          noise={{ opacity: 0.8, scale: 1.2 }}
+          sizing="fill"
+        />
       </div>
 
       {/* Sidebar (desktop) */}
@@ -740,9 +829,13 @@ export function AppDashboard() {
           </button>
 
           <div className="min-w-0 flex-1">
-            <h1 className="font-display text-lg font-semibold tracking-tight truncate">{pageTitle[activeTab]}</h1>
+            <h1 className="font-display text-lg font-semibold tracking-tight truncate">
+              {pageTitle[activeTab]}
+            </h1>
             <p className="font-mono text-[10px] text-[var(--orbit-mute)] hidden sm:block">
-              {HAS_REAL_CONTRACT ? "Soroban contract · Testnet" : "Demo mode · real Testnet payments + local share ledger"}
+              {HAS_REAL_CONTRACT
+                ? "Soroban contract · Testnet"
+                : "Demo mode · real Testnet payments + local share ledger"}
             </p>
           </div>
 
@@ -753,7 +846,9 @@ export function AppDashboard() {
             </div>
 
             {/* Refresh spinner */}
-            {vault.loading && <RefreshCcw className="h-4 w-4 animate-spin text-[var(--orbit-mute)]" />}
+            {vault.loading && (
+              <RefreshCcw className="h-4 w-4 animate-spin text-[var(--orbit-mute)]" />
+            )}
 
             {/* Notification bell */}
             <NotificationCenter />
@@ -762,7 +857,9 @@ export function AppDashboard() {
             {wallet.address ? (
               <div className="flex items-center gap-2 rounded-xl border border-[var(--orbit-edge)] bg-white/[0.04] px-3 py-2">
                 <div className="h-2 w-2 rounded-full bg-[var(--orbit-ok)] shadow-[0_0_8px_var(--orbit-ok)]" />
-                <span className="font-mono text-xs text-[var(--orbit-ink)]">{shortAddr(wallet.address)}</span>
+                <span className="font-mono text-xs text-[var(--orbit-ink)]">
+                  {shortAddr(wallet.address)}
+                </span>
               </div>
             ) : (
               <button onClick={wallet.connect} className="liquid-btn py-2 text-sm">
@@ -775,7 +872,10 @@ export function AppDashboard() {
         {/* Fund banner */}
         {showFundBanner && wallet.address && (
           <div className="px-6 pt-4">
-            <FundBanner address={wallet.address} onFunded={() => wallet.refreshBalance(wallet.address!)} />
+            <FundBanner
+              address={wallet.address}
+              onFunded={() => wallet.refreshBalance(wallet.address!)}
+            />
           </div>
         )}
 
@@ -815,7 +915,10 @@ export function AppDashboard() {
             >
               <Sidebar
                 active={activeTab}
-                onSelect={(t) => { setActiveTab(t); setMobileNavOpen(false); }}
+                onSelect={(t) => {
+                  setActiveTab(t);
+                  setMobileNavOpen(false);
+                }}
                 address={wallet.address}
                 balance={wallet.balance}
                 onDisconnect={wallet.disconnect}

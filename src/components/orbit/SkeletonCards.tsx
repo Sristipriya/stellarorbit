@@ -30,7 +30,10 @@ export function SkeletonRows({ count = 5 }: { count?: number }) {
     <div className="glass rounded-2xl p-5 space-y-3">
       <div className="skeleton-line w-40 mb-4" />
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex items-center justify-between gap-3 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3">
+        <div
+          key={i}
+          className="flex items-center justify-between gap-3 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3"
+        >
           <div className="flex items-center gap-3">
             <div className="skeleton h-8 w-8 rounded-full" />
             <div className="space-y-1.5">

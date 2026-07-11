@@ -47,7 +47,9 @@ export function OraclePricePanel({ state }: { state: VaultState }) {
           </div>
           <div>
             <div className="font-display text-sm font-semibold">SEP-40 Oracle Price</div>
-            <div className="font-mono text-[10px] text-[var(--orbit-mute)]">XLM / USD · Testnet</div>
+            <div className="font-mono text-[10px] text-[var(--orbit-mute)]">
+              XLM / USD · Testnet
+            </div>
           </div>
         </div>
         <button
@@ -62,7 +64,9 @@ export function OraclePricePanel({ state }: { state: VaultState }) {
 
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 p-3">
-          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">XLM / USD</div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
+            XLM / USD
+          </div>
           <div className="font-display text-xl font-semibold text-[var(--orbit-warn)]">
             {price != null ? `$${price.toFixed(4)}` : loading ? "…" : "—"}
           </div>
@@ -70,19 +74,27 @@ export function OraclePricePanel({ state }: { state: VaultState }) {
         </div>
 
         <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 p-3">
-          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">Vault TVL</div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
+            Vault TVL
+          </div>
           <div className="font-display text-xl font-semibold text-[var(--orbit-ink)]">
             {totalAssetsUsd}
           </div>
-          <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-1">{totalAssetsXlm} XLM</div>
+          <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-1">
+            {totalAssetsXlm} XLM
+          </div>
         </div>
 
         <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 p-3">
-          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">Share Price</div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
+            Share Price
+          </div>
           <div className="font-display text-xl font-semibold text-[var(--orbit-accent)]">
             {sharePriceUsd}
           </div>
-          <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-1">{sharePriceXlm.toFixed(5)} XLM</div>
+          <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-1">
+            {sharePriceXlm.toFixed(5)} XLM
+          </div>
         </div>
       </div>
 
@@ -90,7 +102,8 @@ export function OraclePricePanel({ state }: { state: VaultState }) {
         <div className="mt-3 flex items-center gap-1.5">
           <DollarSign className="h-3 w-3 text-[var(--orbit-mute)]" />
           <span className="font-mono text-[9px] text-[var(--orbit-mute)]">
-            Updated {lastUpdated.toLocaleTimeString()} · Powered by Stellar Expert · SEP-40 architecture preview
+            Updated {lastUpdated.toLocaleTimeString()} · Powered by Stellar Expert · SEP-40
+            architecture preview
           </span>
         </div>
       )}

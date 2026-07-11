@@ -8,10 +8,7 @@ import { useVault } from "@/hooks/use-vault";
 
 export const Route = createFileRoute("/admin/users")({
   head: () => ({
-    meta: [
-      { title: "Orbit Admin — Users" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Orbit Admin — Users" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminUsers,
 });
@@ -20,7 +17,9 @@ function AdminUsers() {
   const [authed, setAuthed] = useState(isAdminAuthenticated());
   const vault = useVault(null);
 
-  useEffect(() => { setAuthed(isAdminAuthenticated()); }, []);
+  useEffect(() => {
+    setAuthed(isAdminAuthenticated());
+  }, []);
   if (!authed) return <AdminLoginPage onSuccess={() => setAuthed(true)} />;
 
   const uniqueCount = new Set(vault.events.map((e) => e.address)).size;

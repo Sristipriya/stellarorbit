@@ -10,14 +10,18 @@ import { UniqueUsersPanel } from "@/components/admin/UniqueUsersPanel";
 import { VaultHealthCard } from "@/components/admin/VaultHealthCard";
 import { useVault } from "@/hooks/use-vault";
 import { stroopsToXlm } from "@/lib/stellar/network";
-import { TrendingUp, Users, ArrowDownToLine, ArrowUpFromLine, Activity, DollarSign } from "lucide-react";
+import {
+  TrendingUp,
+  Users,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Activity,
+  DollarSign,
+} from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
-    meta: [
-      { title: "Orbit Admin — Dashboard" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Orbit Admin — Dashboard" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminDashboard,
 });

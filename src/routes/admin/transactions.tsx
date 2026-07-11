@@ -8,10 +8,7 @@ import { useVault } from "@/hooks/use-vault";
 
 export const Route = createFileRoute("/admin/transactions")({
   head: () => ({
-    meta: [
-      { title: "Orbit Admin — Transactions" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Orbit Admin — Transactions" }, { name: "robots", content: "noindex" }],
   }),
   component: AdminTransactions,
 });
@@ -20,7 +17,9 @@ function AdminTransactions() {
   const [authed, setAuthed] = useState(isAdminAuthenticated());
   const vault = useVault(null);
 
-  useEffect(() => { setAuthed(isAdminAuthenticated()); }, []);
+  useEffect(() => {
+    setAuthed(isAdminAuthenticated());
+  }, []);
   if (!authed) return <AdminLoginPage onSuccess={() => setAuthed(true)} />;
 
   return (
