@@ -18,6 +18,7 @@ import { classifyError } from "@/lib/stellar/wallet";
 import { TxStatus, type TxState } from "./TxStatus";
 import { toast } from "sonner";
 import { type Notification } from "@/lib/notifications";
+import { FiatOnRamp } from "./FiatOnRamp";
 
 export function DepositCard({
   address,
@@ -37,6 +38,7 @@ export function DepositCard({
   const [amount, setAmount] = useState("");
   const [tx, setTx] = useState<TxState>({ kind: "idle" });
   const [raw, setRaw] = useState<string | undefined>();
+  const [fiatOpen, setFiatOpen] = useState(false);
 
   // Zap Mode State
   const [useZap, setUseZap] = useState(false);
@@ -146,10 +148,24 @@ export function DepositCard({
         <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
           Deposit
         </h3>
-        <span className="font-mono text-[10px] text-[var(--orbit-mute)]">
-          {currentAsset} → shares
-        </span>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setFiatOpen(true)}
+            className="rounded-md border border-[var(--orbit-edge)] px-2 py-0.5 font-mono text-[10px] uppercase text-[var(--orbit-accent)] hover:bg-[var(--orbit-accent)]/10"
+          >
+            Buy Crypto
+          </button>
+          <span className="font-mono text-[10px] text-[var(--orbit-mute)]">
+            {currentAsset} → shares
+          </span>
+        </div>
       </div>
+
+      <FiatOnRamp 
+        isOpen={fiatOpen} 
+        onClose={() => setFiatOpen(false)} 
+        address={address} 
+      />
 
       {/* Zap Toggle */}
       <div className="mt-4 flex items-center justify-between bg-black/20 p-2 rounded-lg border border-[var(--orbit-edge)]">

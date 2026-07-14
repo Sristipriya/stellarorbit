@@ -1,0 +1,18 @@
+{
+  "name": "Orbit DeFi Vaults",
+  "short_name": "Orbit",
+  "description": "Soroban-powered index vaults on Stellar",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Trophy, ArrowDownToLine, ArrowUpFromLine, ExternalLink } from "lucide-react";
+import { Trophy, ArrowDownToLine, ArrowUpFromLine, ExternalLink, Copy } from "lucide-react";
+import { toast } from "sonner";
 import { type ActivityEvent } from "@/lib/stellar/events";
 import { stroopsToXlm, shortAddr, NETWORK } from "@/lib/stellar/network";
 
@@ -142,22 +143,33 @@ export function LeaderboardTab({
                   </div>
                 </div>
 
-                <div className="text-right shrink-0">
-                  <div className="font-mono text-xs font-semibold text-[var(--orbit-ink)]">
-                    {stroopsToXlm(entry.totalDeposited)} XLM
+                <div className="text-right shrink-0 flex items-center gap-3">
+                  <div>
+                    <div className="font-mono text-xs font-semibold text-[var(--orbit-ink)]">
+                      {stroopsToXlm(entry.totalDeposited)} XLM
+                    </div>
+                    <div className="font-mono text-[9px] text-[var(--orbit-mute)]">
+                      {entry.txCount} tx
+                    </div>
                   </div>
-                  <div className="font-mono text-[9px] text-[var(--orbit-mute)]">
-                    {entry.txCount} tx
-                  </div>
+                  {!isMe && (
+                    <button
+                      onClick={() => toast.success(`Mirroring strategy of ${shortAddr(entry.address)}`)}
+                      className="ml-2 rounded-md border border-[var(--orbit-edge)] px-2 py-1 flex items-center gap-1 font-mono text-[9px] uppercase text-[var(--orbit-accent)] hover:bg-[var(--orbit-accent)]/10"
+                      title="Copy this user's vault allocations"
+                    >
+                      <Copy className="h-3 w-3" /> Mirror
+                    </button>
+                  )}
+                  <a
+                    href={NETWORK.explorerAccount(entry.address)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="ml-1 shrink-0 text-[var(--orbit-mute)] hover:text-[var(--orbit-accent)] transition-colors"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
                 </div>
-                <a
-                  href={NETWORK.explorerAccount(entry.address)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ml-1 shrink-0 text-[var(--orbit-mute)] hover:text-[var(--orbit-accent)] transition-colors"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
               </div>
             );
           })}
