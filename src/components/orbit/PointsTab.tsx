@@ -30,13 +30,7 @@ function useCountUp(target: number, duration = 1200) {
   return value;
 }
 
-export function PointsTab({
-  address,
-  state,
-}: {
-  address: string | null;
-  state: VaultState;
-}) {
+export function PointsTab({ address, state }: { address: string | null; state: VaultState }) {
   const [points, setPoints] = useState(0);
   const [referralCode, setReferralCode] = useState("");
   const [referralLink, setReferralLink] = useState("");
@@ -161,8 +155,8 @@ export function PointsTab({
 
         <p className="text-xs text-[var(--orbit-mute)] mb-4">
           Share your referral link. When friends deposit, you earn{" "}
-          <span className="text-[var(--orbit-accent)]">+10% of their points</span> for 90 days.
-          They earn +5% bonus points on their first deposit.
+          <span className="text-[var(--orbit-accent)]">+10% of their points</span> for 90 days. They
+          earn +5% bonus points on their first deposit.
         </p>
 
         {/* Referral code */}
@@ -171,7 +165,9 @@ export function PointsTab({
             Your Referral Code
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5">
-            <span className="font-mono text-sm text-[var(--orbit-accent)] flex-1">{referralCode}</span>
+            <span className="font-mono text-sm text-[var(--orbit-accent)] flex-1">
+              {referralCode}
+            </span>
           </div>
         </div>
 
@@ -238,16 +234,18 @@ export function PointsTab({
                       i === 0
                         ? "text-[var(--orbit-warn)]"
                         : i === 1
-                        ? "text-slate-400"
-                        : i === 2
-                        ? "text-amber-700"
-                        : "text-[var(--orbit-mute)]"
+                          ? "text-slate-400"
+                          : i === 2
+                            ? "text-amber-700"
+                            : "text-[var(--orbit-mute)]"
                     }`}
                   >
                     {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div className={`font-mono text-xs ${isMe ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}>
+                    <div
+                      className={`font-mono text-xs ${isMe ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}
+                    >
                       {snap.walletAddress.slice(0, 4)}…{snap.walletAddress.slice(-4)}
                       {isMe && " (you)"}
                     </div>

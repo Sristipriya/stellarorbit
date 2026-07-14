@@ -170,7 +170,9 @@ export async function getVaultState(address: string | null): Promise<VaultState>
         ? readContract<bigint>("balance_of", [addrArg(address)]).catch(() => 0n)
         : Promise.resolve(0n),
       readContract<bigint>("get_apy_bps").catch(() => 0n),
-      readContract<Array<{ timestamp: bigint; price_scaled: bigint }>>("get_price_history").catch(() => []),
+      readContract<Array<{ timestamp: bigint; price_scaled: bigint }>>("get_price_history").catch(
+        () => [],
+      ),
     ]);
     return {
       totalAssetsStroops: BigInt(totalAssets),
@@ -195,9 +197,10 @@ export async function getVaultState(address: string | null): Promise<VaultState>
 export async function getPriceHistory(): Promise<PriceSnapshot[]> {
   if (HAS_REAL_CONTRACT) {
     try {
-      const raw = await readContract<Array<{ timestamp: bigint | number; price_scaled: bigint | number }>>(
-        "get_price_history",
-      );
+      const raw =
+        await readContract<Array<{ timestamp: bigint | number; price_scaled: bigint | number }>>(
+          "get_price_history",
+        );
       if (!Array.isArray(raw)) return [];
       return raw.map((e) => ({
         timestamp: Number(e.timestamp),
@@ -387,9 +390,7 @@ export function computePnl(walletAddress: string, state: VaultState): PnlResult 
   if (positions.length === 0) return null;
 
   const totalShares = positions.reduce((acc, p) => acc + BigInt(p.initialSharesMinted), 0n);
-  const oldestEntry = positions.reduce((a, b) =>
-    a.entryTimestamp < b.entryTimestamp ? a : b,
-  );
+  const oldestEntry = positions.reduce((a, b) => (a.entryTimestamp < b.entryTimestamp ? a : b));
   const entryPriceScaled = BigInt(oldestEntry.entrySharePrice);
   const currentPriceScaled = state.pricePerShareScaled;
 

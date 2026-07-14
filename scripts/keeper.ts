@@ -65,14 +65,16 @@ async function startKeeper() {
     try {
       // 1. Fetch current Total Assets from the contract
       const totalAssetsStr = await runCommand(
-        `stellar contract invoke --id ${contractId} --network ${NETWORK} --source ${IDENTITY} -- total_assets`
+        `stellar contract invoke --id ${contractId} --network ${NETWORK} --source ${IDENTITY} -- total_assets`,
       );
-      
+
       // Clean the output (stellar-cli might output quotes or extra text)
       const totalAssets = BigInt(totalAssetsStr.replace(/[^0-9]/g, ""));
-      
+
       if (totalAssets === 0n) {
-        console.log(`[${new Date().toLocaleTimeString()}] 💤 Vault is empty (0 XLM). Waiting for deposits...`);
+        console.log(
+          `[${new Date().toLocaleTimeString()}] 💤 Vault is empty (0 XLM). Waiting for deposits...`,
+        );
         return;
       }
 
@@ -82,22 +84,28 @@ async function startKeeper() {
       const yieldStroops = BigInt(Math.floor(exactYieldFloat));
 
       if (yieldStroops <= 0n) {
-        console.log(`[${new Date().toLocaleTimeString()}] ⏳ Yield too small to harvest this tick.`);
+        console.log(
+          `[${new Date().toLocaleTimeString()}] ⏳ Yield too small to harvest this tick.`,
+        );
         return;
       }
 
       const yieldXlm = (Number(yieldStroops) / 10000000).toFixed(7);
-      console.log(`[${new Date().toLocaleTimeString()}] 🧮 Calculated Yield: +${yieldXlm} XLM. Injecting into contract...`);
+      console.log(
+        `[${new Date().toLocaleTimeString()}] 🧮 Calculated Yield: +${yieldXlm} XLM. Injecting into contract...`,
+      );
 
       // 3. Inject Yield via harvest()
       await runCommand(
-        `stellar contract invoke --id ${contractId} --network ${NETWORK} --source ${IDENTITY} -- harvest --admin ${adminAddress} --yield_amount ${yieldStroops.toString()}`
+        `stellar contract invoke --id ${contractId} --network ${NETWORK} --source ${IDENTITY} -- harvest --admin ${adminAddress} --yield_amount ${yieldStroops.toString()}`,
       );
 
       console.log(`[${new Date().toLocaleTimeString()}] ✅ Successfully harvested and compounded!`);
-
-    } catch (err: any) {
-      console.error(`[${new Date().toLocaleTimeString()}] ❌ Keeper Tick Error:`, err.message);
+    } catch (err: unknown) {
+      console.error(
+        `[${new Date().toLocaleTimeString()}] ❌ Keeper Tick Error:`,
+        err instanceof Error ? err.message : String(err),
+      );
     }
   }, INTERVAL_SECONDS * 1000);
 }

@@ -57,8 +57,10 @@ function AdminSettings() {
       });
       console.log("Harvest TX:", txHash);
       vault.refresh();
-    } catch (err: any) {
-      toast.error("Harvest Failed", { description: err.message || String(err) });
+    } catch (err: unknown) {
+      toast.error("Harvest Failed", {
+        description: err instanceof Error ? err.message : String(err),
+      });
     } finally {
       setHarvesting(false);
     }
@@ -142,7 +144,8 @@ function AdminSettings() {
               Live Presentation Tools
             </h3>
             <p className="font-mono text-xs text-[var(--orbit-mute)] mb-4 max-w-sm">
-              Instantly inject simulated profit (XLM) into the vault to demonstrate yield generation and share price growth live.
+              Instantly inject simulated profit (XLM) into the vault to demonstrate yield generation
+              and share price growth live.
             </p>
             <div className="flex gap-3 items-center">
               <div className="relative">

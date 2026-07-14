@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
-import { deposit, quoteSharesForDeposit, recordPosition, type VaultState } from "@/lib/stellar/vault";
+import {
+  deposit,
+  quoteSharesForDeposit,
+  recordPosition,
+  type VaultState,
+} from "@/lib/stellar/vault";
 import { stroopsToXlm, STROOPS_PER_XLM } from "@/lib/stellar/network";
 import { classifyError } from "@/lib/stellar/wallet";
 import { TxStatus, type TxState } from "./TxStatus";

@@ -44,7 +44,9 @@ export const VAULTS: VaultMeta[] = [
     name: "Orbit XLM Vault",
     description: "Deposit XLM, earn real yield via Blend Protocol lending.",
     assetSymbol: "XLM",
-    contractId: (import.meta.env.VITE_ORBIT_VAULT_CONTRACT_ID as string | undefined) || "CDRDDSKIZW4Q2PTA2B3RFAX4ILY5ZPGJF2IQNPQPNKJ3EQFTORD3MCIX",
+    contractId:
+      (import.meta.env.VITE_ORBIT_VAULT_CONTRACT_ID as string | undefined) ||
+      "CDRDDSKIZW4Q2PTA2B3RFAX4ILY5ZPGJF2IQNPQPNKJ3EQFTORD3MCIX",
     assetId: XLM_SAC,
     strategy: "Blend Protocol Lending",
     risk: "low",
@@ -56,7 +58,7 @@ export const VAULTS: VaultMeta[] = [
     name: "Orbit USDC Vault",
     description: "Stablecoin yield on USDC via Blend + Aquarius LP.",
     assetSymbol: "USDC",
-    contractId: (import.meta.env.VITE_ORBIT_USDC_CONTRACT_ID as string | undefined),
+    contractId: import.meta.env.VITE_ORBIT_USDC_CONTRACT_ID as string | undefined,
     assetId: USDC_SAC,
     strategy: "Blend Lending + Aquarius LP",
     risk: "low",
@@ -68,7 +70,7 @@ export const VAULTS: VaultMeta[] = [
     name: "Orbit Index Vault",
     description: "Auto-rebalanced XLM+USDC basket for diversified yield.",
     assetSymbol: "XLM+USDC",
-    contractId: (import.meta.env.VITE_ORBIT_INDEX_CONTRACT_ID as string | undefined),
+    contractId: import.meta.env.VITE_ORBIT_INDEX_CONTRACT_ID as string | undefined,
     assetId: XLM_SAC, // Index primarily denominated in XLM
     strategy: "Auto-Rebalanced Basket",
     risk: "medium",

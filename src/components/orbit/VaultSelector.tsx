@@ -25,7 +25,11 @@ const RISK_COLOR: Record<VaultMeta["risk"], string> = {
 export function VaultCard({ vault, isSelected, tvlXlm, apyPct, onClick }: VaultCardProps) {
   const isLive = Boolean(vault.contractId);
   const apyDisplay =
-    apyPct != null && apyPct > 0 ? `${apyPct.toFixed(2)}% APY` : isLive ? "Accruing..." : "Coming Soon";
+    apyPct != null && apyPct > 0
+      ? `${apyPct.toFixed(2)}% APY`
+      : isLive
+        ? "Accruing..."
+        : "Coming Soon";
 
   return (
     <motion.button
@@ -137,7 +141,8 @@ export function VaultSelector({
           Choose Vault
         </h3>
         <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)]">
-          {vaults.filter((v) => v.contractId).length} live · {vaults.filter((v) => !v.contractId).length} coming soon
+          {vaults.filter((v) => v.contractId).length} live ·{" "}
+          {vaults.filter((v) => !v.contractId).length} coming soon
         </span>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">

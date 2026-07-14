@@ -30,10 +30,7 @@ export function useVault(address: string | null) {
     setLoading(true);
     setError(null);
     try {
-      const [s, history] = await Promise.all([
-        getVaultState(addrRef.current),
-        getPriceHistory(),
-      ]);
+      const [s, history] = await Promise.all([getVaultState(addrRef.current), getPriceHistory()]);
       setState(s);
       setPriceHistory(history);
     } catch (e) {

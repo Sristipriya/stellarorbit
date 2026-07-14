@@ -2,8 +2,9 @@
 use super::{OrbitVault, OrbitVaultClient};
 use soroban_sdk::{
     testutils::Address as _,
-    token, Address, Env,
+    token, Address, Env, String,
 };
+use orbit_share_token::{OrbitShareToken, OrbitShareTokenClient};
 
 fn setup<'a>() -> (
     Env,
@@ -25,7 +26,18 @@ fn setup<'a>() -> (
     let token_admin = token::StellarAssetClient::new(&env, &asset_id);
     let token_client = token::TokenClient::new(&env, &asset_id);
 
-    // Constructor: asset, admin, fee_recipient, perf_fee_bps (1000 = 10%)
+    let share_token_id = env.register(
+        OrbitShareToken,
+        (
+            admin.clone(),
+            admin.clone(),
+            String::from_str(&env, "Orbit Share"),
+            String::from_str(&env, "orXLM"),
+            7_u32,
+        ),
+    );
+
+    // Constructor: asset, admin, fee_recipient, perf_fee_bps, share_token
     let vault_id = env.register(
         OrbitVault,
         (
@@ -33,9 +45,13 @@ fn setup<'a>() -> (
             admin.clone(),
             fee_recipient.clone(),
             1000_u32,
+            share_token_id.clone(),
         ),
     );
     let vault = OrbitVaultClient::new(&env, &vault_id);
+
+    // Link minter to vault
+    OrbitShareTokenClient::new(&env, &share_token_id).set_minter(&admin, &vault_id);
 
     (
         env,

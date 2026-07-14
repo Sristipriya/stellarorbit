@@ -69,9 +69,7 @@ export function computeAndSavePoints(
   entryTimestamp: number | null,
 ): number {
   const now = Math.floor(Date.now() / 1000);
-  const daysHeld = entryTimestamp
-    ? Math.max(0, (now - entryTimestamp) / SECONDS_PER_DAY)
-    : 0;
+  const daysHeld = entryTimestamp ? Math.max(0, (now - entryTimestamp) / SECONDS_PER_DAY) : 0;
   const sharesXlm = Number(userSharesStroops) / Number(STROOPS_PER_XLM);
   const earned = sharesXlm * daysHeld;
 

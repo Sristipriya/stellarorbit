@@ -34,12 +34,19 @@ pub enum DataKey {
     Asset,
     TotalAssets,
     TotalShares,
-    Balances,
+    ShareToken,
     AssetsLent,
     Admin,
     FeeRecipient,
     PerfFeeBps,
     PriceHistory,
+}
+
+#[soroban_sdk::contractclient(name = "ShareTokenClient")]
+pub trait ShareTokenInterface {
+    fn mint(env: Env, minter: Address, to: Address, amount: i128);
+    fn burn(env: Env, minter: Address, from: Address, amount: i128);
+    fn balance(env: Env, id: Address) -> i128;
 }
 
 #[derive(Clone)]
@@ -64,12 +71,14 @@ impl OrbitVault {
     /// * `admin`         – address allowed to call invest/divest/harvest
     /// * `fee_recipient` – address that receives the performance fee cut
     /// * `perf_fee_bps`  – performance fee in basis points (0–5000, max 50%)
+    /// * `share_token`   – the SEP-41 share token contract address
     pub fn __constructor(
         env: Env,
         asset: Address,
         admin: Address,
         fee_recipient: Address,
         perf_fee_bps: u32,
+        share_token: Address,
     ) {
         assert!(perf_fee_bps <= 5000, "fee must not exceed 50%");
         env.storage().instance().set(&DataKey::Asset, &asset);
@@ -79,9 +88,7 @@ impl OrbitVault {
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::FeeRecipient, &fee_recipient);
         env.storage().instance().set(&DataKey::PerfFeeBps, &perf_fee_bps);
-        env.storage()
-            .instance()
-            .set(&DataKey::Balances, &Map::<Address, i128>::new(&env));
+        env.storage().instance().set(&DataKey::ShareToken, &share_token);
         env.storage()
             .instance()
             .set(&DataKey::PriceHistory, &vec![&env] as &Vec<PriceSnapshot>);
@@ -114,14 +121,10 @@ impl OrbitVault {
         env.storage()
             .instance()
             .set(&DataKey::TotalShares, &(total_shares + shares));
-        let mut balances: Map<Address, i128> = env
-            .storage()
-            .instance()
-            .get(&DataKey::Balances)
-            .unwrap_or(Map::new(&env));
-        let cur = balances.get(from.clone()).unwrap_or(0);
-        balances.set(from.clone(), cur + shares);
-        env.storage().instance().set(&DataKey::Balances, &balances);
+        
+        let share_token: Address = env.storage().instance().get(&DataKey::ShareToken).unwrap();
+        let client = ShareTokenClient::new(&env, &share_token);
+        client.mint(&env.current_contract_address(), &from, &shares);
 
         env.events()
             .publish((symbol_short!("Dep"),), (from, amount, shares));
@@ -146,12 +149,9 @@ impl OrbitVault {
             .unwrap_or(0);
         assert!(total_shares > 0, "vault empty");
 
-        let mut balances: Map<Address, i128> = env
-            .storage()
-            .instance()
-            .get(&DataKey::Balances)
-            .unwrap_or(Map::new(&env));
-        let user_shares = balances.get(from.clone()).unwrap_or(0);
+        let share_token: Address = env.storage().instance().get(&DataKey::ShareToken).unwrap();
+        let client = ShareTokenClient::new(&env, &share_token);
+        let user_shares = client.balance(&from);
         assert!(shares <= user_shares, "insufficient shares");
 
         let assets_lent: i128 = env
@@ -166,8 +166,8 @@ impl OrbitVault {
             "insufficient idle assets; divest required first"
         );
 
-        balances.set(from.clone(), user_shares - shares);
-        env.storage().instance().set(&DataKey::Balances, &balances);
+        client.burn(&env.current_contract_address(), &from, &shares);
+
         env.storage()
             .instance()
             .set(&DataKey::TotalShares, &(total_shares - shares));
@@ -190,12 +190,9 @@ impl OrbitVault {
     // ─────────────────────────── Read-only views ─────────────────────────────
 
     pub fn balance_of(env: Env, who: Address) -> i128 {
-        let balances: Map<Address, i128> = env
-            .storage()
-            .instance()
-            .get(&DataKey::Balances)
-            .unwrap_or(Map::new(&env));
-        balances.get(who).unwrap_or(0)
+        let share_token: Address = env.storage().instance().get(&DataKey::ShareToken).unwrap();
+        let client = ShareTokenClient::new(&env, &share_token);
+        client.balance(&who)
     }
 
     pub fn total_assets(env: Env) -> i128 {

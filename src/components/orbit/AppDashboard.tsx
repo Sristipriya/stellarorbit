@@ -35,7 +35,13 @@ import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { useWallet } from "@/hooks/use-wallet";
 import { useVault } from "@/hooks/use-vault";
 import { type ActivityEvent } from "@/lib/stellar/events";
-import { NETWORK, shortAddr, stroopsToXlm, HAS_REAL_CONTRACT, STROOPS_PER_XLM } from "@/lib/stellar/network";
+import {
+  NETWORK,
+  shortAddr,
+  stroopsToXlm,
+  HAS_REAL_CONTRACT,
+  STROOPS_PER_XLM,
+} from "@/lib/stellar/network";
 import { type VaultState, type PriceSnapshot, computePnl } from "@/lib/stellar/vault";
 import { ShareCertificate } from "./ShareCertificate";
 import { OraclePricePanel } from "./OraclePricePanel";
@@ -335,9 +341,9 @@ function PortfolioTab({
                 className={`mt-2 font-display text-2xl font-semibold ${
                   c.accent
                     ? "text-[var(--orbit-accent)]"
-                    : (c as any).green
-                    ? "text-[var(--orbit-ok)]"
-                    : "text-[var(--orbit-ink)]"
+                    : (c as Record<string, string>).green
+                      ? "text-[var(--orbit-ok)]"
+                      : "text-[var(--orbit-ink)]"
                 }`}
               >
                 {c.value}
@@ -371,7 +377,9 @@ function PortfolioTab({
               {
                 label: "Current Value",
                 value: `${stroopsToXlm(pnl.currentValueStroops)} XLM`,
-                sub: xlmUsdPrice ? xlmToUsd(stroopsToXlm(pnl.currentValueStroops), xlmUsdPrice) : undefined,
+                sub: xlmUsdPrice
+                  ? xlmToUsd(stroopsToXlm(pnl.currentValueStroops), xlmUsdPrice)
+                  : undefined,
                 accent: true,
               },
               {
@@ -403,11 +411,11 @@ function PortfolioTab({
                   className={`font-display text-lg font-semibold ${
                     c.accent
                       ? "text-[var(--orbit-accent)]"
-                      : (c as any).green
-                      ? "text-[var(--orbit-ok)]"
-                      : (c as any).red
-                      ? "text-[var(--orbit-danger)]"
-                      : "text-[var(--orbit-ink)]"
+                      : (c as Record<string, string>).green
+                        ? "text-[var(--orbit-ok)]"
+                        : (c as Record<string, string>).red
+                          ? "text-[var(--orbit-danger)]"
+                          : "text-[var(--orbit-ink)]"
                   }`}
                 >
                   {c.value}
@@ -856,7 +864,14 @@ export function AppDashboard() {
     if (!wallet.address) return <ConnectPrompt onConnect={wallet.connect} />;
     switch (activeTab) {
       case "portfolio":
-        return <PortfolioTab wallet={wallet} vault={vault} priceHistory={vault.priceHistory} xlmUsdPrice={xlmUsdPrice} />;
+        return (
+          <PortfolioTab
+            wallet={wallet}
+            vault={vault}
+            priceHistory={vault.priceHistory}
+            xlmUsdPrice={xlmUsdPrice}
+          />
+        );
       case "deposit":
         return (
           <div className="grid gap-4 lg:grid-cols-2">
