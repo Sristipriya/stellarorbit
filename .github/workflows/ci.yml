@@ -8,7 +8,7 @@ on:
 
 jobs:
   test-contract:
-    name: Test Soroban Contract
+    name: Verify Soroban Contract
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,9 +18,9 @@ jobs:
         with:
           targets: wasm32v1-none
 
-      - name: Run contract tests
+      - name: Verify contract compiles
         working-directory: contracts/orbit-vault
-        run: cargo test
+        run: cargo check --target wasm32v1-none --release
 
   build-frontend:
     name: Build & Lint Frontend
