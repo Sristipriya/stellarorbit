@@ -1,5 +1,4 @@
-import { ORBIT_POINTS_CONTRACT_ID } from "./stellar/network";
-import { readContract, invokeContract, addrArg } from "./stellar/soroban";
+import { supabase } from "./supabase";
 
 export type LeaderboardEntry = {
   walletAddress: string;
@@ -8,78 +7,78 @@ export type LeaderboardEntry = {
   rank: number;
 };
 
-/** Get the on-chain points for a wallet. */
+/** Get the points for a wallet from Supabase. */
 export async function getPoints(walletAddress: string): Promise<number> {
-  if (!ORBIT_POINTS_CONTRACT_ID) return 0;
+  if (typeof window === "undefined") return 0;
   try {
-    const raw = await readContract<bigint | number>(
-      "get_points",
-      [addrArg(walletAddress)],
-      ORBIT_POINTS_CONTRACT_ID,
-    );
-    return Number(raw);
+    const { data } = await supabase
+      .from("profiles")
+      .select("points")
+      .eq("wallet_address", walletAddress)
+      .single();
+    return data ? Number(data.points) : 0;
   } catch {
     return 0;
   }
 }
 
-/** Get the on-chain referrer for a wallet. */
+/** Get the referrer for a wallet. */
 export async function getReferrer(walletAddress: string): Promise<string | null> {
-  if (!ORBIT_POINTS_CONTRACT_ID) return null;
+  if (typeof window === "undefined") return null;
   try {
-    const raw = await readContract<string>(
-      "get_referrer",
-      [addrArg(walletAddress)],
-      ORBIT_POINTS_CONTRACT_ID,
-    );
-    return raw || null;
+    const { data } = await supabase
+      .from("profiles")
+      .select("referred_by")
+      .eq("wallet_address", walletAddress)
+      .single();
+    return data?.referred_by || null;
   } catch {
     return null;
   }
 }
 
-/** Set the referrer on-chain. */
-export async function setReferrer(walletAddress: string, referrerAddress: string): Promise<void> {
-  if (!ORBIT_POINTS_CONTRACT_ID) return;
-  if (walletAddress === referrerAddress) return;
-  try {
-    await invokeContract(ORBIT_POINTS_CONTRACT_ID, "set_referrer", [
-      addrArg(walletAddress),
-      addrArg(referrerAddress),
-    ]);
-  } catch (e) {
-    console.error("Failed to set referrer", e);
-  }
-}
-
-/**
+/** 
  * Build a leaderboard.
- * Since we don't have an off-chain indexer to query all Soroban state for the demo,
- * we return a mocked top list but prepend the user's actual on-chain points if available.
+ * Fetches the top 100 users from Supabase, ordered by points.
  */
 export async function buildLeaderboard(currentUser?: string | null): Promise<LeaderboardEntry[]> {
-  const dummy: LeaderboardEntry[] = [
-    { walletAddress: "GBX...A12B", displayName: "WhaleHunter", totalPoints: 12500, rank: 1 },
-    { walletAddress: "GCA...F90D", displayName: "DeFi Chad", totalPoints: 8900, rank: 2 },
-    { walletAddress: "GDA...E32C", displayName: "Yield Farmer", totalPoints: 4200, rank: 3 },
-  ];
+  if (typeof window === "undefined") return [];
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("wallet_address, display_name, points")
+      .order("points", { ascending: false })
+      .limit(100);
 
-  if (currentUser) {
-    const userPts = await getPoints(currentUser);
-    let displayName = null;
-    try {
-      displayName = localStorage.getItem(`orbit:display-name:${currentUser}`) ?? null;
-    } catch {
-      /* noop */
+    if (error || !data) return [];
+
+    let leaderboard: LeaderboardEntry[] = data.map((row, i) => ({
+      walletAddress: row.wallet_address,
+      displayName: row.display_name,
+      totalPoints: Number(row.points),
+      rank: i + 1,
+    }));
+
+    // Ensure the current user is in the list, if they are not in the top 100
+    if (currentUser && !leaderboard.find((e) => e.walletAddress === currentUser)) {
+      const userPoints = await getPoints(currentUser);
+      leaderboard.push({
+        walletAddress: currentUser,
+        displayName: null,
+        totalPoints: userPoints,
+        rank: 0,
+      });
+      // Re-sort
+      leaderboard = leaderboard.sort((a, b) => b.totalPoints - a.totalPoints);
+      // Re-rank
+      leaderboard = leaderboard.map((e, i) => ({ ...e, rank: i + 1 }));
     }
 
-    // Insert user into correct rank
-    const userEntry = { walletAddress: currentUser, displayName, totalPoints: userPts, rank: 0 };
-    const all = [...dummy, userEntry].sort((a, b) => b.totalPoints - a.totalPoints);
-    return all.map((e, i) => ({ ...e, rank: i + 1 }));
+    return leaderboard;
+  } catch (e) {
+    console.error("Failed to build leaderboard", e);
+    return [];
   }
-
-  return dummy;
 }
 
 export function formatPoints(pts: number): string {
@@ -92,7 +91,7 @@ export function formatPoints(pts: number): string {
 
 const LS_REFERRED_BY = "orbit:referral:referred_by";
 
-/** Get or create the referral code for this wallet. We use the raw address for on-chain. */
+/** Get or create the referral code for this wallet. We use the raw address. */
 export function getMyReferralCode(walletAddress: string): string {
   return walletAddress;
 }
@@ -124,4 +123,33 @@ export function buildReferralLink(walletAddress: string): string {
   const code = getMyReferralCode(walletAddress);
   const base = typeof window !== "undefined" ? window.location.origin : "https://orbit.finance";
   return `${base}/app?ref=${code}`;
+}
+
+/** Initialize a user's profile in Supabase on connection */
+export async function registerUser(walletAddress: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("wallet_address")
+      .eq("wallet_address", walletAddress)
+      .single();
+
+    if (!existing) {
+      const code = getMyReferralCode(walletAddress);
+      const referredBy = getReferrerCode();
+      
+      // Prevent self-referral
+      const finalReferredBy = (referredBy && referredBy !== code) ? referredBy : null;
+
+      await supabase.from("profiles").insert({
+        wallet_address: walletAddress,
+        referral_code: code,
+        referred_by: finalReferredBy,
+        points: 0
+      });
+    }
+  } catch (e) {
+    console.error("Failed to register user", e);
+  }
 }

@@ -8,6 +8,7 @@ import {
   getReferrerCode,
   formatPoints,
   buildLeaderboard,
+  getReferrer,
   type LeaderboardEntry,
 } from "@/lib/points";
 import type { VaultState } from "@/lib/stellar/vault";
@@ -58,7 +59,9 @@ export function PointsTab({ address, state }: { address: string | null; state: V
       const code = getMyReferralCode(address);
       setReferralCode(code);
       setReferralLink(buildReferralLink(address));
-      setReferredBy(getReferrerCode());
+      
+      const backendReferrer = await getReferrer(address);
+      setReferredBy(backendReferrer || getReferrerCode());
 
       const board = await buildLeaderboard(address);
       if (!isMounted) return;
@@ -111,7 +114,8 @@ export function PointsTab({ address, state }: { address: string | null; state: V
         </div>
 
         <p className="font-mono text-xs text-[var(--orbit-mute)]">
-          Earn points by Zapping cross-asset deposits into Orbit vaults.
+          Earn points automatically when depositing. <br/>
+          <span className="text-[var(--orbit-accent)]">Standard Deposit = 1x Points</span> | <span className="text-[var(--orbit-warn)]">Zap Deposit = 2x Points</span>
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-3">

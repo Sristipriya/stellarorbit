@@ -22,6 +22,7 @@ import { signTx } from "./wallet";
 import { addrArg, i128Arg, invokeContract, readContract } from "./soroban";
 import { supabase } from "../supabase";
 import { getVaultById } from "./vaults";
+import { getReferrer } from "../points";
 
 export type VaultState = {
   totalAssetsStroops: bigint;
@@ -249,6 +250,25 @@ async function submitMarkerTx(address: string, memoText: string): Promise<string
   return res.hash;
 }
 
+/* ───────────────────────────── Points Gamification ────────────────────────── */
+
+async function awardPoints(walletAddress: string, points: number) {
+  if (typeof window === "undefined" || points <= 0) return;
+  try {
+    await supabase.rpc("award_points", { p_wallet_address: walletAddress, p_points: points });
+    
+    const referrer = await getReferrer(walletAddress);
+    if (referrer && referrer !== walletAddress) {
+      const bonus = Math.floor(points * 0.10);
+      if (bonus > 0) {
+        await supabase.rpc("award_points", { p_wallet_address: referrer, p_points: bonus });
+      }
+    }
+  } catch (e) {
+    console.error("Failed to award points", e);
+  }
+}
+
 /* ───────────────────────────── Deposit ────────────────────────────────── */
 
 export async function deposit(
@@ -266,6 +286,8 @@ export async function deposit(
       i128Arg(amountStroops),
     ], vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
+    const pts = Math.floor(Number(amountStroops) / 10000000);
+    if (pts > 0) awardPoints(address, pts);
     return { txHash, sharesMinted, amountStroops };
   }
 
@@ -279,6 +301,8 @@ export async function deposit(
   writeDemoState(s);
   // Record price snapshot in demo mode
   appendDemoHistory(priceScaled(s.totalAssets, s.totalShares));
+  const pts = Math.floor(Number(amountStroops) / 10000000);
+  if (pts > 0) awardPoints(address, pts);
   return { txHash, sharesMinted: shares, amountStroops };
 }
 
@@ -310,6 +334,8 @@ export async function zapDeposit(
   );
 
   const sharesMinted = retval == null ? 0n : BigInt(retval);
+  const pts = Math.floor(Number(amountStroops) / 10000000) * 2;
+  if (pts > 0) awardPoints(userAddress, pts);
   return { txHash, sharesMinted };
 }
 

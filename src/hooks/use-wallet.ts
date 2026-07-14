@@ -9,6 +9,7 @@ import {
   type WalletError,
 } from "@/lib/stellar/wallet";
 import { fetchXlmBalance } from "@/lib/stellar/balance";
+import { registerUser } from "@/lib/points";
 
 const LS_ADDR = "orbit:wallet:address";
 const LS_WALLET = "orbit:wallet:id";
@@ -34,6 +35,7 @@ export function useWallet() {
       .then((alive) => {
         if (alive) {
           setAddress(savedAddr);
+          registerUser(savedAddr);
         } else {
           // Session is dead — clear everything so the user must reconnect
           localStorage.removeItem(LS_ADDR);
@@ -66,6 +68,7 @@ export function useWallet() {
       setAddress(addr);
       localStorage.setItem(LS_ADDR, addr);
       if (walletId) localStorage.setItem(LS_WALLET, walletId);
+      await registerUser(addr);
       await refreshBalance(addr);
     } catch (e) {
       setError(classifyError(e));
