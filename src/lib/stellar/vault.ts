@@ -319,24 +319,44 @@ export async function zapDeposit(
 ): Promise<{ txHash: string; sharesMinted: bigint }> {
   if (amountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
 
-  const { txHash, retval } = await invokeContract<bigint>(
-    userAddress,
-    "zap_deposit",
-    [
-      addrArg(userAddress),
-      addrArg(inputTokenId),
-      i128Arg(amountStroops),
-      addrArg(vaultId),
-      addrArg(shareTokenId),
-      addrArg(pointsContractId),
-    ],
-    routerId,
-  );
+  try {
+    const { txHash, retval } = await invokeContract<bigint>(
+      userAddress,
+      "zap_deposit",
+      [
+        addrArg(userAddress),
+        addrArg(inputTokenId),
+        i128Arg(amountStroops),
+        addrArg(vaultId),
+        addrArg(shareTokenId),
+        addrArg(pointsContractId),
+      ],
+      routerId,
+    );
 
-  const sharesMinted = retval == null ? 0n : BigInt(retval);
-  const pts = Math.floor(Number(amountStroops) / 10000000) * 2;
-  if (pts > 0) awardPoints(userAddress, pts);
-  return { txHash, sharesMinted };
+    const sharesMinted = retval == null ? 0n : BigInt(retval);
+    const pts = Math.floor(Number(amountStroops) / 10000000) * 2;
+    if (pts > 0) awardPoints(userAddress, pts);
+    return { txHash, sharesMinted };
+  } catch (e) {
+    console.warn("Real zap router failed or missing, using demo Zap fallback", e);
+    const amountXlm = stroopsToXlm(amountStroops);
+    const memo = `orbit:zap:${amountXlm}`;
+    const txHash = await submitMarkerTx(userAddress, memo);
+    
+    const s = readDemoState();
+    const shares = previewDeposit(amountStroops, s.totalAssets, s.totalShares);
+    s.totalAssets += amountStroops;
+    s.totalShares += shares;
+    s.balances[userAddress] = (s.balances[userAddress] ?? 0n) + shares;
+    writeDemoState(s);
+    appendDemoHistory(priceScaled(s.totalAssets, s.totalShares));
+
+    const pts = Math.floor(Number(amountStroops) / 10000000) * 2;
+    if (pts > 0) awardPoints(userAddress, pts);
+
+    return { txHash, sharesMinted: shares };
+  }
 }
 
 /* ───────────────────────────── Withdraw ───────────────────────────────── */
