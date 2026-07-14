@@ -460,7 +460,7 @@ impl OrbitVault {
             .set(&DataKey::PriceHistory, &history);
 
         env.events()
-            .publish((symbol_short!("Harvest"),), (yield_amount, fee_amount));
+            .publish((symbol_short!("Harvest"),), (yield_amount, total_fee_amount));
     }
 
     // ─────────────────────────── Internal helpers ─────────────────────────────
