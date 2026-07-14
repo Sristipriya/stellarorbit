@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { deposit, quoteSharesForDeposit, type VaultState } from "@/lib/stellar/vault";
-import { stroopsToXlm } from "@/lib/stellar/network";
+import { deposit, quoteSharesForDeposit, recordPosition, type VaultState } from "@/lib/stellar/vault";
+import { stroopsToXlm, STROOPS_PER_XLM } from "@/lib/stellar/network";
 import { classifyError } from "@/lib/stellar/wallet";
 import { TxStatus, type TxState } from "./TxStatus";
 import { toast } from "sonner";
@@ -53,6 +53,14 @@ export function DepositCard({
       setRaw(`tx_hash=${txHash}`);
       setAmount("");
       onDone();
+      // Record position entry for P&L tracking
+      if (address) {
+        const entryPrice =
+          state.totalSharesStroops === 0n
+            ? STROOPS_PER_XLM
+            : (state.totalAssetsStroops * STROOPS_PER_XLM) / state.totalSharesStroops;
+        recordPosition(address, entryPrice, sharesMinted);
+      }
       toast.success(`Deposited ${stroopsToXlm(amountStroops)} XLM`, {
         description: `Shares: ${stroopsToXlm(sharesMinted)}`,
       });

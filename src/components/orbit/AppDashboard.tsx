@@ -24,6 +24,8 @@ import {
   Trophy,
   Calculator,
   Menu,
+  Percent,
+  DollarSign,
 } from "lucide-react";
 import { DepositCard } from "./DepositCard";
 import { WithdrawCard } from "./WithdrawCard";
@@ -33,8 +35,8 @@ import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { useWallet } from "@/hooks/use-wallet";
 import { useVault } from "@/hooks/use-vault";
 import { type ActivityEvent } from "@/lib/stellar/events";
-import { NETWORK, shortAddr, stroopsToXlm, HAS_REAL_CONTRACT } from "@/lib/stellar/network";
-import { type VaultState } from "@/lib/stellar/vault";
+import { NETWORK, shortAddr, stroopsToXlm, HAS_REAL_CONTRACT, STROOPS_PER_XLM } from "@/lib/stellar/network";
+import { type VaultState, type PriceSnapshot, computePnl } from "@/lib/stellar/vault";
 import { ShareCertificate } from "./ShareCertificate";
 import { OraclePricePanel } from "./OraclePricePanel";
 import { SimulatorTab } from "./SimulatorTab";
@@ -43,8 +45,11 @@ import { NetworkStatusBar } from "./NetworkStatusBar";
 import { NotificationCenter } from "./NotificationCenter";
 import { MobileBottomNav, type Tab } from "./MobileBottomNav";
 import { SkeletonStatCards, SkeletonChart, SkeletonRows } from "./SkeletonCards";
-import { fetchXlmUsdPrice } from "@/lib/oracle-price";
+import { fetchXlmUsdPrice, xlmToUsd } from "@/lib/oracle-price";
 import { useNotifications } from "@/lib/notifications";
+import { PointsTab } from "./PointsTab";
+import { handleReferralFromUrl } from "@/lib/points";
+import { VAULTS } from "@/lib/stellar/vaults";
 
 // ──────────────────── Helpers ──────────────────
 function pricePerShare(state: VaultState): string {
@@ -123,10 +128,11 @@ const NAV_ITEMS: { id: Tab; label: string; icon: React.FC<{ className?: string }
   { id: "portfolio", label: "Portfolio", icon: LayoutDashboard },
   { id: "deposit", label: "Deposit", icon: ArrowDownToLine },
   { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
+  { id: "points", label: "Points & Refs", icon: Zap },
   { id: "history", label: "History", icon: History },
   { id: "leaderboard", label: "Leaderboard", icon: Trophy },
   { id: "simulate", label: "Simulate", icon: Calculator },
-  { id: "faucet", label: "Faucet", icon: Zap },
+  { id: "faucet", label: "Faucet", icon: Settings },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -233,13 +239,14 @@ function Sidebar({
 function PortfolioTab({
   wallet,
   vault,
+  priceHistory,
   xlmUsdPrice,
 }: {
   wallet: ReturnType<typeof useWallet>;
   vault: { state: VaultState; loading: boolean; events: ActivityEvent[]; refresh: () => void };
+  priceHistory: PriceSnapshot[];
   xlmUsdPrice: number | null;
 }) {
-  const price = parseFloat(pricePerShare(vault.state));
   const totalAssetsStr = stroopsToXlm(vault.state.totalAssetsStroops);
   const totalSharesStr = stroopsToXlm(vault.state.totalSharesStroops);
   const userSharesStr = stroopsToXlm(vault.state.userSharesStroops);
@@ -249,10 +256,12 @@ function PortfolioTab({
       : (vault.state.userSharesStroops * vault.state.totalAssetsStroops) /
         vault.state.totalSharesStroops;
 
-  const chartData = Array.from({ length: 12 }, (_, i) => ({
-    t: `${i + 1}h`,
-    price: +(price * (1 - 0.02 + (i / 12) * 0.03 + Math.sin(i) * 0.005)).toFixed(5),
-  }));
+  // Real APY from contract (in bps). e.g. 500 = 5.00%
+  const apyPct = Number(vault.state.apyBps) / 100;
+  const apyLabel = vault.state.apyBps > 0n ? `${apyPct.toFixed(2)}% APY` : "Accruing...";
+
+  // P&L for connected wallet
+  const pnl = wallet.address ? computePnl(wallet.address, vault.state) : null;
 
   const cards = [
     {
@@ -260,7 +269,7 @@ function PortfolioTab({
       value: `${totalAssetsStr} XLM`,
       accent: true,
       icon: TrendingUp,
-      note: "All depositors combined",
+      note: xlmUsdPrice ? `≈ ${xlmToUsd(totalAssetsStr, xlmUsdPrice)}` : "All depositors combined",
     },
     {
       label: "Total Shares Issued",
@@ -275,12 +284,19 @@ function PortfolioTab({
       note: pnlPercent(vault.state) + " from parity",
     },
     {
-      label: "Your Shares",
-      value: userSharesStr,
-      icon: Wallet,
-      note: `≈ ${stroopsToXlm(underlying)} XLM underlying`,
+      label: "7-Day APY",
+      value: vault.state.apyBps > 0n ? `${apyPct.toFixed(2)}%` : "—",
+      icon: Percent,
+      note: apyLabel,
+      green: vault.state.apyBps > 0n,
     },
   ];
+
+  // Build chart data from real price history; fall back to flat line if empty
+  const chartValues: number[] =
+    priceHistory.length >= 2
+      ? priceHistory.map((s) => Number(s.priceScaled) / Number(STROOPS_PER_XLM))
+      : [1.0, 1.0];
 
   if (vault.loading && vault.state.totalAssetsStroops === 0n) {
     return (
@@ -307,14 +323,22 @@ function PortfolioTab({
             >
               <div className="flex items-start justify-between">
                 <div
-                  className={`text-[10px] font-mono uppercase tracking-widest ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-mute)]"}`}
+                  className={`text-[10px] font-mono uppercase tracking-widest ${
+                    c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-mute)]"
+                  }`}
                 >
                   {c.label}
                 </div>
                 <Icon className="h-4 w-4 shrink-0 text-[var(--orbit-mute)]/60" />
               </div>
               <div
-                className={`mt-2 font-display text-2xl font-semibold ${c.accent ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}
+                className={`mt-2 font-display text-2xl font-semibold ${
+                  c.accent
+                    ? "text-[var(--orbit-accent)]"
+                    : (c as any).green
+                    ? "text-[var(--orbit-ok)]"
+                    : "text-[var(--orbit-ink)]"
+                }`}
               >
                 {c.value}
               </div>
@@ -324,6 +348,79 @@ function PortfolioTab({
         })}
       </div>
 
+      {/* P&L Panel — shown when user has a tracked position */}
+      {pnl && wallet.address && vault.state.userSharesStroops > 0n && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`glass rounded-2xl p-5 border ${
+            pnl.earnedStroops >= 0n
+              ? "border-[var(--orbit-ok)]/30"
+              : "border-[var(--orbit-danger)]/30"
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <DollarSign className="h-4 w-4 text-[var(--orbit-ok)]" />
+            <h3 className="font-display text-sm font-semibold">Your P&amp;L</h3>
+            <span className="ml-auto font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)]">
+              since first deposit
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              {
+                label: "Current Value",
+                value: `${stroopsToXlm(pnl.currentValueStroops)} XLM`,
+                sub: xlmUsdPrice ? xlmToUsd(stroopsToXlm(pnl.currentValueStroops), xlmUsdPrice) : undefined,
+                accent: true,
+              },
+              {
+                label: "Your Shares",
+                value: userSharesStr,
+                sub: "in vault",
+              },
+              {
+                label: "Total Earned",
+                value: `${pnl.earnedStroops >= 0n ? "+" : ""}${stroopsToXlm(pnl.earnedStroops > 0n ? pnl.earnedStroops : -pnl.earnedStroops)} XLM`,
+                green: pnl.earnedStroops >= 0n,
+                red: pnl.earnedStroops < 0n,
+              },
+              {
+                label: "Return",
+                value: `${pnl.earnedPct >= 0 ? "+" : ""}${pnl.earnedPct.toFixed(2)}%`,
+                green: pnl.earnedPct >= 0,
+                red: pnl.earnedPct < 0,
+              },
+            ].map((c) => (
+              <div
+                key={c.label}
+                className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3"
+              >
+                <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">
+                  {c.label}
+                </div>
+                <div
+                  className={`font-display text-lg font-semibold ${
+                    c.accent
+                      ? "text-[var(--orbit-accent)]"
+                      : (c as any).green
+                      ? "text-[var(--orbit-ok)]"
+                      : (c as any).red
+                      ? "text-[var(--orbit-danger)]"
+                      : "text-[var(--orbit-ink)]"
+                  }`}
+                >
+                  {c.value}
+                </div>
+                {c.sub && (
+                  <div className="font-mono text-[9px] text-[var(--orbit-mute)]">{c.sub}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       {/* Oracle price panel */}
       <OraclePricePanel state={vault.state} />
 
@@ -332,7 +429,7 @@ function PortfolioTab({
         <ShareCertificate address={wallet.address} state={vault.state} xlmUsdPrice={xlmUsdPrice} />
       )}
 
-      {/* Chart */}
+      {/* Share Price History Chart — real on-chain data */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -341,13 +438,23 @@ function PortfolioTab({
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
-            Share Price (simulated trend)
+            Share Price History
           </h3>
           <span className="font-mono text-[10px] text-[var(--orbit-mute)]">
-            {HAS_REAL_CONTRACT ? "live" : "demo"}
+            {priceHistory.length >= 2
+              ? `${priceHistory.length} data points · ${HAS_REAL_CONTRACT ? "on-chain" : "demo"}`
+              : "Awaiting first harvest…"}
           </span>
         </div>
-        <SparkLine data={chartData.map((d) => d.price)} />
+        {priceHistory.length >= 2 ? (
+          <SparkLine data={chartValues} />
+        ) : (
+          <div className="flex h-[140px] items-center justify-center">
+            <p className="font-mono text-xs text-[var(--orbit-mute)]">
+              Price history will appear here after yield is harvested.
+            </p>
+          </div>
+        )}
       </motion.div>
 
       {/* Recent Activity */}
@@ -728,6 +835,7 @@ export function AppDashboard() {
   // Fetch oracle price once
   useEffect(() => {
     fetchXlmUsdPrice().then(setXlmUsdPrice);
+    handleReferralFromUrl();
   }, []);
 
   const showFundBanner = wallet.address && wallet.balance && !wallet.balance.funded;
@@ -741,13 +849,14 @@ export function AppDashboard() {
     simulate: "Vault Simulator",
     faucet: "Testnet Faucet",
     settings: "Settings",
+    points: "Points & Referrals",
   };
 
   function renderContent() {
     if (!wallet.address) return <ConnectPrompt onConnect={wallet.connect} />;
     switch (activeTab) {
       case "portfolio":
-        return <PortfolioTab wallet={wallet} vault={vault} xlmUsdPrice={xlmUsdPrice} />;
+        return <PortfolioTab wallet={wallet} vault={vault} priceHistory={vault.priceHistory} xlmUsdPrice={xlmUsdPrice} />;
       case "deposit":
         return (
           <div className="grid gap-4 lg:grid-cols-2">
@@ -785,6 +894,8 @@ export function AppDashboard() {
             onFunded={() => wallet.refreshBalance(wallet.address!)}
           />
         );
+      case "points":
+        return <PointsTab address={wallet.address} state={vault.state} />;
       case "settings":
         return <SettingsTab wallet={wallet} />;
       default:

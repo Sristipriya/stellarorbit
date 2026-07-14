@@ -2,29 +2,31 @@
 //! Orbit — single-asset index vault on Soroban.
 //!
 //! State:
-//!   - total_assets : i128  (asset stroops held by vault)
-//!   - total_shares : i128  (shares outstanding)
-//!   - balances     : Map<Address, i128>
+//!   - total_assets      : i128  (asset stroops held by vault)
+//!   - total_shares      : i128  (shares outstanding)
+//!   - balances          : Map<Address, i128>
+//!   - assets_lent       : i128  (deployed to yield strategy)
+//!   - admin             : Address
+//!   - fee_recipient     : Address
+//!   - perf_fee_bps      : u32   (performance fee in basis points, e.g. 1000 = 10%)
+//!   - price_history     : Vec<PriceSnapshot>
 //!
 //! Functions:
-//!   - deposit(from, amount)   -> i128 (shares minted)
-//!   - withdraw(from, shares)  -> i128 (assets returned)
-//!   - balance_of(who)         -> i128
-//!   - preview_share_price()   -> i128 (assets per share, scaled by 1e7)
-//!
-//! Events:
-//!   - ("Dep", from, amount, shares)
-//!   - ("Wd",  from, amount, shares)
-//!
-//! L3+ hooks (not implemented in L1/L2 scope):
-//!   - SEP-40 oracle reads for multi-asset NAV
-//!   - Multi-asset accounting via vector of (asset, balance, weight)
-//!
-//! This contract takes asset transfers via `token::Client` for a configured
-//! asset (set at `__constructor`). For the Testnet build we point it at the
-//! native XLM Stellar Asset Contract (SAC).
+//!   - deposit(from, amount)       -> i128 (shares minted)
+//!   - withdraw(from, shares)      -> i128 (assets returned)
+//!   - balance_of(who)             -> i128
+//!   - total_assets()              -> i128
+//!   - total_shares()              -> i128
+//!   - preview_share_price()       -> i128 (assets per share, scaled by 1e7)
+//!   - get_apy_bps()               -> i128 (annualised 7d APY in bps, e.g. 500 = 5%)
+//!   - get_price_history()         -> Vec<PriceSnapshot>
+//!   - invest(admin, amount)       -> unit (stub: track deployed capital)
+//!   - divest(admin, amount)       -> unit (stub: recall deployed capital)
+//!   - harvest(admin, yield_amt)   -> unit (inject profit, deduct fee)
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, token, Address, Env, Map};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, symbol_short, token, vec, Address, Env, Map, Vec,
+};
 
 #[derive(Clone)]
 #[contracttype]
@@ -35,26 +37,57 @@ pub enum DataKey {
     Balances,
     AssetsLent,
     Admin,
+    FeeRecipient,
+    PerfFeeBps,
+    PriceHistory,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct PriceSnapshot {
+    pub timestamp: u64,
+    /// Price per share scaled by 1e7 (same as STROOPS_PER_XLM).
+    pub price_scaled: i128,
 }
 
 const SCALE: i128 = 10_000_000; // 1e7 — matches XLM stroop scale
+const MAX_HISTORY: u32 = 90; // keep 90 snapshots (≈90 harvests)
 
 #[contract]
 pub struct OrbitVault;
 
 #[contractimpl]
 impl OrbitVault {
-    /// Initialise the vault with the underlying asset contract address.
-    pub fn __constructor(env: Env, asset: Address, admin: Address) {
+    /// Initialise the vault.
+    ///
+    /// * `asset`         – Stellar Asset Contract address (e.g. native XLM SAC)
+    /// * `admin`         – address allowed to call invest/divest/harvest
+    /// * `fee_recipient` – address that receives the performance fee cut
+    /// * `perf_fee_bps`  – performance fee in basis points (0–5000, max 50%)
+    pub fn __constructor(
+        env: Env,
+        asset: Address,
+        admin: Address,
+        fee_recipient: Address,
+        perf_fee_bps: u32,
+    ) {
+        assert!(perf_fee_bps <= 5000, "fee must not exceed 50%");
         env.storage().instance().set(&DataKey::Asset, &asset);
         env.storage().instance().set(&DataKey::TotalAssets, &0_i128);
         env.storage().instance().set(&DataKey::TotalShares, &0_i128);
         env.storage().instance().set(&DataKey::AssetsLent, &0_i128);
         env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage().instance().set(&DataKey::FeeRecipient, &fee_recipient);
+        env.storage().instance().set(&DataKey::PerfFeeBps, &perf_fee_bps);
         env.storage()
             .instance()
             .set(&DataKey::Balances, &Map::<Address, i128>::new(&env));
+        env.storage()
+            .instance()
+            .set(&DataKey::PriceHistory, &vec![&env] as &Vec<PriceSnapshot>);
     }
+
+    // ─────────────────────────── Deposit ────────────────────────────────────
 
     pub fn deposit(env: Env, from: Address, amount: i128) -> i128 {
         from.require_auth();
@@ -72,11 +105,9 @@ impl OrbitVault {
             .unwrap_or(0);
         let shares = preview_deposit(amount, total_assets, total_shares);
 
-        // Pull tokens from depositor.
         let asset: Address = env.storage().instance().get(&DataKey::Asset).unwrap();
         token::Client::new(&env, &asset).transfer(&from, &env.current_contract_address(), &amount);
 
-        // Update state.
         env.storage()
             .instance()
             .set(&DataKey::TotalAssets, &(total_assets + amount));
@@ -96,6 +127,8 @@ impl OrbitVault {
             .publish((symbol_short!("Dep"),), (from, amount, shares));
         shares
     }
+
+    // ─────────────────────────── Withdraw ───────────────────────────────────
 
     pub fn withdraw(env: Env, from: Address, shares: i128) -> i128 {
         from.require_auth();
@@ -127,14 +160,12 @@ impl OrbitVault {
             .get(&DataKey::AssetsLent)
             .unwrap_or(0);
         let idle_assets = total_assets - assets_lent;
-
         let assets_out = preview_redeem(shares, total_assets, total_shares);
         assert!(
             assets_out <= idle_assets,
             "insufficient idle assets; divest required first"
         );
 
-        // Update state first (effects), then transfer (interaction).
         balances.set(from.clone(), user_shares - shares);
         env.storage().instance().set(&DataKey::Balances, &balances);
         env.storage()
@@ -156,6 +187,8 @@ impl OrbitVault {
         assets_out
     }
 
+    // ─────────────────────────── Read-only views ─────────────────────────────
+
     pub fn balance_of(env: Env, who: Address) -> i128 {
         let balances: Map<Address, i128> = env
             .storage()
@@ -171,6 +204,7 @@ impl OrbitVault {
             .get(&DataKey::TotalAssets)
             .unwrap_or(0)
     }
+
     pub fn total_shares(env: Env) -> i128 {
         env.storage()
             .instance()
@@ -178,24 +212,6 @@ impl OrbitVault {
             .unwrap_or(0)
     }
 
-    /// Assets per share, scaled by 1e7. Returns 1.0 (1e7) before first deposit.
-    pub fn preview_share_price(env: Env) -> i128 {
-        let total_assets: i128 = env
-            .storage()
-            .instance()
-            .get(&DataKey::TotalAssets)
-            .unwrap_or(0);
-        let total_shares: i128 = env
-            .storage()
-            .instance()
-            .get(&DataKey::TotalShares)
-            .unwrap_or(0);
-        if total_shares == 0 {
-            SCALE
-        } else {
-            (total_assets * SCALE) / total_shares
-        }
-    }
     pub fn assets_lent(env: Env) -> i128 {
         env.storage()
             .instance()
@@ -203,12 +219,80 @@ impl OrbitVault {
             .unwrap_or(0)
     }
 
-    /// Admin function to deploy idle XLM to the lending strategy (e.g., Blend).
-    /// In this MVP, this tracks the deployed state.
+    /// Price per share scaled by 1e7. Returns 1.0 (1e7) before first deposit.
+    pub fn preview_share_price(env: Env) -> i128 {
+        let ta: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalAssets)
+            .unwrap_or(0);
+        let ts: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalShares)
+            .unwrap_or(0);
+        price_per_share(ta, ts)
+    }
+
+    /// Returns up to the last 90 price snapshots recorded on each harvest.
+    pub fn get_price_history(env: Env) -> Vec<PriceSnapshot> {
+        env.storage()
+            .instance()
+            .get(&DataKey::PriceHistory)
+            .unwrap_or(vec![&env])
+    }
+
+    /// Returns 7-day annualised APY in basis points (e.g. 500 = 5% APY).
+    /// Returns 0 if fewer than 2 snapshots or the window is less than 1 hour.
+    pub fn get_apy_bps(env: Env) -> i128 {
+        let history: Vec<PriceSnapshot> = env
+            .storage()
+            .instance()
+            .get(&DataKey::PriceHistory)
+            .unwrap_or(vec![&env]);
+
+        if history.len() < 2 {
+            return 0;
+        }
+
+        let latest = history.get(history.len() - 1).unwrap();
+        // Look for a snapshot ≥7 days ago; fall back to oldest available.
+        let seven_days_secs: u64 = 7 * 24 * 3600;
+        let target_ts = latest.timestamp.saturating_sub(seven_days_secs);
+
+        let mut baseline = history.get(0).unwrap();
+        for i in 0..history.len() {
+            let snap = history.get(i).unwrap();
+            if snap.timestamp >= target_ts {
+                break;
+            }
+            baseline = snap;
+        }
+
+        // Avoid division by zero and tiny time windows (< 1 hour).
+        let elapsed = latest.timestamp.saturating_sub(baseline.timestamp);
+        if elapsed < 3600 || baseline.price_scaled == 0 {
+            return 0;
+        }
+
+        // APY (bps) = ((p_now / p_then) - 1) * (seconds_in_year / elapsed) * 10_000
+        // Use integer scaled arithmetic: multiply by 1e12 to preserve precision.
+        let seconds_in_year: i128 = 365 * 24 * 3600;
+        let elapsed_i128 = elapsed as i128;
+        let ratio_scaled = (latest.price_scaled * 1_000_000_i128) / baseline.price_scaled;
+        let growth_scaled = ratio_scaled - 1_000_000_i128; // fractional gain * 1e6
+        let apy_bps =
+            (growth_scaled * seconds_in_year * 10_000_i128) / (elapsed_i128 * 1_000_000_i128);
+
+        apy_bps
+    }
+
+    // ─────────────────────────── Admin — Yield strategy ──────────────────────
+
+    /// Mark XLM as deployed to external yield strategy.
     pub fn invest(env: Env, admin: Address, amount: i128) {
         admin.require_auth();
-        let stored_admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
-        assert!(admin == stored_admin, "unauthorized");
+        Self::assert_admin(&env, &admin);
         assert!(amount > 0, "must invest positive amount");
 
         let total_assets: i128 = env
@@ -224,18 +308,16 @@ impl OrbitVault {
         let idle_assets = total_assets - assets_lent;
         assert!(amount <= idle_assets, "insufficient idle assets to invest");
 
-        // Note: In a full integration, we would transfer `amount` to the Blend Pool here.
         env.storage()
             .instance()
             .set(&DataKey::AssetsLent, &(assets_lent + amount));
         env.events().publish((symbol_short!("Invest"),), (amount,));
     }
 
-    /// Admin function to pull XLM back from the lending strategy.
+    /// Recall XLM from yield strategy.
     pub fn divest(env: Env, admin: Address, amount: i128) {
         admin.require_auth();
-        let stored_admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
-        assert!(admin == stored_admin, "unauthorized");
+        Self::assert_admin(&env, &admin);
         assert!(amount > 0, "must divest positive amount");
 
         let assets_lent: i128 = env
@@ -245,39 +327,94 @@ impl OrbitVault {
             .unwrap_or(0);
         assert!(amount <= assets_lent, "insufficient lent assets");
 
-        // Note: In a full integration, we would withdraw `amount` from the Blend Pool here.
         env.storage()
             .instance()
             .set(&DataKey::AssetsLent, &(assets_lent - amount));
         env.events().publish((symbol_short!("Divest"),), (amount,));
     }
 
-    /// Simulates yield generation by allowing the admin to inject profit (XLM) into the vault.
-    /// This increases TotalAssets without minting new shares, driving up the Share Price.
+    /// Inject yield into vault, deduct performance fee, record price snapshot.
+    ///
+    /// Admin must have approved the contract to pull `yield_amount` tokens
+    /// from their wallet (via token allowance / auth).
     pub fn harvest(env: Env, admin: Address, yield_amount: i128) {
         admin.require_auth();
-        let stored_admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
-        assert!(admin == stored_admin, "unauthorized");
+        Self::assert_admin(&env, &admin);
         assert!(yield_amount > 0, "yield must be positive");
 
-        // Pull yield tokens from admin into the vault
-        let asset: Address = env.storage().instance().get(&DataKey::Asset).unwrap();
-        token::Client::new(&env, &asset).transfer(
-            &admin,
-            &env.current_contract_address(),
-            &yield_amount,
-        );
+        let perf_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::PerfFeeBps)
+            .unwrap_or(0);
+        let fee_amount = (yield_amount * perf_fee_bps as i128) / 10_000_i128;
+        let net_yield = yield_amount - fee_amount;
 
+        let asset: Address = env.storage().instance().get(&DataKey::Asset).unwrap();
+        let token = token::Client::new(&env, &asset);
+
+        // Pull gross yield from admin wallet.
+        token.transfer(&admin, &env.current_contract_address(), &yield_amount);
+
+        // Pay performance fee to fee_recipient.
+        if fee_amount > 0 {
+            let fee_recipient: Address = env
+                .storage()
+                .instance()
+                .get(&DataKey::FeeRecipient)
+                .unwrap();
+            token.transfer(&env.current_contract_address(), &fee_recipient, &fee_amount);
+        }
+
+        // Credit net yield to vault.
         let total_assets: i128 = env
             .storage()
             .instance()
             .get(&DataKey::TotalAssets)
             .unwrap_or(0);
+        let new_total = total_assets + net_yield;
         env.storage()
             .instance()
-            .set(&DataKey::TotalAssets, &(total_assets + yield_amount));
+            .set(&DataKey::TotalAssets, &new_total);
+
+        // Record price snapshot.
+        let total_shares: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalShares)
+            .unwrap_or(0);
+        let snap = PriceSnapshot {
+            timestamp: env.ledger().timestamp(),
+            price_scaled: price_per_share(new_total, total_shares),
+        };
+        let mut history: Vec<PriceSnapshot> = env
+            .storage()
+            .instance()
+            .get(&DataKey::PriceHistory)
+            .unwrap_or(vec![&env]);
+        // Keep only last MAX_HISTORY entries (sliding window).
+        if history.len() >= MAX_HISTORY {
+            // Remove oldest entry by rebuilding without it.
+            let mut trimmed: Vec<PriceSnapshot> = Vec::new(&env);
+            for i in 1..history.len() {
+                trimmed.push_back(history.get(i).unwrap());
+            }
+            history = trimmed;
+        }
+        history.push_back(snap);
+        env.storage()
+            .instance()
+            .set(&DataKey::PriceHistory, &history);
+
         env.events()
-            .publish((symbol_short!("Harvest"),), (yield_amount,));
+            .publish((symbol_short!("Harvest"),), (yield_amount, fee_amount));
+    }
+
+    // ─────────────────────────── Internal helpers ─────────────────────────────
+
+    fn assert_admin(env: &Env, caller: &Address) {
+        let stored_admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
+        assert!(*caller == stored_admin, "unauthorized");
     }
 }
 
@@ -294,6 +431,14 @@ fn preview_redeem(shares: i128, total_assets: i128, total_shares: i128) -> i128 
         0
     } else {
         (shares * total_assets) / total_shares
+    }
+}
+
+fn price_per_share(total_assets: i128, total_shares: i128) -> i128 {
+    if total_shares == 0 {
+        SCALE
+    } else {
+        (total_assets * SCALE) / total_shares
     }
 }
 

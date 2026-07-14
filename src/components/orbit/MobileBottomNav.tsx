@@ -5,6 +5,7 @@ import {
   History,
   Trophy,
   Calculator,
+  Star,
 } from "lucide-react";
 
 export type Tab =
@@ -15,15 +16,15 @@ export type Tab =
   | "leaderboard"
   | "simulate"
   | "faucet"
-  | "settings";
+  | "settings"
+  | "points";
 
 const MOBILE_TABS: { id: Tab; label: string; icon: React.FC<{ className?: string }> }[] = [
   { id: "portfolio", label: "Home", icon: LayoutDashboard },
   { id: "deposit", label: "Deposit", icon: ArrowDownToLine },
   { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
+  { id: "points", label: "Points", icon: Star },
   { id: "history", label: "History", icon: History },
-  { id: "leaderboard", label: "Ranks", icon: Trophy },
-  { id: "simulate", label: "Simulate", icon: Calculator },
 ];
 
 export function MobileBottomNav({ active, onSelect }: { active: Tab; onSelect: (t: Tab) => void }) {

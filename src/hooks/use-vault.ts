@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getVaultState, ZERO_STATE, type VaultState } from "@/lib/stellar/vault";
+import {
+  getVaultState,
+  getPriceHistory,
+  ZERO_STATE,
+  type VaultState,
+  type PriceSnapshot,
+} from "@/lib/stellar/vault";
 import { pollActivity, resetActivityPoller, type ActivityEvent } from "@/lib/stellar/events";
 
 const STATE_POLL_MS = 15_000;
@@ -8,6 +14,7 @@ const EVENT_POLL_MS = 8_000;
 export function useVault(address: string | null) {
   const [state, setState] = useState<VaultState>(ZERO_STATE);
   const [events, setEvents] = useState<ActivityEvent[]>([]);
+  const [priceHistory, setPriceHistory] = useState<PriceSnapshot[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const addrRef = useRef(address);
@@ -23,8 +30,12 @@ export function useVault(address: string | null) {
     setLoading(true);
     setError(null);
     try {
-      const s = await getVaultState(addrRef.current);
+      const [s, history] = await Promise.all([
+        getVaultState(addrRef.current),
+        getPriceHistory(),
+      ]);
       setState(s);
+      setPriceHistory(history);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -61,5 +72,5 @@ export function useVault(address: string | null) {
     return () => clearInterval(t);
   }, [pollEvents, address]);
 
-  return { state, events, loading, error, refresh, pollEvents };
+  return { state, events, priceHistory, loading, error, refresh, pollEvents };
 }
