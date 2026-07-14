@@ -39,3 +39,9 @@ export function shortAddr(addr: string | null | undefined): string {
   if (!addr) return "—";
   return `${addr.slice(0, 4)}…${addr.slice(-4)}`;
 }
+
+export const ORBIT_USDC_CONTRACT_ID: string | undefined =
+  "CB3YIGNQRXXRY4TG4KEOX667UGZK4AZ5JIKPMEHSSHV3VZ5GNPWB4J2R";
+
+export const ORBIT_INDEX_CONTRACT_ID: string | undefined =
+  "CAXSCGC7FNM3GKPE4BDHYUV2YWC5K3DKRVX5AOR7YP6DIXQNWFYCP2JS";
