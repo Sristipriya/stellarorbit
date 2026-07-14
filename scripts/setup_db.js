@@ -1,6 +1,7 @@
 import { Client } from "pg";
 
-const connectionString = "postgresql://postgres:1912Divyanshu@@db.rzwyivjgsevwwenxsiwd.supabase.co:5432/postgres";
+const connectionString =
+  "postgresql://postgres:1912Divyanshu@@db.rzwyivjgsevwwenxsiwd.supabase.co:5432/postgres";
 
 async function main() {
   const client = new Client({ connectionString });

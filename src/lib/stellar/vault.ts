@@ -398,7 +398,7 @@ export async function recordPosition(
       const oldPrice = BigInt(existing.entry_share_price);
       const newShares = oldShares + sharesMinted;
       const avgPrice = (oldPrice * oldShares + entrySharePriceScaled * sharesMinted) / newShares;
-      
+
       await supabase
         .from("positions")
         .update({
@@ -422,7 +422,10 @@ export async function recordPosition(
 }
 
 /** Compute P&L for a wallet from Supabase positions and current vault state. */
-export async function computePnl(walletAddress: string, state: VaultState): Promise<PnlResult | null> {
+export async function computePnl(
+  walletAddress: string,
+  state: VaultState,
+): Promise<PnlResult | null> {
   if (typeof window === "undefined") return null;
   try {
     const { data: pos } = await supabase
