@@ -43,6 +43,16 @@ export function DepositCard({
   // Zap Mode State
   const [useZap, setUseZap] = useState(false);
 
+  // Referrer tracking
+  const [referrer, setReferrer] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Parse ?ref= from URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const ref = searchParams.get("ref");
+    if (ref) setReferrer(ref);
+  }, []);
+
   // Determine native asset name based on vaultId
   const isUsdcVault = vaultId === ORBIT_USDC_CONTRACT_ID;
   const nativeAsset = isUsdcVault ? "USDC" : "XLM";
@@ -90,12 +100,13 @@ export function DepositCard({
           shareTokenId,
           ORBIT_POINTS_CONTRACT_ID,
           ORBIT_ZAP_ROUTER_ID,
+          referrer,
         );
         txHash = res.txHash;
         sharesMinted = res.sharesMinted;
       } else {
         // Standard Deposit
-        const res = await deposit(address, amount, vaultId ?? "xlm");
+        const res = await deposit(address, amount, vaultId ?? "xlm", referrer);
         txHash = res.txHash;
         sharesMinted = res.sharesMinted;
         amountStroops = res.amountStroops;

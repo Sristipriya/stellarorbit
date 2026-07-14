@@ -274,7 +274,8 @@ async function awardPoints(walletAddress: string, points: number) {
 export async function deposit(
   address: string,
   amountXlm: string,
-  vaultId: string
+  vaultId: string,
+  referrer: string | null = null
 ): Promise<{ txHash: string; sharesMinted: bigint; amountStroops: bigint }> {
   const amountStroops = xlmToStroops(amountXlm);
   if (amountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
@@ -284,6 +285,7 @@ export async function deposit(
     const { txHash, retval } = await invokeContract<bigint>(address, "deposit", [
       addrArg(address),
       i128Arg(amountStroops),
+      referrer ? addrArg(referrer) : { _type: "void" }, // Option<Address> in Soroban
     ], vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     const pts = Math.floor(Number(amountStroops) / 10000000);
@@ -316,6 +318,7 @@ export async function zapDeposit(
   shareTokenId: string,
   pointsContractId: string,
   routerId: string,
+  referrer: string | null = null
 ): Promise<{ txHash: string; sharesMinted: bigint }> {
   if (amountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
 

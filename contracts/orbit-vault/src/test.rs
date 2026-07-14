@@ -87,8 +87,8 @@ fn second_deposit_uses_share_ratio() {
     token_admin.mint(&alice, &1_000_0000000);
     token_admin.mint(&bob, &1_000_0000000);
 
-    vault.deposit(&alice, &100_0000000);
-    let bob_shares = vault.deposit(&bob, &50_0000000);
+    vault.deposit(&alice, &100_0000000, &None);
+    let bob_shares = vault.deposit(&bob, &50_0000000, &None);
     assert_eq!(bob_shares, 50_0000000);
 }
 
@@ -98,7 +98,7 @@ fn withdraw_returns_proportional_assets() {
     let alice = Address::generate(&env);
     token_admin.mint(&alice, &1_000_0000000);
 
-    vault.deposit(&alice, &100_0000000);
+    vault.deposit(&alice, &100_0000000, &None);
     let out = vault.withdraw(&alice, &40_0000000);
     assert_eq!(out, 40_0000000);
     assert_eq!(vault.balance_of(&alice), 60_0000000);
@@ -111,7 +111,7 @@ fn cannot_withdraw_more_than_owned() {
     let (env, _vault_id, vault, token_admin, _t, _asset, _, _fee) = setup();
     let alice = Address::generate(&env);
     token_admin.mint(&alice, &1_000_0000000);
-    vault.deposit(&alice, &10_0000000);
+    vault.deposit(&alice, &10_0000000, &None);
     vault.withdraw(&alice, &11_0000000);
 }
 
@@ -126,7 +126,7 @@ fn harvest_increases_total_assets_and_share_price_with_fee() {
     let (env, _, vault, token_admin, token_client, _, admin, fee_recipient) = setup();
     let alice = Address::generate(&env);
     token_admin.mint(&alice, &100_0000000);
-    vault.deposit(&alice, &100_0000000);
+    vault.deposit(&alice, &100_0000000, &None);
 
     // Harvest 50 XLM gross. Fee is 10% = 5 XLM → net = 45 XLM to vault.
     token_admin.mint(&admin, &50_0000000);
@@ -144,7 +144,7 @@ fn harvest_records_price_snapshot() {
     let (env, _, vault, token_admin, _, _, admin, _fee) = setup();
     let alice = Address::generate(&env);
     token_admin.mint(&alice, &100_0000000);
-    vault.deposit(&alice, &100_0000000);
+    vault.deposit(&alice, &100_0000000, &None);
 
     token_admin.mint(&admin, &10_0000000);
     vault.harvest(&admin, &10_0000000);
@@ -161,7 +161,7 @@ fn invest_and_divest_updates_assets_lent() {
     let (env, _, vault, token_admin, _, _, admin, _fee) = setup();
     let alice = Address::generate(&env);
     token_admin.mint(&alice, &100_0000000);
-    vault.deposit(&alice, &100_0000000);
+    vault.deposit(&alice, &100_0000000, &None);
 
     vault.invest(&admin, &60_0000000);
     assert_eq!(vault.assets_lent(), 60_0000000);
@@ -177,7 +177,7 @@ fn cannot_withdraw_if_invested() {
     let (env, _, vault, token_admin, _, _, admin, _fee) = setup();
     let alice = Address::generate(&env);
     token_admin.mint(&alice, &100_0000000);
-    vault.deposit(&alice, &100_0000000);
+    vault.deposit(&alice, &100_0000000, &None);
 
     vault.invest(&admin, &60_0000000);
     // Alice tries to withdraw 50, but only 40 is idle

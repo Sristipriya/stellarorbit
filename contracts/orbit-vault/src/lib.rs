@@ -42,6 +42,7 @@ pub enum DataKey {
     PriceHistory,
     ManagementFeeBps,
     BlendPool,
+    Referrer(Address), // maps user -> referrer
 }
 
 #[soroban_sdk::contractclient(name = "ShareTokenClient")]
@@ -119,7 +120,7 @@ impl OrbitVault {
 
     // ─────────────────────────── Deposit ────────────────────────────────────
 
-    pub fn deposit(env: Env, from: Address, amount: i128) -> i128 {
+    pub fn deposit(env: Env, from: Address, amount: i128, referrer: Option<Address>) -> i128 {
         from.require_auth();
         assert!(amount > 0, "amount must be positive");
 
@@ -144,6 +145,16 @@ impl OrbitVault {
         env.storage()
             .instance()
             .set(&DataKey::TotalShares, &(total_shares + shares));
+
+        // Save referrer if not already set and referrer is not self
+        if let Some(r) = referrer {
+            if r != from {
+                let key = DataKey::Referrer(from.clone());
+                if !env.storage().instance().has(&key) {
+                    env.storage().instance().set(&key, &r);
+                }
+            }
+        }
         
         let share_token: Address = env.storage().instance().get(&DataKey::ShareToken).unwrap();
         let client = ShareTokenClient::new(&env, &share_token);
@@ -416,6 +427,13 @@ impl OrbitVault {
 
         // Pay fee to fee_recipient.
         if total_fee_amount > 0 {
+            // For a production ready vault, we would iterate through all users, 
+            // calculate their share of the profit, check their referrer, 
+            // and distribute 10% of their specific performance fee to their referrer.
+            // Since this is a simple vault without per-user profit tracking on-chain,
+            // we will send the entire fee to the protocol fee_recipient. 
+            // The off-chain Points engine will handle the 10% referral bonus distribution 
+            // via the award_points RPC in Supabase (which was built in Phase 3).
             let fee_recipient: Address = env
                 .storage()
                 .instance()

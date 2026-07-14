@@ -43,8 +43,10 @@ import {
   STROOPS_PER_XLM,
 } from "@/lib/stellar/network";
 import { type VaultState, type PriceSnapshot, computePnl } from "@/lib/stellar/vault";
+import { TxStatus } from "./TxStatus";
 import { ShareCertificate } from "./ShareCertificate";
 import { OraclePricePanel } from "./OraclePricePanel";
+import { YieldProjection } from "./YieldProjection";
 import { SimulatorTab } from "./SimulatorTab";
 import { LeaderboardTab } from "./LeaderboardTab";
 import { NetworkStatusBar } from "./NetworkStatusBar";
@@ -453,6 +455,12 @@ function PortfolioTab({
           </div>
         </motion.div>
       )}
+
+      {/* Yield Projection */}
+      <YieldProjection 
+        depositAmount={vault.state.userSharesStroops > 0n ? Number(stroopsToXlm(vault.state.userSharesStroops)) : 1000} 
+        apyBps={vault.state.apyBps} 
+      />
 
       {/* Oracle price panel */}
       <OraclePricePanel state={vault.state} />
