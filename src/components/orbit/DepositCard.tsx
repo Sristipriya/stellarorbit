@@ -93,7 +93,7 @@ export function DepositCard({
         sharesMinted = res.sharesMinted;
       } else {
         // Standard Deposit
-        const res = await deposit(vaultId, amount);
+        const res = await deposit(address, amount, vaultId ?? "xlm");
         txHash = res.txHash;
         sharesMinted = res.sharesMinted;
         amountStroops = res.amountStroops;
@@ -119,7 +119,7 @@ export function DepositCard({
           state.totalSharesStroops === 0n
             ? STROOPS_PER_XLM
             : (state.totalAssetsStroops * STROOPS_PER_XLM) / state.totalSharesStroops;
-        recordPosition(address, entryPrice, sharesMinted);
+        recordPosition(address, entryPrice, sharesMinted, vaultId ?? "xlm");
       }
       toast.success(`Deposited ${Number(amountStroops) / 1e7} ${currentAsset}`, {
         description: `Shares: ${stroopsToXlm(sharesMinted)}`,

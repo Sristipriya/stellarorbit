@@ -21,6 +21,7 @@ import { NETWORK, HAS_REAL_CONTRACT, xlmToStroops, stroopsToXlm, STROOPS_PER_XLM
 import { signTx } from "./wallet";
 import { addrArg, i128Arg, invokeContract, readContract } from "./soroban";
 import { supabase } from "../supabase";
+import { getVaultById } from "./vaults";
 
 export type VaultState = {
   totalAssetsStroops: bigint;
@@ -162,16 +163,19 @@ export function quoteAssetsForShares(sharesXlm: string, state: VaultState): bigi
 
 /* ───────────────────────────── Read state ─────────────────────────────── */
 
-export async function getVaultState(address: string | null): Promise<VaultState> {
-  if (HAS_REAL_CONTRACT) {
+export async function getVaultState(address: string | null, vaultId: string): Promise<VaultState> {
+  const vault = getVaultById(vaultId);
+  const contractId = vault?.contractId;
+
+  if (HAS_REAL_CONTRACT && contractId) {
     const [totalAssets, totalShares, userShares, apyBps, history] = await Promise.all([
-      readContract<bigint>("total_assets").catch(() => 0n),
-      readContract<bigint>("total_shares").catch(() => 0n),
+      readContract<bigint>("total_assets", [], contractId).catch(() => 0n),
+      readContract<bigint>("total_shares", [], contractId).catch(() => 0n),
       address
-        ? readContract<bigint>("balance_of", [addrArg(address)]).catch(() => 0n)
+        ? readContract<bigint>("balance_of", [addrArg(address)], contractId).catch(() => 0n)
         : Promise.resolve(0n),
-      readContract<bigint>("get_apy_bps").catch(() => 0n),
-      readContract<Array<{ timestamp: bigint; price_scaled: bigint }>>("get_price_history").catch(
+      readContract<bigint>("get_apy_bps", [], contractId).catch(() => 0n),
+      readContract<Array<{ timestamp: bigint; price_scaled: bigint }>>("get_price_history", [], contractId).catch(
         () => [],
       ),
     ]);
@@ -195,12 +199,17 @@ export async function getVaultState(address: string | null): Promise<VaultState>
 }
 
 /** Fetch on-chain price history for the chart. */
-export async function getPriceHistory(): Promise<PriceSnapshot[]> {
-  if (HAS_REAL_CONTRACT) {
+export async function getPriceHistory(vaultId: string): Promise<PriceSnapshot[]> {
+  const vault = getVaultById(vaultId);
+  const contractId = vault?.contractId;
+
+  if (HAS_REAL_CONTRACT && contractId) {
     try {
       const raw =
         await readContract<Array<{ timestamp: bigint | number; price_scaled: bigint | number }>>(
           "get_price_history",
+          [],
+          contractId
         );
       if (!Array.isArray(raw)) return [];
       return raw.map((e) => ({
@@ -245,15 +254,17 @@ async function submitMarkerTx(address: string, memoText: string): Promise<string
 export async function deposit(
   address: string,
   amountXlm: string,
+  vaultId: string
 ): Promise<{ txHash: string; sharesMinted: bigint; amountStroops: bigint }> {
   const amountStroops = xlmToStroops(amountXlm);
   if (amountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
+  const vault = getVaultById(vaultId);
 
-  if (HAS_REAL_CONTRACT) {
+  if (HAS_REAL_CONTRACT && vault?.contractId) {
     const { txHash, retval } = await invokeContract<bigint>(address, "deposit", [
       addrArg(address),
       i128Arg(amountStroops),
-    ]);
+    ], vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     return { txHash, sharesMinted, amountStroops };
   }
@@ -307,15 +318,17 @@ export async function zapDeposit(
 export async function withdraw(
   address: string,
   sharesXlm: string,
+  vaultId: string
 ): Promise<{ txHash: string; assetsOut: bigint; sharesBurned: bigint }> {
   const sharesStroops = xlmToStroops(sharesXlm);
   if (sharesStroops <= 0n) throw new Error("Enter shares greater than zero.");
+  const vault = getVaultById(vaultId);
 
-  if (HAS_REAL_CONTRACT) {
+  if (HAS_REAL_CONTRACT && vault?.contractId) {
     const { txHash, retval } = await invokeContract<bigint>(address, "withdraw", [
       addrArg(address),
       i128Arg(sharesStroops),
-    ]);
+    ], vault.contractId);
     const assetsOut = retval == null ? 0n : BigInt(retval);
     return { txHash, assetsOut, sharesBurned: sharesStroops };
   }
@@ -339,15 +352,17 @@ export async function withdraw(
 export async function harvest(
   adminAddress: string,
   yieldAmountXlm: string,
+  vaultId: string
 ): Promise<{ txHash: string; yieldAmountStroops: bigint }> {
   const yieldAmountStroops = xlmToStroops(yieldAmountXlm);
   if (yieldAmountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
+  const vault = getVaultById(vaultId);
 
-  if (HAS_REAL_CONTRACT) {
+  if (HAS_REAL_CONTRACT && vault?.contractId) {
     const { txHash } = await invokeContract<bigint>(adminAddress, "harvest", [
       addrArg(adminAddress),
       i128Arg(yieldAmountStroops),
-    ]);
+    ], vault.contractId);
     return { txHash, yieldAmountStroops };
   }
 
@@ -381,15 +396,15 @@ export async function recordPosition(
   walletAddress: string,
   entrySharePriceScaled: bigint,
   sharesMinted: bigint,
+  vaultId: string
 ) {
   if (typeof window === "undefined") return;
   try {
-    // We'll use vault_id = "default" for now, until multi-vault is active
     const { data: existing } = await supabase
       .from("positions")
       .select("current_shares, entry_share_price")
       .eq("wallet_address", walletAddress)
-      .eq("vault_id", "default")
+      .eq("vault_id", vaultId)
       .single();
 
     if (existing) {
@@ -406,12 +421,12 @@ export async function recordPosition(
           entry_share_price: avgPrice.toString(),
         })
         .eq("wallet_address", walletAddress)
-        .eq("vault_id", "default");
+        .eq("vault_id", vaultId);
     } else {
       // Insert new position
       await supabase.from("positions").insert({
         wallet_address: walletAddress,
-        vault_id: "default",
+        vault_id: vaultId,
         entry_share_price: entrySharePriceScaled.toString(),
         current_shares: sharesMinted.toString(),
       });
@@ -425,6 +440,7 @@ export async function recordPosition(
 export async function computePnl(
   walletAddress: string,
   state: VaultState,
+  vaultId: string
 ): Promise<PnlResult | null> {
   if (typeof window === "undefined") return null;
   try {
@@ -432,7 +448,7 @@ export async function computePnl(
       .from("positions")
       .select("*")
       .eq("wallet_address", walletAddress)
-      .eq("vault_id", "default")
+      .eq("vault_id", vaultId)
       .single();
 
     if (!pos || !pos.current_shares) return null;

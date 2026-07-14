@@ -39,12 +39,12 @@ function toBigInt(v: unknown): bigint {
 let realStartLedger: number | null = null;
 const realSeen = new Set<string>();
 
-async function pollRealEvents(): Promise<ActivityEvent[]> {
+async function pollRealEvents(contractId: string): Promise<ActivityEvent[]> {
   if (realStartLedger == null) {
     const head = await latestLedger();
     realStartLedger = Math.max(1, head - LOOKBACK_LEDGERS);
   }
-  const raw = await fetchContractEvents(realStartLedger);
+  const raw = await fetchContractEvents(realStartLedger, contractId);
   const out: ActivityEvent[] = [];
   for (const ev of raw) {
     const key = ev.id;
@@ -124,8 +124,8 @@ async function pollDemoEvents(address: string): Promise<ActivityEvent[]> {
 
 /* ─────────────────────────── unified poller ────────────────────────────── */
 
-export async function pollActivity(address: string | null): Promise<ActivityEvent[]> {
-  if (HAS_REAL_CONTRACT) return pollRealEvents();
+export async function pollActivity(address: string | null, contractId: string | undefined): Promise<ActivityEvent[]> {
+  if (HAS_REAL_CONTRACT && contractId) return pollRealEvents(contractId);
   if (!address) return [];
   return pollDemoEvents(address);
 }

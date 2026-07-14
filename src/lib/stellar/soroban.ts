@@ -142,9 +142,8 @@ export type ContractEvent = {
 };
 
 /** Fetch Orbit contract events from `startLedger` to head. */
-export async function fetchContractEvents(startLedger: number): Promise<ContractEvent[]> {
+export async function fetchContractEvents(startLedger: number, contractId: string): Promise<ContractEvent[]> {
   const server = rpcServer();
-  const contractId = requireContract();
   const res = await server.getEvents({
     startLedger,
     filters: [{ type: "contract", contractIds: [contractId], topics: [["*"]] }],

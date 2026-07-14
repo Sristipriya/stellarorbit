@@ -9,11 +9,13 @@ import { type Notification } from "@/lib/notifications";
 export function WithdrawCard({
   address,
   state,
+  vaultId,
   onDone,
   onNotify,
 }: {
   address: string | null;
   state: VaultState;
+  vaultId?: string;
   onDone: () => void;
   onNotify?: (n: Omit<Notification, "id" | "at" | "read">) => void;
 }) {
@@ -45,7 +47,7 @@ export function WithdrawCard({
     setRaw(undefined);
     setTx({ kind: "pending", label: `Withdrawing ${shares} shares…` });
     try {
-      const { txHash, assetsOut, sharesBurned } = await withdraw(address, shares);
+      const { txHash, assetsOut, sharesBurned } = await withdraw(address, shares, vaultId ?? "xlm");
       const msg = `${stroopsToXlm(sharesBurned)} shares → ${stroopsToXlm(assetsOut)} XLM`;
       setTx({
         kind: "success",

@@ -15,7 +15,7 @@ export const Route = createFileRoute("/admin/users")({
 
 function AdminUsers() {
   const [authed, setAuthed] = useState(isAdminAuthenticated());
-  const vault = useVault(null);
+  const vault = useVault(null, "xlm");
 
   useEffect(() => {
     setAuthed(isAdminAuthenticated());

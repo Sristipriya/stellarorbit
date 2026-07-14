@@ -11,26 +11,31 @@ import { pollActivity, resetActivityPoller, type ActivityEvent } from "@/lib/ste
 const STATE_POLL_MS = 15_000;
 const EVENT_POLL_MS = 8_000;
 
-export function useVault(address: string | null) {
+export function useVault(address: string | null, vaultId: string) {
   const [state, setState] = useState<VaultState>(ZERO_STATE);
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [priceHistory, setPriceHistory] = useState<PriceSnapshot[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const addrRef = useRef(address);
+  const vaultIdRef = useRef(vaultId);
 
   // reset poller cursors when the user (or contract id) changes
   useEffect(() => {
     addrRef.current = address;
+    vaultIdRef.current = vaultId;
     resetActivityPoller();
     setEvents([]);
-  }, [address]);
+  }, [address, vaultId]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [s, history] = await Promise.all([getVaultState(addrRef.current), getPriceHistory()]);
+      const [s, history] = await Promise.all([
+        getVaultState(addrRef.current, vaultIdRef.current),
+        getPriceHistory(vaultIdRef.current),
+      ]);
       setState(s);
       setPriceHistory(history);
     } catch (e) {
@@ -42,7 +47,7 @@ export function useVault(address: string | null) {
 
   const pollEvents = useCallback(async () => {
     try {
-      const fresh = await pollActivity(addrRef.current);
+      const fresh = await pollActivity(addrRef.current, vaultIdRef.current);
       if (fresh.length === 0) return;
       setEvents((prev) => {
         const seen = new Set(prev.map((e) => e.id));
@@ -60,14 +65,14 @@ export function useVault(address: string | null) {
     refresh();
     const t = setInterval(refresh, STATE_POLL_MS);
     return () => clearInterval(t);
-  }, [refresh, address]);
+  }, [refresh, address, vaultId]);
 
   // initial + interval activity polling
   useEffect(() => {
     pollEvents();
     const t = setInterval(pollEvents, EVENT_POLL_MS);
     return () => clearInterval(t);
-  }, [pollEvents, address]);
+  }, [pollEvents, address, vaultId]);
 
   return { state, events, priceHistory, loading, error, refresh, pollEvents };
 }

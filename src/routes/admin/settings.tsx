@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin/settings")({
 
 function AdminSettings() {
   const [authed, setAuthed] = useState(isAdminAuthenticated());
-  const vault = useVault(null);
+  const vault = useVault(null, "xlm");
   const [health, setHealth] = useState<HealthResult | null>(null);
   const [checking, setChecking] = useState(false);
   const [yieldAmount, setYieldAmount] = useState("50");

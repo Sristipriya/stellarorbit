@@ -55,7 +55,8 @@ import { fetchXlmUsdPrice, xlmToUsd } from "@/lib/oracle-price";
 import { useNotifications } from "@/lib/notifications";
 import { PointsTab } from "./PointsTab";
 import { handleReferralFromUrl } from "@/lib/points";
-import { VAULTS } from "@/lib/stellar/vaults";
+import { VAULTS, DEFAULT_VAULT_ID } from "@/lib/stellar/vaults";
+import { VaultSelector } from "./VaultSelector";
 
 // ──────────────────── Helpers ──────────────────
 function pricePerShare(state: VaultState): string {
@@ -245,11 +246,15 @@ function Sidebar({
 function PortfolioTab({
   wallet,
   vault,
+  activeVaultId,
+  setActiveVaultId,
   priceHistory,
   xlmUsdPrice,
 }: {
   wallet: ReturnType<typeof useWallet>;
   vault: { state: VaultState; loading: boolean; events: ActivityEvent[]; refresh: () => void };
+  activeVaultId: string;
+  setActiveVaultId: (id: string) => void;
   priceHistory: PriceSnapshot[];
   xlmUsdPrice: number | null;
 }) {
@@ -323,6 +328,19 @@ function PortfolioTab({
 
   return (
     <div className="space-y-6">
+      {/* Vault Selector */}
+      <VaultSelector
+        vaults={VAULTS}
+        selectedId={activeVaultId}
+        onSelect={setActiveVaultId}
+        vaultStats={{
+          [activeVaultId]: {
+            tvlXlm: totalAssetsStr,
+            apyPct: apyPct,
+          },
+        }}
+      />
+
       {/* Stat grid */}
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         {cards.map((c) => {
@@ -841,7 +859,8 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
 // ──────────────────── Main Dashboard ────────────────────
 export function AppDashboard() {
   const wallet = useWallet();
-  const vault = useVault(wallet.address);
+  const [activeVaultId, setActiveVaultId] = useState<string>(DEFAULT_VAULT_ID);
+  const vault = useVault(wallet.address, activeVaultId);
   const { add } = useNotifications();
   const [activeTab, setActiveTab] = useState<Tab>("portfolio");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -875,6 +894,8 @@ export function AppDashboard() {
           <PortfolioTab
             wallet={wallet}
             vault={vault}
+            activeVaultId={activeVaultId}
+            setActiveVaultId={setActiveVaultId}
             priceHistory={vault.priceHistory}
             xlmUsdPrice={xlmUsdPrice}
           />
@@ -886,7 +907,7 @@ export function AppDashboard() {
               address={wallet.address}
               state={vault.state}
               walletBalance={wallet.balance?.xlm ?? null}
-              vaultId={vault.id}
+              vaultId={activeVaultId}
               onDone={vault.refresh}
               onNotify={add}
             />
@@ -899,6 +920,7 @@ export function AppDashboard() {
             <WithdrawCard
               address={wallet.address}
               state={vault.state}
+              vaultId={activeVaultId}
               onDone={vault.refresh}
               onNotify={add}
             />
