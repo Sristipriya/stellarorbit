@@ -16,7 +16,6 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 | -------------------- | ---------------------------------------------------------- |
 | **Live Demo**        | https://stellarorbit.vercel.app/                           |
 | **Contract Address** | `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ` |
-| **Admin Panel**      | https://stellarorbit.vercel.app/admin/                     |
 | **Network**          | Stellar Testnet                                            |
 | **Soroban RPC**      | `https://soroban-testnet.stellar.org`                      |
 
@@ -27,6 +26,14 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 ### User-Facing
 
 - **Multi-Wallet Support** — Connect via StellarWalletsKit (Freighter, Albedo, xBull, Lobstr)
+- **Real Yield via Blend Protocol** — Vaults utilize Blend Protocol lending markets for real cross-contract yield.
+- **Zap Deposits** — Deposit any Stellar asset; the frontend automatically routes through Soroswap before depositing native assets into the vault.
+- **Fiat On-Ramp (SEP-24)** — Built-in modal to buy crypto with fiat via testanchor.stellar.org.
+- **Progressive Web App (PWA)** — Installable on mobile/desktop, works offline, and supports background sync.
+- **Vault Strategies Marketplace** — UI allowing third-party strategists to submit new vault strategies and parameter tuning for the DAO.
+- **Yield Projection** — A chart projecting compound growth using Blend APY against a standard wallet hold.
+- **SEP-41 Compliant Share Token** — Users receive a minted `share_token` (e.g. oXLM) representing their proportional share.
+- **Points & Referrals** — Earn Orbit Points for deposits; refer users via `?ref=` links for on-chain attribution and off-chain rewards.
 - **Live On-Chain Data** — Real-time XLM balance, vault shares, TVL from Soroban RPC
 - **Deposit & Withdraw** — Soroban contract calls with wallet signing; preview shares before submitting
 - **Share Certificate** — Visual ownership card with copy-to-clipboard and USD equivalent value
@@ -37,20 +44,6 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 - **Notification Center** — In-app bell with unread badge; tracks deposits, withdrawals, errors
 - **Network Status Bar** — Live Soroban RPC latency, color-coded dot, and latest ledger number
 - **Testnet Faucet** — One-click Friendbot funding for new accounts
-- **Skeleton Loading** — Animated placeholders while vault data loads
-- **Toast Notifications** — Sonner toasts on every deposit/withdraw success or error
-- **Mobile Bottom Navigation** — Fixed bottom tab bar on small screens
-- **Responsive Sidebar** — Slide-in drawer on mobile, persistent sidebar on desktop
-
-### Admin Panel (`/admin/`)
-
-- **Protected Login** — Credential check against `VITE_ADMIN_USER` / `VITE_ADMIN_PASS`
-- **KPI Dashboard** — TVL, unique wallets, total deposits, withdrawals, share price, tx count
-- **7-Day Volume Chart** — Bar chart of deposit vs withdrawal volume by day
-- **Vault Health Card** — Contract ID, RPC URL, mode, live NAV metrics
-- **Transaction Table** — Filterable by type, searchable, CSV export
-- **User Analytics** — Unique wallets ranked by deposit volume
-- **RPC Health Check** — Live latency ping with status indicator
 
 ---
 
@@ -60,10 +53,9 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
  ┌────────────────┐   sign tx (XDR)    ┌──────────────────────────────────┐
  │ Stellar wallet │ ◀───────────────── │  Orbit web app (TanStack Start)  │
  │ (Freighter,    │ ─signed XDR──────▶ │  / landing · /app dashboard      │
- │  Albedo, xBull,│                    │  /admin analytics panel          │
- │  Lobstr)       │                    └──────────┬───────────────────────┘
- └────────────────┘                               │ Horizon / Soroban RPC
-                                                  ▼
+ │  Albedo, xBull,│                    └──────────┬───────────────────────┘
+ │  Lobstr)       │                               │ Horizon / Soroban RPC
+ └────────────────┘                               ▼
                                        ┌──────────────────────┐
                                        │  Soroban contract    │
                                        │  orbit-vault         │
@@ -100,12 +92,7 @@ stellarorbit/
 │   ├── routes/
 │   │   ├── __root.tsx         Root layout, Toaster, NotificationProvider
 │   │   ├── index.tsx          Landing page (Hero, Stats, HowItWorks, FAQ, Roadmap)
-│   │   ├── app.tsx            Vault dashboard route
-│   │   └── admin/
-│   │       ├── index.tsx      Admin dashboard (KPIs, charts, vault health)
-│   │       ├── transactions.tsx Admin transaction table
-│   │       ├── users.tsx      Admin user analytics
-│   │       └── settings.tsx   RPC health, network config
+│   │   └── app.tsx            Vault dashboard route
 │   │
 │   ├── components/
 │   │   ├── orbit/
@@ -130,14 +117,6 @@ stellarorbit/
 │   │   │   ├── PositionCard.tsx
 │   │   │   ├── VaultOverview.tsx
 │   │   │   └── WalletButton.tsx
-│   │   ├── admin/
-│   │   │   ├── AdminLoginPage.tsx   Credential login form
-│   │   │   ├── AdminLayout.tsx      Admin sidebar + mobile header
-│   │   │   ├── StatsGrid.tsx        KPI card grid
-│   │   │   ├── ActivityChart.tsx    7-day deposit/withdrawal bar chart
-│   │   │   ├── TransactionTable.tsx Filterable + searchable tx table + CSV export
-│   │   │   ├── UniqueUsersPanel.tsx Unique wallet list sorted by volume
-│   │   │   └── VaultHealthCard.tsx  Contract ID, mode, RPC, NAV metrics
 │   │   └── ui/
 │   │       └── ...                  shadcn/ui primitives
 │   │
@@ -147,7 +126,6 @@ stellarorbit/
 │   │   └── use-mobile.tsx     Mobile breakpoint hook
 │   │
 │   ├── lib/
-│   │   ├── admin-auth.ts      Admin credential check (sessionStorage)
 │   │   ├── oracle-price.ts    XLM/USD price from Stellar Expert + CoinGecko fallback
 │   │   ├── notifications.tsx  React context + useNotifications hook
 │   │   ├── utils.ts
@@ -183,8 +161,6 @@ stellarorbit/
 | Variable                       | Required | Default     | Description                                                |
 | ------------------------------ | -------- | ----------- | ---------------------------------------------------------- |
 | `VITE_ORBIT_VAULT_CONTRACT_ID` | No       | `""`        | Deployed Soroban contract ID. If unset, runs in demo mode. |
-| `VITE_ADMIN_USER`              | No       | `admin`     | Admin panel login username.                                |
-| `VITE_ADMIN_PASS`              | No       | `orbit2024` | Admin panel login password.                                |
 
 ---
 
