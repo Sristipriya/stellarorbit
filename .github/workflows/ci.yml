@@ -7,6 +7,22 @@ on:
     branches: ["main"]
 
 jobs:
+  test-contract:
+    name: Test Soroban Contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.81.0
+          targets: wasm32-unknown-unknown
+
+      - name: Run contract tests
+        working-directory: contracts/orbit-vault
+        run: cargo test
+
   build-frontend:
     name: Build & Lint Frontend
     runs-on: ubuntu-latest
