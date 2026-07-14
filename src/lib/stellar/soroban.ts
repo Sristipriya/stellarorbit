@@ -51,8 +51,13 @@ export function i128Arg(v: bigint | string | number): ScArg {
 }
 
 /** Read-only contract call. */
-export async function readContract<T = unknown>(method: string, args: ScArg[] = []): Promise<T> {
-  const contract = new Contract(requireContract());
+export async function readContract<T = unknown>(
+  method: string,
+  args: ScArg[] = [],
+  contractId?: string,
+): Promise<T> {
+  const targetId = contractId || requireContract();
+  const contract = new Contract(targetId);
   const src = new Account(READ_SOURCE_PK, "0");
   const tx = new TransactionBuilder(src, {
     fee: BASE_FEE,
@@ -73,9 +78,11 @@ export async function invokeContract<T = unknown>(
   source: string,
   method: string,
   args: ScArg[],
+  contractId?: string,
 ): Promise<{ txHash: string; retval: T | null }> {
   const server = rpcServer();
-  const contract = new Contract(requireContract());
+  const targetId = contractId || requireContract();
+  const contract = new Contract(targetId);
 
   const account = await server.getAccount(source);
   const raw = new TransactionBuilder(account, {

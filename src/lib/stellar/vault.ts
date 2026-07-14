@@ -270,6 +270,37 @@ export async function deposit(
   return { txHash, sharesMinted: shares, amountStroops };
 }
 
+/* ───────────────────────────── Zap Deposit ──────────────────────────────── */
+
+export async function zapDeposit(
+  userAddress: string,
+  inputTokenId: string,
+  amountStroops: bigint,
+  vaultId: string,
+  shareTokenId: string,
+  pointsContractId: string,
+  routerId: string,
+): Promise<{ txHash: string; sharesMinted: bigint }> {
+  if (amountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
+
+  const { txHash, retval } = await invokeContract<bigint>(
+    userAddress,
+    "zap_deposit",
+    [
+      addrArg(userAddress),
+      addrArg(inputTokenId),
+      i128Arg(amountStroops),
+      addrArg(vaultId),
+      addrArg(shareTokenId),
+      addrArg(pointsContractId),
+    ],
+    routerId,
+  );
+
+  const sharesMinted = retval == null ? 0n : BigInt(retval);
+  return { txHash, sharesMinted };
+}
+
 /* ───────────────────────────── Withdraw ───────────────────────────────── */
 
 export async function withdraw(

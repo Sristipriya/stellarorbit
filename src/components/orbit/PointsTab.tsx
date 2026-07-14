@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Copy, CheckCircle, Star, Trophy, Zap, Share2, Clock } from "lucide-react";
 import {
-  computeAndSavePoints,
+  getPoints,
   getMyReferralCode,
   buildReferralLink,
   getReferrerCode,
   formatPoints,
-  getAllPoints,
-  currentSeason,
-  type PointsSnapshot,
+  buildLeaderboard,
+  type LeaderboardEntry,
 } from "@/lib/points";
 import type { VaultState } from "@/lib/stellar/vault";
 
@@ -36,10 +35,10 @@ export function PointsTab({ address, state }: { address: string | null; state: V
   const [referralLink, setReferralLink] = useState("");
   const [referredBy, setReferredBy] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [allPoints, setAllPoints] = useState<PointsSnapshot[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const animatedPoints = useCountUp(points);
 
-  const season = currentSeason();
+  const season = 1; // Demo mock
   // Season ends every 30 days from genesis
   const msPerSeason = 30 * 24 * 3600 * 1000;
   const msIntoSeason = Date.now() % msPerSeason;
@@ -48,30 +47,30 @@ export function PointsTab({ address, state }: { address: string | null; state: V
   useEffect(() => {
     if (!address) return;
 
-    // Derive entry timestamp from localStorage positions (if any)
-    let entryTs: number | null = null;
-    try {
-      const raw = localStorage.getItem("orbit:positions:v1");
-      if (raw) {
-        const positions = JSON.parse(raw) as { walletAddress: string; entryTimestamp: number }[];
-        const mine = positions.filter((p) => p.walletAddress === address);
-        if (mine.length > 0) {
-          entryTs = Math.min(...mine.map((p) => p.entryTimestamp));
-        }
-      }
-    } catch {
-      /* noop */
+    let isMounted = true;
+
+    async function loadData() {
+      if (!address) return;
+      const pts = await getPoints(address);
+      if (!isMounted) return;
+      setPoints(pts);
+
+      const code = getMyReferralCode(address);
+      setReferralCode(code);
+      setReferralLink(buildReferralLink(address));
+      setReferredBy(getReferrerCode());
+
+      const board = await buildLeaderboard(address);
+      if (!isMounted) return;
+      setLeaderboard(board);
     }
 
-    const pts = computeAndSavePoints(address, state.userSharesStroops, entryTs);
-    setPoints(pts);
+    loadData();
 
-    const code = getMyReferralCode(address);
-    setReferralCode(code);
-    setReferralLink(buildReferralLink(address));
-    setReferredBy(getReferrerCode());
-    setAllPoints(getAllPoints());
-  }, [address, state.userSharesStroops]);
+    return () => {
+      isMounted = false;
+    };
+  }, [address]);
 
   function copyLink() {
     navigator.clipboard.writeText(referralLink);
@@ -112,7 +111,7 @@ export function PointsTab({ address, state }: { address: string | null; state: V
         </div>
 
         <p className="font-mono text-xs text-[var(--orbit-mute)]">
-          Points = XLM deposited × days held in vault
+          Earn points by Zapping cross-asset deposits into Orbit vaults.
         </p>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
@@ -121,7 +120,7 @@ export function PointsTab({ address, state }: { address: string | null; state: V
               Your Shares
             </div>
             <div className="font-display text-base font-semibold">
-              {(Number(state.userSharesStroops) / 10_000_000).toFixed(4)} orXLM
+              {(Number(state.userSharesStroops) / 10_000_000).toFixed(4)}
             </div>
           </div>
           <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3">
@@ -154,9 +153,8 @@ export function PointsTab({ address, state }: { address: string | null; state: V
         </div>
 
         <p className="text-xs text-[var(--orbit-mute)] mb-4">
-          Share your referral link. When friends deposit, you earn{" "}
-          <span className="text-[var(--orbit-accent)]">+10% of their points</span> for 90 days. They
-          earn +5% bonus points on their first deposit.
+          Share your referral link. When friends Zap deposit, you earn{" "}
+          <span className="text-[var(--orbit-accent)]">+10% of their points</span> on-chain!
         </p>
 
         {/* Referral code */}
@@ -165,7 +163,7 @@ export function PointsTab({ address, state }: { address: string | null; state: V
             Your Referral Code
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5">
-            <span className="font-mono text-sm text-[var(--orbit-accent)] flex-1">
+            <span className="font-mono text-sm text-[var(--orbit-accent)] flex-1 truncate">
               {referralCode}
             </span>
           </div>
@@ -177,7 +175,7 @@ export function PointsTab({ address, state }: { address: string | null; state: V
             Shareable Link
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex-1 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2 font-mono text-[10px] text-[var(--orbit-ink)] break-all">
+            <div className="flex-1 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2 font-mono text-[10px] text-[var(--orbit-ink)] truncate">
               {referralLink}
             </div>
             <button
@@ -196,14 +194,16 @@ export function PointsTab({ address, state }: { address: string | null; state: V
         {referredBy && (
           <div className="rounded-xl border border-[var(--orbit-accent)]/20 bg-[var(--orbit-accent)]/10 p-3">
             <p className="font-mono text-[10px] text-[var(--orbit-accent)]">
-              ✅ You were referred by code: <strong>{referredBy}</strong>. Bonus points active!
+              ✅ You were referred by code:{" "}
+              <strong className="truncate block max-w-xs">{referredBy}</strong>. Bonus points
+              active!
             </p>
           </div>
         )}
       </motion.div>
 
       {/* Mini Leaderboard */}
-      {allPoints.length > 0 && (
+      {leaderboard.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -214,11 +214,11 @@ export function PointsTab({ address, state }: { address: string | null; state: V
             <Trophy className="h-4 w-4 text-[var(--orbit-warn)]" />
             <h3 className="font-display text-sm font-semibold">Season Leaderboard</h3>
             <span className="ml-auto font-mono text-[9px] text-[var(--orbit-mute)]">
-              top {Math.min(allPoints.length, 10)}
+              top {Math.min(leaderboard.length, 10)}
             </span>
           </div>
           <div className="space-y-2">
-            {allPoints.slice(0, 10).map((snap, i) => {
+            {leaderboard.slice(0, 10).map((snap, i) => {
               const isMe = snap.walletAddress === address;
               return (
                 <div
@@ -246,7 +246,8 @@ export function PointsTab({ address, state }: { address: string | null; state: V
                     <div
                       className={`font-mono text-xs ${isMe ? "text-[var(--orbit-accent)]" : "text-[var(--orbit-ink)]"}`}
                     >
-                      {snap.walletAddress.slice(0, 4)}…{snap.walletAddress.slice(-4)}
+                      {snap.displayName ||
+                        `${snap.walletAddress.slice(0, 4)}…${snap.walletAddress.slice(-4)}`}
                       {isMe && " (you)"}
                     </div>
                   </div>

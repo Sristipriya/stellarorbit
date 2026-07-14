@@ -1,11 +1,19 @@
 import { useMemo, useState } from "react";
 import {
   deposit,
+  zapDeposit,
   quoteSharesForDeposit,
   recordPosition,
   type VaultState,
 } from "@/lib/stellar/vault";
-import { stroopsToXlm, STROOPS_PER_XLM } from "@/lib/stellar/network";
+import {
+  stroopsToXlm,
+  STROOPS_PER_XLM,
+  ORBIT_VAULT_CONTRACT_ID,
+  ORBIT_USDC_CONTRACT_ID,
+  ORBIT_ZAP_ROUTER_ID,
+  ORBIT_POINTS_CONTRACT_ID,
+} from "@/lib/stellar/network";
 import { classifyError } from "@/lib/stellar/wallet";
 import { TxStatus, type TxState } from "./TxStatus";
 import { toast } from "sonner";
@@ -15,18 +23,30 @@ export function DepositCard({
   address,
   state,
   walletBalance,
+  vaultId,
   onDone,
   onNotify,
 }: {
   address: string | null;
   state: VaultState;
   walletBalance: string | null;
+  vaultId?: string;
   onDone: () => void;
   onNotify?: (n: Omit<Notification, "id" | "at" | "read">) => void;
 }) {
   const [amount, setAmount] = useState("");
   const [tx, setTx] = useState<TxState>({ kind: "idle" });
   const [raw, setRaw] = useState<string | undefined>();
+
+  // Zap Mode State
+  const [useZap, setUseZap] = useState(false);
+
+  // Determine native asset name based on vaultId
+  const isUsdcVault = vaultId === ORBIT_USDC_CONTRACT_ID;
+  const nativeAsset = isUsdcVault ? "USDC" : "XLM";
+  const zapAsset = isUsdcVault ? "XLM" : "USDC";
+
+  const currentAsset = useZap ? zapAsset : nativeAsset;
 
   const previewShares = useMemo(() => {
     if (!amount) return 0n;
@@ -37,20 +57,54 @@ export function DepositCard({
     }
   }, [amount, state]);
 
+  // We assume 1:1 price swap mock for demo, so walletBalance check is naive
   const insufficient = Boolean(walletBalance && Number(amount || 0) + 0.5 > Number(walletBalance));
 
   async function submit() {
-    if (!address) return;
+    if (!address || !vaultId) return;
     setRaw(undefined);
-    setTx({ kind: "pending", label: `Depositing ${amount} XLM…` });
+    setTx({ kind: "pending", label: `Depositing ${amount} ${currentAsset}…` });
     try {
-      const { txHash, sharesMinted, amountStroops } = await deposit(address, amount);
-      const msg = `${stroopsToXlm(amountStroops)} XLM → ${stroopsToXlm(sharesMinted)} shares`;
+      let txHash, sharesMinted, amountStroops;
+
+      if (useZap) {
+        // Zap Deposit
+        if (!ORBIT_ZAP_ROUTER_ID || !ORBIT_POINTS_CONTRACT_ID) {
+          throw new Error("Zap router not deployed");
+        }
+        // Native asset ID is the vault we are zapping FROM.
+        // For the demo, inputTokenId is either USDC or XLM.
+        // Here we just pass the dummy zapAsset token ID (using the vault IDs as token IDs for mock).
+        const inputTokenId = isUsdcVault ? ORBIT_VAULT_CONTRACT_ID! : ORBIT_USDC_CONTRACT_ID!;
+        const shareTokenId = vaultId; // the vault issues its own shares in our current design
+
+        amountStroops = BigInt(Math.floor(Number(amount) * 1e7));
+
+        const res = await zapDeposit(
+          address,
+          inputTokenId,
+          amountStroops,
+          vaultId,
+          shareTokenId,
+          ORBIT_POINTS_CONTRACT_ID,
+          ORBIT_ZAP_ROUTER_ID,
+        );
+        txHash = res.txHash;
+        sharesMinted = res.sharesMinted;
+      } else {
+        // Standard Deposit
+        const res = await deposit(vaultId, amount);
+        txHash = res.txHash;
+        sharesMinted = res.sharesMinted;
+        amountStroops = res.amountStroops;
+      }
+
+      const msg = `${Number(amountStroops) / 1e7} ${currentAsset} → ${stroopsToXlm(sharesMinted)} shares`;
       setTx({
         kind: "success",
         title: "Deposited",
         lines: [
-          `Amount: ${stroopsToXlm(amountStroops)} XLM`,
+          `Amount: ${Number(amountStroops) / 1e7} ${currentAsset}`,
           `Shares minted: ${stroopsToXlm(sharesMinted)}`,
         ],
         txHash,
@@ -58,6 +112,7 @@ export function DepositCard({
       setRaw(`tx_hash=${txHash}`);
       setAmount("");
       onDone();
+
       // Record position entry for P&L tracking
       if (address) {
         const entryPrice =
@@ -66,7 +121,7 @@ export function DepositCard({
             : (state.totalAssetsStroops * STROOPS_PER_XLM) / state.totalSharesStroops;
         recordPosition(address, entryPrice, sharesMinted);
       }
-      toast.success(`Deposited ${stroopsToXlm(amountStroops)} XLM`, {
+      toast.success(`Deposited ${Number(amountStroops) / 1e7} ${currentAsset}`, {
         description: `Shares: ${stroopsToXlm(sharesMinted)}`,
       });
       onNotify?.({ kind: "success", title: "Deposit Successful", message: msg, txHash });
@@ -91,9 +146,25 @@ export function DepositCard({
         <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
           Deposit
         </h3>
-        <span className="font-mono text-[10px] text-[var(--orbit-mute)]">XLM → shares</span>
+        <span className="font-mono text-[10px] text-[var(--orbit-mute)]">
+          {currentAsset} → shares
+        </span>
       </div>
-      <label className="mt-4 block text-xs text-[var(--orbit-mute)]">Amount (XLM)</label>
+
+      {/* Zap Toggle */}
+      <div className="mt-4 flex items-center justify-between bg-black/20 p-2 rounded-lg border border-[var(--orbit-edge)]">
+        <span className="text-xs text-[var(--orbit-mute)]">⚡ Zap Deposit (Cross-Asset)</span>
+        <button
+          onClick={() => setUseZap(!useZap)}
+          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${useZap ? "bg-[var(--orbit-accent)]" : "bg-[var(--orbit-edge)]"}`}
+        >
+          <span
+            className={`inline-block h-3 w-3 transform rounded-full bg-black transition-transform ${useZap ? "translate-x-5" : "translate-x-1"}`}
+          />
+        </button>
+      </div>
+
+      <label className="mt-4 block text-xs text-[var(--orbit-mute)]">Amount ({currentAsset})</label>
       <div className="mt-1 flex items-center gap-2 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5 focus-within:border-[var(--orbit-accent)]">
         <input
           id="deposit-amount"
@@ -124,14 +195,23 @@ export function DepositCard({
       <button
         onClick={submit}
         disabled={!address || !amount || insufficient || tx.kind === "pending"}
-        className="liquid-btn mt-4 w-full justify-center"
+        className={`liquid-btn mt-4 w-full justify-center ${useZap ? "bg-[var(--orbit-accent)]/20 border-[var(--orbit-accent)]" : ""}`}
       >
         {tx.kind === "pending"
           ? "Signing…"
           : insufficient
             ? "Insufficient balance"
-            : "Deposit into Orbit"}
+            : useZap
+              ? `⚡ Zap ${currentAsset} into Orbit`
+              : "Deposit into Orbit"}
       </button>
+
+      {useZap && (
+        <div className="mt-2 text-center text-[9px] text-[var(--orbit-accent)]/70">
+          Zapping earns Orbit Points! 🏆
+        </div>
+      )}
+
       <div className="mt-3">
         <TxStatus state={tx} raw={raw} />
       </div>

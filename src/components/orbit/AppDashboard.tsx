@@ -879,6 +879,7 @@ export function AppDashboard() {
               address={wallet.address}
               state={vault.state}
               walletBalance={wallet.balance?.xlm ?? null}
+              vaultId={vault.id}
               onDone={vault.refresh}
               onNotify={add}
             />

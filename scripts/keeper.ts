@@ -6,7 +6,7 @@ import { join } from "path";
 const execAsync = promisify(exec);
 
 const INTERVAL_SECONDS = 15;
-const APY_PERCENT = 1000; 
+const APY_PERCENT = 1000;
 const IDENTITY = "orbit-deployer";
 const NETWORK = "testnet";
 
@@ -38,7 +38,7 @@ async function startKeeper() {
   console.log("=========================================\n");
 
   const activeVaults: string[] = [];
-  
+
   const xlmVault = await getEnvVar("VITE_ORBIT_VAULT_CONTRACT_ID");
   const usdcVault = await getEnvVar("VITE_ORBIT_USDC_CONTRACT_ID");
   const indexVault = await getEnvVar("VITE_ORBIT_INDEX_CONTRACT_ID");
@@ -53,7 +53,7 @@ async function startKeeper() {
   }
 
   console.log(`🏦 Active Vaults Found: ${activeVaults.length}`);
-  activeVaults.forEach(v => console.log(`   - ${v}`));
+  activeVaults.forEach((v) => console.log(`   - ${v}`));
   console.log(`⏱️  Tick Interval: ${INTERVAL_SECONDS} seconds`);
   console.log(`📈 Simulated APY: ${APY_PERCENT}%\n`);
 
@@ -100,7 +100,9 @@ async function startKeeper() {
           `stellar contract invoke --id ${contractId} --network ${NETWORK} --source ${IDENTITY} -- harvest --admin ${adminAddress} --yield_amount ${yieldStroops.toString()}`,
         );
 
-        console.log(`[${new Date().toLocaleTimeString()}] ✅ Harvested [${contractId.substring(0, 6)}...]`);
+        console.log(
+          `[${new Date().toLocaleTimeString()}] ✅ Harvested [${contractId.substring(0, 6)}...]`,
+        );
       } catch (err: unknown) {
         console.error(
           `[${new Date().toLocaleTimeString()}] ❌ Keeper Tick Error [${contractId.substring(0, 6)}...]:`,

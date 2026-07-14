@@ -1,0 +1,6 @@
+- `[x]` Create orbit-points Soroban contract.
+- `[x]` Create orbit-zap-router Soroban contract.
+- `[x]` Compile contracts to WebAssembly (wasm32v1-none).
+- `[x]` Deploy Phase 4 contracts to testnet.
+- `[x]` Update DepositCard.tsx to support cross-asset Zap deposits.
+- `[x]` Update PointsTab.tsx to use on-chain points data.

@@ -268,8 +268,13 @@
 
 /* ── Skeleton loading ── */
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 .skeleton {
   background: oklch(0.28 0.018 260 / 0.7);
@@ -292,7 +297,7 @@
   z-index: 50;
   display: flex;
   align-items: stretch;
-  background: oklch(0.10 0.012 260 / 0.95);
+  background: oklch(0.1 0.012 260 / 0.95);
   border-top: 1px solid var(--orbit-edge);
   backdrop-filter: blur(20px) saturate(160%);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -310,7 +315,9 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--orbit-mute);
-  transition: color 150ms ease, background 150ms ease;
+  transition:
+    color 150ms ease,
+    background 150ms ease;
   cursor: pointer;
   border: none;
   background: transparent;
@@ -350,14 +357,26 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
-.net-dot.ok    { background: var(--orbit-ok);     box-shadow: 0 0 6px var(--orbit-ok); }
-.net-dot.slow  { background: var(--orbit-warn);   box-shadow: 0 0 6px var(--orbit-warn); }
-.net-dot.down  { background: var(--orbit-danger); box-shadow: 0 0 6px var(--orbit-danger); }
+.net-dot.ok {
+  background: var(--orbit-ok);
+  box-shadow: 0 0 6px var(--orbit-ok);
+}
+.net-dot.slow {
+  background: var(--orbit-warn);
+  box-shadow: 0 0 6px var(--orbit-warn);
+}
+.net-dot.down {
+  background: var(--orbit-danger);
+  box-shadow: 0 0 6px var(--orbit-danger);
+}
 
 /* ── Share certificate ── */
 .cert-card {
-  background:
-    linear-gradient(135deg, oklch(0.18 0.04 260 / 0.9) 0%, oklch(0.14 0.03 240 / 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    oklch(0.18 0.04 260 / 0.9) 0%,
+    oklch(0.14 0.03 240 / 0.9) 100%
+  );
   border: 1px solid oklch(0.82 0.16 195 / 0.4);
   border-radius: 1.5rem;
   box-shadow:
@@ -368,16 +387,15 @@
   overflow: hidden;
 }
 .cert-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background-image:
-    repeating-linear-gradient(
-      45deg,
-      oklch(0.82 0.16 195 / 0.03) 0px,
-      oklch(0.82 0.16 195 / 0.03) 1px,
-      transparent 1px,
-      transparent 8px
-    );
+  background-image: repeating-linear-gradient(
+    45deg,
+    oklch(0.82 0.16 195 / 0.03) 0px,
+    oklch(0.82 0.16 195 / 0.03) 1px,
+    transparent 1px,
+    transparent 8px
+  );
   pointer-events: none;
 }

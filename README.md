@@ -12,19 +12,20 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 
 ## Live Deployment
 
-| Resource              | Value |
-|-----------------------|-------|
-| **Live Demo**         | https://stellarorbit.vercel.app/ |
-| **Contract Address**  | `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ` |
-| **Admin Panel**       | https://stellarorbit.vercel.app/admin/ |
-| **Network**           | Stellar Testnet |
-| **Soroban RPC**       | `https://soroban-testnet.stellar.org` |
+| Resource             | Value                                                      |
+| -------------------- | ---------------------------------------------------------- |
+| **Live Demo**        | https://stellarorbit.vercel.app/                           |
+| **Contract Address** | `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ` |
+| **Admin Panel**      | https://stellarorbit.vercel.app/admin/                     |
+| **Network**          | Stellar Testnet                                            |
+| **Soroban RPC**      | `https://soroban-testnet.stellar.org`                      |
 
 ---
 
 ## Features
 
 ### User-Facing
+
 - **Multi-Wallet Support** — Connect via StellarWalletsKit (Freighter, Albedo, xBull, Lobstr)
 - **Live On-Chain Data** — Real-time XLM balance, vault shares, TVL from Soroban RPC
 - **Deposit & Withdraw** — Soroban contract calls with wallet signing; preview shares before submitting
@@ -42,6 +43,7 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 - **Responsive Sidebar** — Slide-in drawer on mobile, persistent sidebar on desktop
 
 ### Admin Panel (`/admin/`)
+
 - **Protected Login** — Credential check against `VITE_ADMIN_USER` / `VITE_ADMIN_PASS`
 - **KPI Dashboard** — TVL, unique wallets, total deposits, withdrawals, share price, tx count
 - **7-Day Volume Chart** — Bar chart of deposit vs withdrawal volume by day
@@ -178,11 +180,11 @@ stellarorbit/
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `VITE_ORBIT_VAULT_CONTRACT_ID` | No | `""` | Deployed Soroban contract ID. If unset, runs in demo mode. |
-| `VITE_ADMIN_USER` | No | `admin` | Admin panel login username. |
-| `VITE_ADMIN_PASS` | No | `orbit2024` | Admin panel login password. |
+| Variable                       | Required | Default     | Description                                                |
+| ------------------------------ | -------- | ----------- | ---------------------------------------------------------- |
+| `VITE_ORBIT_VAULT_CONTRACT_ID` | No       | `""`        | Deployed Soroban contract ID. If unset, runs in demo mode. |
+| `VITE_ADMIN_USER`              | No       | `admin`     | Admin panel login username.                                |
+| `VITE_ADMIN_PASS`              | No       | `orbit2024` | Admin panel login password.                                |
 
 ---
 
@@ -245,10 +247,10 @@ The admin panel is read-only — it displays live analytics from the Stellar Tes
 
 ## Operating Modes
 
-| Mode | `VITE_ORBIT_VAULT_CONTRACT_ID` | Share state | Activity |
-|------|-------------------------------|-------------|----------|
-| **Real** | Set to deployed contract | On-chain via Soroban RPC | Soroban contract events |
-| **Demo** | Not set | `localStorage` | Horizon memo-tagged payments |
+| Mode     | `VITE_ORBIT_VAULT_CONTRACT_ID` | Share state              | Activity                     |
+| -------- | ------------------------------ | ------------------------ | ---------------------------- |
+| **Real** | Set to deployed contract       | On-chain via Soroban RPC | Soroban contract events      |
+| **Demo** | Not set                        | `localStorage`           | Horizon memo-tagged payments |
 
 ---
 
@@ -300,13 +302,13 @@ Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for bui
 
 ## Roadmap
 
-| Level | Feature | Status |
-|-------|---------|--------|
-| L1–L2 | Wallet connect + vault foundation | ✅ Done |
-| L3 | Full Soroban contract (deposit/withdraw/share math) | ✅ Done |
-| L4 | Production MVP, admin panel, leaderboard, simulator, oracle panel | ✅ Done |
-| L5 | Multi-asset baskets, SEP-40 full oracle integration | 🔜 Next |
-| L6 | Automated DEX rebalancing, Zap deposits, Mainnet launch | 🔜 Future |
+| Level | Feature                                                           | Status    |
+| ----- | ----------------------------------------------------------------- | --------- |
+| L1–L2 | Wallet connect + vault foundation                                 | ✅ Done   |
+| L3    | Full Soroban contract (deposit/withdraw/share math)               | ✅ Done   |
+| L4    | Production MVP, admin panel, leaderboard, simulator, oracle panel | ✅ Done   |
+| L5    | Multi-asset baskets, SEP-40 full oracle integration               | 🔜 Next   |
+| L6    | Automated DEX rebalancing, Zap deposits, Mainnet launch           | 🔜 Future |
 
 ---
 
