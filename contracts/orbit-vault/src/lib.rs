@@ -40,6 +40,8 @@ pub enum DataKey {
     FeeRecipient,
     PerfFeeBps,
     PriceHistory,
+    ManagementFeeBps,
+    BlendPool,
 }
 
 #[soroban_sdk::contractclient(name = "ShareTokenClient")]
@@ -47,6 +49,12 @@ pub trait ShareTokenInterface {
     fn mint(env: Env, minter: Address, to: Address, amount: i128);
     fn burn(env: Env, minter: Address, from: Address, amount: i128);
     fn balance(env: Env, id: Address) -> i128;
+}
+
+#[soroban_sdk::contractclient(name = "BlendPoolClient")]
+pub trait BlendPoolInterface {
+    fn supply(env: Env, from: Address, reserve: Address, amount: i128);
+    fn withdraw(env: Env, from: Address, reserve: Address, amount: i128, to: Address);
 }
 
 #[derive(Clone)]
@@ -89,9 +97,24 @@ impl OrbitVault {
         env.storage().instance().set(&DataKey::FeeRecipient, &fee_recipient);
         env.storage().instance().set(&DataKey::PerfFeeBps, &perf_fee_bps);
         env.storage().instance().set(&DataKey::ShareToken, &share_token);
+        // Default management fee to 0 bps initially
+        env.storage().instance().set(&DataKey::ManagementFeeBps, &0_u32);
         env.storage()
             .instance()
             .set(&DataKey::PriceHistory, &vec![&env] as &Vec<PriceSnapshot>);
+    }
+
+    pub fn set_blend_pool(env: Env, admin: Address, pool: Address) {
+        admin.require_auth();
+        Self::assert_admin(&env, &admin);
+        env.storage().instance().set(&DataKey::BlendPool, &pool);
+    }
+
+    pub fn set_management_fee(env: Env, admin: Address, bps: u32) {
+        admin.require_auth();
+        Self::assert_admin(&env, &admin);
+        assert!(bps <= 5000, "management fee too high");
+        env.storage().instance().set(&DataKey::ManagementFeeBps, &bps);
     }
 
     // ─────────────────────────── Deposit ────────────────────────────────────
@@ -305,6 +328,13 @@ impl OrbitVault {
         let idle_assets = total_assets - assets_lent;
         assert!(amount <= idle_assets, "insufficient idle assets to invest");
 
+        // Real Blend integration
+        if let Some(pool) = env.storage().instance().get::<_, Address>(&DataKey::BlendPool) {
+            let asset: Address = env.storage().instance().get(&DataKey::Asset).unwrap();
+            let blend = BlendPoolClient::new(&env, &pool);
+            blend.supply(&env.current_contract_address(), &asset, &amount);
+        }
+
         env.storage()
             .instance()
             .set(&DataKey::AssetsLent, &(assets_lent + amount));
@@ -323,6 +353,13 @@ impl OrbitVault {
             .get(&DataKey::AssetsLent)
             .unwrap_or(0);
         assert!(amount <= assets_lent, "insufficient lent assets");
+
+        // Real Blend integration
+        if let Some(pool) = env.storage().instance().get::<_, Address>(&DataKey::BlendPool) {
+            let asset: Address = env.storage().instance().get(&DataKey::Asset).unwrap();
+            let blend = BlendPoolClient::new(&env, &pool);
+            blend.withdraw(&env.current_contract_address(), &asset, &amount, &env.current_contract_address());
+        }
 
         env.storage()
             .instance()
@@ -344,8 +381,32 @@ impl OrbitVault {
             .instance()
             .get(&DataKey::PerfFeeBps)
             .unwrap_or(0);
-        let fee_amount = (yield_amount * perf_fee_bps as i128) / 10_000_i128;
-        let net_yield = yield_amount - fee_amount;
+        let mgmt_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ManagementFeeBps)
+            .unwrap_or(0);
+
+        let total_assets: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalAssets)
+            .unwrap_or(0);
+
+        // Calculate performance fee from gross yield
+        let perf_fee_amount = (yield_amount * perf_fee_bps as i128) / 10_000_i128;
+        
+        // Calculate annualized management fee (approximation per harvest)
+        // A full implementation would scale this by time since last harvest. 
+        // For Layer 1, we just apply the BPS on the AUM for the period.
+        let mgmt_fee_amount = (total_assets * mgmt_fee_bps as i128) / 10_000_i128;
+        
+        let total_fee_amount = perf_fee_amount + mgmt_fee_amount;
+
+        // Note: if yield is less than mgmt fee, net yield could be negative (value erosion), 
+        // but for simplicity we cap it so we don't try to pull more than yield_amount.
+        let total_fee_amount = if total_fee_amount > yield_amount { yield_amount } else { total_fee_amount };
+        let net_yield = yield_amount - total_fee_amount;
 
         let asset: Address = env.storage().instance().get(&DataKey::Asset).unwrap();
         let token = token::Client::new(&env, &asset);
@@ -353,22 +414,17 @@ impl OrbitVault {
         // Pull gross yield from admin wallet.
         token.transfer(&admin, &env.current_contract_address(), &yield_amount);
 
-        // Pay performance fee to fee_recipient.
-        if fee_amount > 0 {
+        // Pay fee to fee_recipient.
+        if total_fee_amount > 0 {
             let fee_recipient: Address = env
                 .storage()
                 .instance()
                 .get(&DataKey::FeeRecipient)
                 .unwrap();
-            token.transfer(&env.current_contract_address(), &fee_recipient, &fee_amount);
+            token.transfer(&env.current_contract_address(), &fee_recipient, &total_fee_amount);
         }
 
         // Credit net yield to vault.
-        let total_assets: i128 = env
-            .storage()
-            .instance()
-            .get(&DataKey::TotalAssets)
-            .unwrap_or(0);
         let new_total = total_assets + net_yield;
         env.storage()
             .instance()

@@ -20,6 +20,7 @@ import {
 import { NETWORK, HAS_REAL_CONTRACT, xlmToStroops, stroopsToXlm, STROOPS_PER_XLM } from "./network";
 import { signTx } from "./wallet";
 import { addrArg, i128Arg, invokeContract, readContract } from "./soroban";
+import { supabase } from "../supabase";
 
 export type VaultState = {
   totalAssetsStroops: bigint;
@@ -363,85 +364,104 @@ export async function harvest(
   return { txHash, yieldAmountStroops };
 }
 
-/* ─────────────── P&L Tracking (localStorage-based, per wallet) ──────────── */
-
-const LS_POSITIONS = "orbit:positions:v1";
-
-type PositionRecord = {
-  walletAddress: string;
-  entrySharePrice: string; // scaled string (bigint)
-  entryTimestamp: number;
-  initialSharesMinted: string;
-};
-
-function readPositions(): PositionRecord[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(LS_POSITIONS);
-    return raw ? (JSON.parse(raw) as PositionRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writePositions(positions: PositionRecord[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(LS_POSITIONS, JSON.stringify(positions));
-}
-
-/** Record a new deposit position for P&L tracking. */
-export function recordPosition(
-  walletAddress: string,
-  entrySharePriceScaled: bigint,
-  sharesMinted: bigint,
-) {
-  const positions = readPositions();
-  positions.push({
-    walletAddress,
-    entrySharePrice: entrySharePriceScaled.toString(),
-    entryTimestamp: Math.floor(Date.now() / 1000),
-    initialSharesMinted: sharesMinted.toString(),
-  });
-  writePositions(positions);
-}
+/* ─────────────── P&L Tracking (Supabase, per wallet) ──────────── */
 
 export type PnlResult = {
   entryPriceScaled: bigint;
   currentPriceScaled: bigint;
   entryTimestamp: number;
-  totalSharesDeposited: bigint; // sum across all deposit events
+  totalSharesDeposited: bigint;
   currentValueStroops: bigint;
   earnedStroops: bigint;
   earnedPct: number;
 };
 
-/** Compute P&L for a wallet from recorded positions and current vault state. */
-export function computePnl(walletAddress: string, state: VaultState): PnlResult | null {
-  const positions = readPositions().filter((p) => p.walletAddress === walletAddress);
-  if (positions.length === 0) return null;
+/** Record a new deposit position for P&L tracking in Supabase. */
+export async function recordPosition(
+  walletAddress: string,
+  entrySharePriceScaled: bigint,
+  sharesMinted: bigint,
+) {
+  if (typeof window === "undefined") return;
+  try {
+    // We'll use vault_id = "default" for now, until multi-vault is active
+    const { data: existing } = await supabase
+      .from("positions")
+      .select("current_shares, entry_share_price")
+      .eq("wallet_address", walletAddress)
+      .eq("vault_id", "default")
+      .single();
 
-  const totalShares = positions.reduce((acc, p) => acc + BigInt(p.initialSharesMinted), 0n);
-  const oldestEntry = positions.reduce((a, b) => (a.entryTimestamp < b.entryTimestamp ? a : b));
-  const entryPriceScaled = BigInt(oldestEntry.entrySharePrice);
-  const currentPriceScaled = state.pricePerShareScaled;
+    if (existing) {
+      // Average the entry price
+      const oldShares = BigInt(existing.current_shares);
+      const oldPrice = BigInt(existing.entry_share_price);
+      const newShares = oldShares + sharesMinted;
+      const avgPrice = (oldPrice * oldShares + entrySharePriceScaled * sharesMinted) / newShares;
+      
+      await supabase
+        .from("positions")
+        .update({
+          current_shares: newShares.toString(),
+          entry_share_price: avgPrice.toString(),
+        })
+        .eq("wallet_address", walletAddress)
+        .eq("vault_id", "default");
+    } else {
+      // Insert new position
+      await supabase.from("positions").insert({
+        wallet_address: walletAddress,
+        vault_id: "default",
+        entry_share_price: entrySharePriceScaled.toString(),
+        current_shares: sharesMinted.toString(),
+      });
+    }
+  } catch (e) {
+    console.error("Failed to record position in Supabase", e);
+  }
+}
 
-  // Cost basis: total_shares × entry_price
-  const costBasisStroops = (totalShares * entryPriceScaled) / STROOPS_PER_XLM;
+/** Compute P&L for a wallet from Supabase positions and current vault state. */
+export async function computePnl(walletAddress: string, state: VaultState): Promise<PnlResult | null> {
+  if (typeof window === "undefined") return null;
+  try {
+    const { data: pos } = await supabase
+      .from("positions")
+      .select("*")
+      .eq("wallet_address", walletAddress)
+      .eq("vault_id", "default")
+      .single();
 
-  // Current value: user_shares_in_vault × current_price
-  const currentShares = state.userSharesStroops;
-  const currentValueStroops = (currentShares * currentPriceScaled) / STROOPS_PER_XLM;
-  const earnedStroops = currentValueStroops - costBasisStroops;
-  const earnedPct =
-    costBasisStroops > 0n ? Number((earnedStroops * 10000n) / costBasisStroops) / 100 : 0;
+    if (!pos || !pos.current_shares) return null;
 
-  return {
-    entryPriceScaled,
-    currentPriceScaled,
-    entryTimestamp: oldestEntry.entryTimestamp,
-    totalSharesDeposited: totalShares,
-    currentValueStroops,
-    earnedStroops,
-    earnedPct,
-  };
+    const totalShares = BigInt(pos.current_shares);
+    if (totalShares === 0n) return null;
+
+    const entryTimestamp = new Date(pos.entry_timestamp).getTime();
+    const entryPriceScaled = BigInt(pos.entry_share_price);
+    const currentPriceScaled = state.pricePerShareScaled;
+
+    // Cost basis: total_shares × entry_price
+    const costBasisStroops = (totalShares * entryPriceScaled) / STROOPS_PER_XLM;
+
+    // Current value: user_shares_in_vault × current_price
+    const currentShares = state.userSharesStroops;
+    const currentValueStroops = (currentShares * currentPriceScaled) / STROOPS_PER_XLM;
+    const earnedStroops = currentValueStroops - costBasisStroops;
+    const earnedPct =
+      costBasisStroops > 0n ? Number((earnedStroops * 10000n) / costBasisStroops) / 100 : 0;
+
+    return {
+      entryPriceScaled,
+      currentPriceScaled,
+      entryTimestamp,
+      totalSharesDeposited: totalShares,
+      currentValueStroops,
+      earnedStroops,
+      earnedPct,
+    };
+  } catch (e) {
+    console.error("Failed to fetch PnL from Supabase", e);
+    return null;
+  }
 }

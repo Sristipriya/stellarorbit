@@ -1,11 +1,18 @@
-- `[x]` Phase 1-3 implementation completed.
-- `[x]` Phase 4: Full On-Chain UX & Ecosystem
-  - `[x]` Create orbit-points Soroban contract.
-  - `[x]` Create orbit-zap-router Soroban contract.
-  - `[x]` Compile contracts to WebAssembly (wasm32v1-none).
-  - `[x]` Deploy Phase 4 contracts to testnet.
-  - `[x]` Update DepositCard.tsx to support cross-asset Zap deposits.
-  - `[x]` Update PointsTab.tsx to use on-chain points data.
-- `[x]` Phase 5: Final Git push and verification
-  - `[x]` Push all changes to GitHub.
-  - `[x]` Verify CI/CD pipeline passes.
+- `[x]` **1. Supabase P&L Integration**
+  - `[x]` Install `@supabase/supabase-js`.
+  - `[x]` Setup Supabase client in `src/lib/supabase.ts`.
+  - `[x]` Update `.env` with Supabase credentials.
+  - `[x]` Create SQL migration/table for `positions` (wallet, vault_id, entry_price, shares).
+  - `[x]` Update `AppDashboard` / `DepositCard` to track and display user P&L.
+- `[x]` **2. Real Yield (Blend Protocol Integration)**
+  - `[x]` Create `contracts/orbit-blend-pool-mock` to simulate Blend pool (`supply`, `withdraw`).
+  - `[x]` Update `contracts/orbit-vault/src/lib.rs` to call Blend pool interface in `invest()` / `divest()`.
+  - `[x]` Write automated tests for cross-contract calls.
+- `[x]` **3. Multi-Vault Architecture**
+  - `[x]` Create `contracts/orbit-vault-registry` to map assets to vault IDs.
+  - `[x]` Deploy registry, vault, and blend pool mock to testnet.
+  - `[x]` Update frontend `vault.ts` to query the registry.
+  - `[x]` Add Vault Selector to the UI.
+- `[x]` **4. Finalization**
+  - `[x]` Verify APY display uses on-chain data.
+  - `[x]` Push to GitHub and verify CI passes.

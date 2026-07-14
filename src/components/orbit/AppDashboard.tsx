@@ -267,7 +267,14 @@ function PortfolioTab({
   const apyLabel = vault.state.apyBps > 0n ? `${apyPct.toFixed(2)}% APY` : "Accruing...";
 
   // P&L for connected wallet
-  const pnl = wallet.address ? computePnl(wallet.address, vault.state) : null;
+  const [pnl, setPnl] = useState<Awaited<ReturnType<typeof computePnl>>>(null);
+  useEffect(() => {
+    if (wallet.address && vault.state.userSharesStroops > 0n) {
+      computePnl(wallet.address, vault.state).then(setPnl);
+    } else {
+      setPnl(null);
+    }
+  }, [wallet.address, vault.state.userSharesStroops, vault.state.pricePerShareScaled]);
 
   const cards = [
     {
