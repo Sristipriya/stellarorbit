@@ -63,7 +63,7 @@ export const VAULTS: VaultMeta[] = [
     strategy: "Blend Lending + Aquarius LP",
     risk: "low",
     color: "oklch(0.78 0.13 225)",
-    icon: "💵",
+    icon: "💲",
   },
   {
     id: "index",
@@ -75,7 +75,7 @@ export const VAULTS: VaultMeta[] = [
     strategy: "Auto-Rebalanced Basket",
     risk: "medium",
     color: "oklch(0.82 0.17 155)",
-    icon: "📊",
+    icon: "📈",
   },
 ];
 
