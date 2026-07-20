@@ -4,7 +4,7 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-stellarorbit.vercel.app-8af)](https://stellarorbit.vercel.app/)
 [![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-blue)](https://stellar.org)
-[![Contract](https://img.shields.io/badge/Soroban-Testnet%20Contract-purple)](https://stellar.expert/explorer/testnet/contract/CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ)
+[![Contract](https://img.shields.io/badge/Soroban-Testnet%20Contract-purple)](https://stellar.expert/explorer/testnet/contract/CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN)
 
 Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Testnet**, architected to grow into a multi-asset RWA index using SEP-40 oracles. Connect a Stellar wallet, fund via Friendbot, deposit XLM into the vault contract, receive shares, and withdraw at current share NAV.
 
@@ -15,7 +15,7 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 | Resource             | Value                                                      |
 | -------------------- | ---------------------------------------------------------- |
 | **Live Demo**        | https://stellarorbit.vercel.app/                           |
-| **Contract Address** | `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ` |
+| **Contract Address** | `CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN` |
 | **Network**          | Stellar Testnet                                            |
 | **Soroban RPC**      | `https://soroban-testnet.stellar.org`                      |
 
@@ -25,25 +25,24 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 
 ### User-Facing
 
-- **Multi-Wallet Support** — Connect via StellarWalletsKit (Freighter, Albedo, xBull, Lobstr)
+- **Multi-Wallet Support** — Connect via StellarWalletsKit with a premium glassmorphic, animated modal.
+- **Mandatory Onboarding & Auth Flow** — Zero-friction onboarding syncs wallets and display names to a Supabase backend to personalize the global leaderboard.
 - **Real Yield via Blend Protocol** — Vaults utilize Blend Protocol lending markets for real cross-contract yield.
 - **Zap Deposits** — Deposit any Stellar asset; the frontend automatically routes through Soroswap before depositing native assets into the vault.
 - **Fiat On-Ramp (SEP-24)** — Built-in modal to buy crypto with fiat via testanchor.stellar.org.
 - **Progressive Web App (PWA)** — Installable on mobile/desktop, works offline, and supports background sync.
 - **Vault Strategies Marketplace** — UI allowing third-party strategists to submit new vault strategies and parameter tuning for the DAO.
 - **Yield Projection** — A chart projecting compound growth using Blend APY against a standard wallet hold.
-- **SEP-41 Compliant Share Token** — Users receive a minted `share_token` (e.g. oXLM) representing their proportional share.
-- **Points & Referrals** — Earn Orbit Points for deposits; refer users via `?ref=` links for on-chain attribution and off-chain rewards.
-- **Live On-Chain Data** — Real-time XLM balance, vault shares, TVL from Soroban RPC
-- **Deposit & Withdraw** — Soroban contract calls with wallet signing; preview shares before submitting
-- **Share Certificate** — Visual ownership card with copy-to-clipboard and USD equivalent value
-- **SEP-40 Oracle Panel** — Live XLM/USD price feed converts TVL and share price into USD
-- **Vault Simulator** — What-if calculator: project returns over time with a chart
-- **Leaderboard** — Ranked depositor table derived from on-chain events (no backend)
-- **Transaction History** — Full deposit/withdrawal history with explorer links
-- **Notification Center** — In-app bell with unread badge; tracks deposits, withdrawals, errors
-- **Network Status Bar** — Live Soroban RPC latency, color-coded dot, and latest ledger number
-- **Testnet Faucet** — One-click Friendbot funding for new accounts
+- **SEP-41 Compliant Share Token** — Users receive a minted `share_token` representing their proportional share.
+- **Live Soroban Event Polling** — Real-time ledger polling instantly updates TVL, Volume, Analytics charts, and Leaderboards without a backend indexer.
+- **Deposit & Withdraw** — Soroban contract calls with wallet signing; preview shares before submitting.
+- **Share Certificate** — Visual ownership card with copy-to-clipboard and USD equivalent value.
+- **SEP-40 Oracle Panel** — Live XLM/USD price feed converts TVL and share price into USD.
+- **Vault Simulator** — What-if calculator: project returns over time with an interactive chart.
+- **Leaderboard** — Ranked depositor table derived directly from on-chain Soroban events.
+- **Transaction History** — Full deposit/withdrawal history with explorer links.
+- **Network Status Bar** — Live Soroban RPC latency, color-coded dot, and latest ledger number.
+- **Testnet Faucet** — One-click Friendbot funding for new accounts.
 
 ---
 
@@ -269,8 +268,8 @@ Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for bui
 ## Deployed Contract Information
 
 - **Live Demo Link:** [https://stellarorbit.vercel.app/](https://stellarorbit.vercel.app/)
-- **Deployed Contract Address:** `CAEVXCBXW6CFCOELPQQ2D2KZ6JVVT5T6RQA5NCD3WGG6JJ5UC3XZD4OJ`
-- **Recent Transaction Hash:** `4cbeda5d4223cca5235c8f5dad269de26e6373b2369c3ce483ffc092aacb46a3`
+- **Deployed Contract Address:** `CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN`
+- **Stellar Expert Explorer:** [View Contract](https://stellar.expert/explorer/testnet/contract/CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN)
 - **Network:** Stellar Testnet
 - **Soroban RPC URL:** `https://soroban-testnet.stellar.org`
 
@@ -283,8 +282,9 @@ Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for bui
 | L1–L2 | Wallet connect + vault foundation                                 | ✅ Done   |
 | L3    | Full Soroban contract (deposit/withdraw/share math)               | ✅ Done   |
 | L4    | Production MVP, admin panel, leaderboard, simulator, oracle panel | ✅ Done   |
-| L5    | Multi-asset baskets, SEP-40 full oracle integration               | 🔜 Next   |
-| L6    | Automated DEX rebalancing, Zap deposits, Mainnet launch           | 🔜 Future |
+| L5    | Real-time Event Polling & Supabase Auth Onboarding Flow           | ✅ Done   |
+| L6    | **DeFi Super-Protocol**: Yield Tranching & Share Collateral Loans | 🔜 Next   |
+| L7    | Automated DEX rebalancing, Zap deposits, Mainnet launch           | 🔜 Future |
 
 ---
 
