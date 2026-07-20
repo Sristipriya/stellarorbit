@@ -288,6 +288,56 @@
   animation: skeleton-pulse 1.6s ease-in-out infinite;
 }
 
+/* ── Sidebar ── */
+.orbit-sidebar {
+  background: var(--orbit-panel);
+  border-right: 1px solid var(--orbit-edge);
+}
+.orbit-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.75rem;
+  color: var(--orbit-mute);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.65rem;
+  transition: all 150ms ease;
+  position: relative;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.orbit-sidebar-item:hover {
+  background: oklch(1 0 0 / 0.04);
+  color: var(--orbit-ink);
+}
+.orbit-sidebar-item.active {
+  background: oklch(1 0 0 / 0.06);
+  color: var(--orbit-ink);
+  font-weight: 700;
+}
+.sidebar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orbit-edge);
+  flex-shrink: 0;
+  transition: all 150ms ease;
+}
+.orbit-sidebar-item.active .sidebar-dot {
+  background: var(--orbit-accent);
+  box-shadow: 0 0 6px var(--orbit-accent);
+}
+.orbit-sidebar-disconnect:hover {
+  background: oklch(0.7 0.21 25 / 0.1);
+  color: var(--orbit-danger);
+}
+
 /* ── Mobile bottom nav ── */
 .mobile-bottom-nav {
   position: fixed;

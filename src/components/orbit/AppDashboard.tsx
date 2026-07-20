@@ -245,7 +245,7 @@ function Sidebar({
             >
               <span className="sidebar-dot" />
               <Icon className="h-4 w-4 shrink-0" />
-              <span className="text-sm">{item.label}</span>
+              <span className="sidebar-label">{item.label}</span>
               {isActive && <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-50" />}
             </button>
           );
@@ -260,7 +260,7 @@ function Sidebar({
         >
           <span className="sidebar-dot" />
           <Shield className="h-4 w-4 shrink-0" />
-          <span className="text-sm">Admin Panel</span>
+          <span className="sidebar-label">Admin Panel</span>
         </a>
         {address && (
           <button
@@ -269,7 +269,7 @@ function Sidebar({
           >
             <span className="sidebar-dot" style={{ background: "var(--orbit-danger)" }} />
             <LogOut className="h-4 w-4 shrink-0" />
-            <span className="text-sm font-medium">Disconnect Wallet</span>
+            <span className="sidebar-label font-medium">Disconnect Wallet</span>
           </button>
         )}
       </div>
