@@ -46,6 +46,9 @@ export type ScArg = xdr.ScVal;
 export function addrArg(g: string): ScArg {
   return SdkAddress.fromString(g).toScVal();
 }
+export function voidArg(): ScArg {
+  return xdr.ScVal.scvVoid();
+}
 export function i128Arg(v: bigint | string | number): ScArg {
   return nativeToScVal(typeof v === "bigint" ? v : BigInt(v), { type: "i128" });
 }

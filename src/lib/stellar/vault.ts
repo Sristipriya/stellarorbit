@@ -19,7 +19,7 @@ import {
 } from "@stellar/stellar-sdk";
 import { NETWORK, HAS_REAL_CONTRACT, xlmToStroops, stroopsToXlm, STROOPS_PER_XLM } from "./network";
 import { signTx } from "./wallet";
-import { addrArg, i128Arg, invokeContract, readContract } from "./soroban";
+import { addrArg, i128Arg, voidArg, invokeContract, readContract } from "./soroban";
 import { supabase } from "../supabase";
 import { getVaultById } from "./vaults";
 import { getReferrer } from "../points";
@@ -285,7 +285,7 @@ export async function deposit(
     const { txHash, retval } = await invokeContract<bigint>(address, "deposit", [
       addrArg(address),
       i128Arg(amountStroops),
-      referrer ? addrArg(referrer) : { _type: "void" }, // Option<Address> in Soroban
+      referrer ? addrArg(referrer) : voidArg(), // Option<Address> in Soroban
     ], vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     const pts = Math.floor(Number(amountStroops) / 10000000);
