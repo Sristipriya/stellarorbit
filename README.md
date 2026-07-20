@@ -274,8 +274,8 @@ Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for bui
 
 - **Live Demo Link:** [https://stellarorbit.vercel.app/](https://stellarorbit.vercel.app/)
 - **Orbit Vault Contract:** `CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN`
-- **Orbit Tranche (Yield Stripping) Contract:** `CDTRANCHEYIELDSTRIPPERMOCKIDXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
-- **Orbit Market (P2P Lending) Contract:** `CDMARKETP2PLENDINGMOCKIDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
+- **Orbit Tranche (Yield Stripping) Contract:** `CCDQKZTBYLMGL35ZDVBZ6IIVH6HOZ7SVCIAUH5T6YIUTL6KDIBB4QDUV`
+- **Orbit Market (P2P Lending) Contract:** `CBPGA3ELHHUTPFTHYXMUWOVZY7Q7QNYUXY7EWTKWY7DKJDHEKVM65G67`
 - **Stellar Expert Explorer:** [View Vault Contract](https://stellar.expert/explorer/testnet/contract/CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN)
 - **Network:** Stellar Testnet
 - **Soroban RPC URL:** `https://soroban-testnet.stellar.org`
