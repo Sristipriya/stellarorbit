@@ -25,7 +25,7 @@ export type ActivityEvent = {
 };
 
 /** How many ledgers back to scan on first load. ~5s/ledger on Stellar → ~30 min. */
-const LOOKBACK_LEDGERS = 100000;
+const LOOKBACK_LEDGERS = 10000;
 
 function toBigInt(v: unknown): bigint {
   if (typeof v === "bigint") return v;
@@ -44,10 +44,11 @@ async function pollRealEvents(address: string | null, contractId: string): Promi
     const head = await latestLedger();
     realStartLedger = Math.max(1, head - LOOKBACK_LEDGERS);
   }
-  const raw = await fetchContractEvents(realStartLedger, contractId);
+  const { events: raw, latestLedger } = await fetchContractEvents(realStartLedger, contractId);
+  realStartLedger = Math.max(realStartLedger, latestLedger);
+  
   const out: ActivityEvent[] = [];
   for (const ev of raw) {
-    realStartLedger = Math.max(realStartLedger, ev.ledger);
     const key = ev.id;
     if (realSeen.has(key)) continue;
     realSeen.add(key);
