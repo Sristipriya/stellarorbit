@@ -55,8 +55,8 @@ export function useVault(address: string | null, vaultId: string) {
         merged.sort((a, b) => b.at - a.at);
         return merged.slice(0, 50);
       });
-    } catch {
-      // swallow — keep last known events
+    } catch (e) {
+      console.error("pollEvents error:", e);
     }
   }, []);
 

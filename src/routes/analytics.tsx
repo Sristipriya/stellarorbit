@@ -89,18 +89,20 @@ function DailyVolumeChart({ events }: { events: any[] }) {
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${wdH}%` }}
+                    whileHover={{ scaleX: 1.15, filter: "brightness(1.2)" }}
                     transition={{ duration: 0.6, delay: i * 0.03 }}
-                    className="w-full rounded-t-sm"
-                    style={{ background: "var(--orbit-warn)", opacity: 0.7 }}
+                    className="w-full rounded-t-sm origin-bottom cursor-pointer"
+                    style={{ background: "var(--orbit-warn)", opacity: 0.8 }}
                   />
                 )}
                 {depH > 0 && (
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${depH}%` }}
+                    whileHover={{ scaleX: 1.15, filter: "brightness(1.2)" }}
                     transition={{ duration: 0.6, delay: i * 0.03 + 0.1 }}
-                    className="w-full"
-                    style={{ background: "var(--orbit-ok)", opacity: total === 0 ? 0.1 : 0.8 }}
+                    className="w-full origin-bottom cursor-pointer"
+                    style={{ background: "var(--orbit-ok)", opacity: total === 0 ? 0.1 : 0.9 }}
                   />
                 )}
                 {total === 0 && (

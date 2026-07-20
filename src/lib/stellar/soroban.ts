@@ -150,7 +150,7 @@ export async function fetchContractEvents(startLedger: number, contractId: strin
   const res = await server.getEvents({
     startLedger,
     filters: [{ type: "contract", contractIds: [contractId], topics: [["*"]] }],
-    limit: 100,
+    limit: 10000,
   });
   return res.events.map((e) => {
     const topics = e.topic.map((t) => {
