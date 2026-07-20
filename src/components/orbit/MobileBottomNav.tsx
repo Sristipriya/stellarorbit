@@ -3,8 +3,6 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   History,
-  Trophy,
-  Calculator,
   Star,
 } from "lucide-react";
 
@@ -14,7 +12,8 @@ export type Tab =
   | "withdraw"
   | "history"
   | "leaderboard"
-  | "simulate"
+  | "analyze"
+  | "health"
   | "faucet"
   | "settings"
   | "points";

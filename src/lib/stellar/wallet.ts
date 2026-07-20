@@ -58,7 +58,7 @@ export async function verifyWalletConnection(): Promise<boolean> {
   try {
     await ensureKit();
     const { StellarWalletsKit } = await import("@creit.tech/stellar-wallets-kit");
-    await StellarWalletsKit.getAddress({ skipRequestAccess: true });
+    await StellarWalletsKit.getAddress();
     return true;
   } catch {
     return false;

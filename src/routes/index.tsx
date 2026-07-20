@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { TopNav } from "@/components/orbit/TopNav";
-import { EtherealShadow } from "@/components/ui/etheral-shadow";
+import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { Hero as AnimatedHero, ShaderBackground } from "@/components/ui/animated-shader-hero";
 
 export const Route = createFileRoute("/")({

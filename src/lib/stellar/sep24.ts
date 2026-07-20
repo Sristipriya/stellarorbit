@@ -31,13 +31,13 @@ export async function initiateSep24Deposit(
   const { transaction: challengeXdr, network_passphrase } = await challengeRes.json();
 
   // 3. Sign Challenge (Client side using connected wallet)
-  const { signedXDR } = await signTx(challengeXdr, network_passphrase, userAddress);
+  const { signedTxXdr } = await signTx(challengeXdr, network_passphrase, userAddress);
 
   // 4. Submit Challenge to get JWT
   const tokenRes = await fetch(webAuthEndpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ transaction: signedXDR })
+    body: JSON.stringify({ transaction: signedTxXdr })
   });
   if (!tokenRes.ok) {
     const err = await tokenRes.json();

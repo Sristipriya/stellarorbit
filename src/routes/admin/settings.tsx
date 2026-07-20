@@ -51,7 +51,7 @@ function AdminSettings() {
     }
     setHarvesting(true);
     try {
-      const { txHash } = await harvest(address, yieldAmount);
+      const { txHash } = await harvest(address, yieldAmount, "xlm");
       toast.success("Yield Injected!", {
         description: `Successfully added ${yieldAmount} XLM profit to the vault.`,
       });
