@@ -147,8 +147,8 @@ function AnalyticsPage() {
     try {
       const { data } = await supabase
         .from("profiles")
-        .select("wallet_address, display_name, created_at")
-        .order("created_at", { ascending: false })
+        .select("wallet_address, display_name, last_updated")
+        .order("last_updated", { ascending: false })
         .limit(100);
       if (data) setDbUsers(data);
     } catch {}
@@ -191,7 +191,7 @@ function AnalyticsPage() {
     return {
       address: addr,
       name: profile?.display_name || null,
-      joinedAt: profile?.created_at || null,
+      joinedAt: profile?.last_updated || null,
       dep: stats.dep,
       wd: stats.wd,
       txCount: stats.txCount,

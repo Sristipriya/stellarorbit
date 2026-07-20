@@ -44,8 +44,8 @@ async function pollRealEvents(address: string | null, contractId: string): Promi
     const head = await latestLedger();
     realStartLedger = Math.max(1, head - LOOKBACK_LEDGERS);
   }
-  const { events: raw, latestLedger } = await fetchContractEvents(realStartLedger, contractId);
-  realStartLedger = Math.max(realStartLedger, latestLedger);
+  const { events: raw, latestLedger: fetchedLatestLedger } = await fetchContractEvents(realStartLedger, contractId);
+  realStartLedger = Math.max(realStartLedger, fetchedLatestLedger);
   
   const out: ActivityEvent[] = [];
   for (const ev of raw) {

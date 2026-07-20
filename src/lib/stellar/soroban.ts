@@ -145,14 +145,14 @@ export type ContractEvent = {
 };
 
 /** Fetch Orbit contract events from `startLedger` to head. */
-export async function fetchContractEvents(startLedger: number, contractId: string): Promise<ContractEvent[]> {
+export async function fetchContractEvents(startLedger: number, contractId: string): Promise<{ events: ContractEvent[]; latestLedger: number }> {
   const server = rpcServer();
   const res = await server.getEvents({
     startLedger,
     filters: [{ type: "contract", contractIds: [contractId], topics: [["*"]] }],
     limit: 10000,
   });
-  return res.events.map((e) => {
+  const parsed = res.events.map((e) => {
     const topics = e.topic.map((t) => {
       try {
         return scValToNative(t) as unknown;
@@ -175,4 +175,5 @@ export async function fetchContractEvents(startLedger: number, contractId: strin
       values,
     };
   });
+  return { events: parsed, latestLedger: res.latestLedger };
 }
