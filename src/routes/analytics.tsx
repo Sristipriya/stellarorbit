@@ -180,18 +180,28 @@ function AnalyticsPage() {
   const totalUsers = Math.max(uniqueOnChain, dbCount);
 
   // Merge into user roster
-  const roster = Array.from(onChainUsers.entries()).map(([addr, stats]) => {
+  const allAddresses = new Set([
+    ...Array.from(onChainUsers.keys()),
+    ...dbUsers.map(u => u.wallet_address).filter(Boolean)
+  ]);
+
+  const roster = Array.from(allAddresses).map((addr) => {
+    const stats = onChainUsers.get(addr) || { dep: 0n, wd: 0n, txCount: 0, lastAt: 0 };
     const profile = dbUsers.find((u) => u.wallet_address === addr);
     return {
       address: addr,
       name: profile?.display_name || null,
+      joinedAt: profile?.created_at || null,
       dep: stats.dep,
       wd: stats.wd,
       txCount: stats.txCount,
       lastAt: stats.lastAt,
       isMe: addr === address,
     };
-  }).sort((a, b) => Number(b.dep - a.dep));
+  }).sort((a, b) => {
+    if (b.dep !== a.dep) return Number(b.dep - a.dep);
+    return (b.joinedAt ? new Date(b.joinedAt).getTime() : 0) - (a.joinedAt ? new Date(a.joinedAt).getTime() : 0);
+  });
 
   const apyPct = xlmVault.state.apyBps > 0n ? Number(xlmVault.state.apyBps) / 100 : 5.25;
 
@@ -371,7 +381,7 @@ function AnalyticsPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-[var(--orbit-edge)]">
-                    {["#", "Wallet", "Name", "Total Deposited", "Total Withdrawn", "Net", "Txns", ""].map((h) => (
+                    {["#", "Wallet", "Name", "Joined", "Total Deposited", "Total Withdrawn", "Net", "Txns", ""].map((h) => (
                       <th key={h} className="pb-3 pr-4 font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] font-normal whitespace-nowrap">
                         {h}
                       </th>
@@ -403,6 +413,9 @@ function AnalyticsPage() {
                         </td>
                         <td className="py-3 pr-4 font-mono text-[10px] text-[var(--orbit-mute)]">
                           {user.name || "—"}
+                        </td>
+                        <td className="py-3 pr-4 font-mono text-[10px] text-[var(--orbit-mute)] whitespace-nowrap">
+                          {user.joinedAt ? new Date(user.joinedAt).toLocaleDateString() : "—"}
                         </td>
                         <td className="py-3 pr-4 font-mono text-xs text-[var(--orbit-ok)]">
                           +{Number(stroopsToXlm(user.dep)).toFixed(2)} XLM

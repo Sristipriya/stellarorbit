@@ -6,6 +6,7 @@ import {
   type VaultState,
   type PriceSnapshot,
 } from "@/lib/stellar/vault";
+import { getVaultById } from "@/lib/stellar/vaults";
 import { pollActivity, resetActivityPoller, type ActivityEvent } from "@/lib/stellar/events";
 
 const STATE_POLL_MS = 15_000;
@@ -47,7 +48,8 @@ export function useVault(address: string | null, vaultId: string) {
 
   const pollEvents = useCallback(async () => {
     try {
-      const fresh = await pollActivity(addrRef.current, vaultIdRef.current);
+      const vault = getVaultById(vaultIdRef.current);
+      const fresh = await pollActivity(addrRef.current, vault?.contractId);
       if (fresh.length === 0) return;
       setEvents((prev) => {
         const seen = new Set(prev.map((e) => e.id));
