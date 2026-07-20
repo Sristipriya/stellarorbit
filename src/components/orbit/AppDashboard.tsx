@@ -36,6 +36,7 @@ import { FundBanner } from "./FundBanner";
 import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { useWallet } from "@/hooks/use-wallet";
 import { useVault } from "@/hooks/use-vault";
+import { supabase } from "@/lib/supabase";
 import { type ActivityEvent } from "@/lib/stellar/events";
 import {
   NETWORK,
@@ -604,7 +605,18 @@ function ReceivePanel({ address }: { address: string | null }) {
 function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
   const [name, setName] = useState("");
   const [saved, setSaved] = useState(false);
-  function saveProfile() {
+  
+  useEffect(() => {
+    if (wallet.address) {
+      supabase.from("profiles").select("display_name").eq("wallet_address", wallet.address).single().then(({ data }) => {
+        if (data?.display_name) setName(data.display_name);
+      });
+    }
+  }, [wallet.address]);
+
+  async function saveProfile() {
+    if (!wallet.address) return;
+    await supabase.from("profiles").update({ display_name: name || null }).eq("wallet_address", wallet.address);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -662,26 +674,43 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
 // ──────────────────── Connect Prompt ────────────────────
 function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center">
+    <div className="flex min-h-[70vh] items-center justify-center px-4 relative">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] opacity-15 blur-3xl pointer-events-none">
+        <EtheralShadow color="var(--orbit-accent)" animation={{ scale: 20, speed: 40 }} />
+      </div>
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-        className="orbit-card max-w-md w-full p-10 text-center"
+        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+        className="glass max-w-md w-full p-12 text-center rounded-[2rem] border border-[var(--orbit-edge)]/50 relative overflow-hidden"
       >
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
+        
+        <div className="relative mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-[1.5rem] bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20 shadow-[0_0_40px_var(--orbit-accent-soft)]">
           <Wallet className="h-10 w-10 text-[var(--orbit-accent)]" />
+          <div className="absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-white/10" />
         </div>
-        <div className="font-display text-2xl font-bold">Connect a Stellar Wallet</div>
-        <p className="mt-3 text-sm text-[var(--orbit-mute)] leading-relaxed">
-          Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can fund themselves with Friendbot.
+        
+        <h2 className="font-display text-3xl font-bold tracking-tight text-white mb-4">
+          Connect your Wallet
+        </h2>
+        
+        <p className="text-sm text-[var(--orbit-mute)] leading-relaxed mb-10 max-w-[280px] mx-auto">
+          Connect to access the Orbit Vault, analyze on-chain data, and earn yield on Stellar.
         </p>
-        <button onClick={onConnect} className="orbit-btn orbit-btn-primary mx-auto mt-7">
-          <Wallet className="h-4 w-4" /> Connect Wallet
+        
+        <button 
+          onClick={onConnect} 
+          className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-[var(--orbit-accent)] px-6 py-4 font-display text-base font-bold text-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_30px_var(--orbit-accent-soft)] overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+          <Wallet className="relative h-5 w-5 z-10" /> 
+          <span className="relative z-10">Connect Wallet</span>
         </button>
-        <div className="mt-4 flex items-center justify-center gap-1.5">
+        
+        <div className="mt-8 flex items-center justify-center gap-2">
           <span className="live-dot" />
-          <span className="font-mono text-[10px] text-[var(--orbit-ok)]">Stellar Testnet · Live</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-ok)]">Stellar Testnet · Live</span>
         </div>
       </motion.div>
     </div>
