@@ -39,7 +39,7 @@ function toBigInt(v: unknown): bigint {
 let realStartLedger: number | null = null;
 const realSeen = new Set<string>();
 
-async function pollRealEvents(contractId: string): Promise<ActivityEvent[]> {
+async function pollRealEvents(address: string | null, contractId: string): Promise<ActivityEvent[]> {
   if (realStartLedger == null) {
     const head = await latestLedger();
     realStartLedger = Math.max(1, head - LOOKBACK_LEDGERS);
@@ -56,10 +56,13 @@ async function pollRealEvents(contractId: string): Promise<ActivityEvent[]> {
     const kind = ev.topic0 === "Dep" ? "deposit" : ev.topic0 === "Wd" ? "withdraw" : null;
     if (!kind) continue;
 
+    const eventAddress = typeof from === "string" ? from : String(from);
+    if (address && eventAddress !== address) continue;
+
     out.push({
       id: key,
       kind,
-      address: typeof from === "string" ? from : String(from),
+      address: eventAddress,
       amountStroops: toBigInt(amount),
       sharesStroops: toBigInt(shares),
       txHash: ev.txHash,
@@ -125,7 +128,7 @@ async function pollDemoEvents(address: string): Promise<ActivityEvent[]> {
 /* ─────────────────────────── unified poller ────────────────────────────── */
 
 export async function pollActivity(address: string | null, contractId: string | undefined): Promise<ActivityEvent[]> {
-  if (HAS_REAL_CONTRACT && contractId) return pollRealEvents(contractId);
+  if (HAS_REAL_CONTRACT && contractId) return pollRealEvents(address, contractId);
   if (!address) return [];
   return pollDemoEvents(address);
 }

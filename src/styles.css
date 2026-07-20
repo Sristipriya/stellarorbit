@@ -399,3 +399,67 @@
   );
   pointer-events: none;
 }
+
+/* -- Brutalist 3D Aesthetics -- */
+.brutalist-card {
+  background: var(--orbit-bg);
+  border: 2px solid var(--orbit-edge);
+  box-shadow: 4px 4px 0px var(--orbit-edge);
+  border-radius: 0;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.brutalist-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--orbit-edge);
+}
+
+.brutalist-button {
+  background: var(--orbit-accent);
+  color: var(--orbit-bg);
+  border: 2px solid var(--orbit-ink);
+  box-shadow: 4px 4px 0px var(--orbit-ink);
+  border-radius: 0;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: all 0.1s ease;
+  cursor: pointer;
+}
+
+.brutalist-button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--orbit-ink);
+}
+
+.brutalist-button:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px var(--orbit-ink);
+}
+
+.brutalist-ghost {
+  background: transparent;
+  color: var(--orbit-ink);
+  border: 2px solid var(--orbit-ink);
+  box-shadow: 4px 4px 0px var(--orbit-ink);
+  border-radius: 0;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  font-weight: bold;
+  transition: all 0.1s ease;
+  cursor: pointer;
+}
+
+.brutalist-ghost:hover {
+  background: var(--orbit-ink);
+  color: var(--orbit-bg);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--orbit-edge);
+}
+
+.brutalist-ghost:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--orbit-edge);
+}
+

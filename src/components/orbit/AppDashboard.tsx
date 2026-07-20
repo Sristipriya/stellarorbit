@@ -47,7 +47,7 @@ import { TxStatus } from "./TxStatus";
 import { ShareCertificate } from "./ShareCertificate";
 import { OraclePricePanel } from "./OraclePricePanel";
 import { YieldProjection } from "./YieldProjection";
-import { SimulatorTab } from "./SimulatorTab";
+
 import { LeaderboardTab } from "./LeaderboardTab";
 import { NetworkStatusBar } from "./NetworkStatusBar";
 import { NotificationCenter } from "./NotificationCenter";
@@ -140,7 +140,6 @@ const NAV_ITEMS: { id: Tab; label: string; icon: React.FC<{ className?: string }
   { id: "points", label: "Points & Refs", icon: Zap },
   { id: "history", label: "History", icon: History },
   { id: "leaderboard", label: "Leaderboard", icon: Trophy },
-  { id: "simulate", label: "Simulate", icon: Calculator },
   { id: "faucet", label: "Faucet", icon: Settings },
   { id: "settings", label: "Settings", icon: Settings },
 ];
@@ -159,14 +158,14 @@ function Sidebar({
   onDisconnect: () => void;
 }) {
   return (
-    <div className="flex h-full flex-col border-r border-[var(--orbit-edge)] bg-black/60 backdrop-blur-xl">
+    <div className="flex h-full flex-col border-r-4 border-black bg-[var(--orbit-bg)]">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--orbit-accent)] shadow-[0_0_20px_var(--orbit-accent)]">
+        <div className="flex h-8 w-8 items-center justify-center border-2 border-black bg-[var(--orbit-accent)] shadow-[4px_4px_0_0_black]">
           <Globe className="h-4 w-4 text-black" />
         </div>
         <span className="font-display text-lg font-semibold tracking-tight">Orbit</span>
-        <span className="ml-auto rounded-full border border-[var(--orbit-accent)]/30 bg-[var(--orbit-accent)]/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-accent)]">
+        <span className="ml-auto border-b-4 border-r-4 border-l-2 border-t-2 border-black bg-[var(--orbit-accent)]/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-accent)]">
           Testnet
         </span>
       </div>
@@ -352,7 +351,7 @@ function PortfolioTab({
               key={c.label}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass rounded-2xl p-4"
+              className="brutalist-card rounded-2xl p-4"
             >
               <div className="flex items-start justify-between">
                 <div
@@ -386,7 +385,7 @@ function PortfolioTab({
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`glass rounded-2xl p-5 border ${
+          className={`brutalist-card rounded-2xl p-5 border ${
             pnl.earnedStroops >= 0n
               ? "border-[var(--orbit-ok)]/30"
               : "border-[var(--orbit-danger)]/30"
@@ -429,7 +428,7 @@ function PortfolioTab({
             ].map((c) => (
               <div
                 key={c.label}
-                className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3"
+                className="rounded-xl border border-[var(--orbit-edge)] bg-[var(--orbit-panel)] p-3"
               >
                 <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1">
                   {c.label}
@@ -475,7 +474,7 @@ function PortfolioTab({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="glass rounded-2xl p-5"
+        className="brutalist-card rounded-2xl p-5"
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
@@ -510,7 +509,7 @@ function HistoryTab({ events, loading }: { events: ActivityEvent[]; loading: boo
 
   if (events.length === 0) {
     return (
-      <div className="glass rounded-2xl p-10 text-center">
+      <div className="brutalist-card rounded-2xl p-10 text-center">
         <History className="mx-auto h-10 w-10 text-[var(--orbit-mute)]/40" />
         <div className="mt-4 font-display text-lg">No transactions yet</div>
         <p className="mt-2 text-sm text-[var(--orbit-mute)]">
@@ -521,7 +520,7 @@ function HistoryTab({ events, loading }: { events: ActivityEvent[]; loading: boo
   }
 
   return (
-    <div className="glass rounded-2xl p-5">
+    <div className="brutalist-card rounded-2xl p-5">
       <h3 className="mb-4 font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
         Transaction History
       </h3>
@@ -529,7 +528,7 @@ function HistoryTab({ events, loading }: { events: ActivityEvent[]; loading: boo
         {events.map((e) => (
           <div
             key={e.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3"
+            className="flex items-center justify-between gap-3 rounded-xl border border-[var(--orbit-edge)] bg-[var(--orbit-panel)] px-4 py-3"
           >
             <div className="flex items-center gap-3">
               {e.kind === "deposit" ? (
@@ -609,7 +608,7 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
 
   return (
     <div className="space-y-4 max-w-lg">
-      <div className="glass rounded-2xl p-6">
+      <div className="brutalist-card rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--orbit-warn)]/20">
             <Zap className="h-5 w-5 text-[var(--orbit-warn)]" />
@@ -636,7 +635,7 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
         <button
           onClick={fund}
           disabled={!address || status === "loading"}
-          className="liquid-btn w-full justify-center"
+          className="brutalist-button w-full justify-center"
           style={{
             background:
               "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)",
@@ -681,7 +680,7 @@ function FaucetTab({ address, onFunded }: { address: string | null; onFunded: ()
         )}
       </div>
 
-      <div className="glass rounded-2xl p-5">
+      <div className="brutalist-card rounded-2xl p-5">
         <div className="flex items-start gap-3">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--orbit-mute)]" />
           <div>
@@ -707,7 +706,7 @@ function ReceivePanel({ address }: { address: string | null }) {
     setTimeout(() => setCopied(false), 2000);
   }
   return (
-    <div className="glass rounded-2xl p-5">
+    <div className="brutalist-card rounded-2xl p-5">
       <h3 className="mb-4 font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
         Receive XLM
       </h3>
@@ -724,7 +723,7 @@ function ReceivePanel({ address }: { address: string | null }) {
             </div>
             <div className="font-mono text-xs break-all text-[var(--orbit-ink)]">{address}</div>
           </div>
-          <button onClick={copy} className="liquid-btn w-full justify-center">
+          <button onClick={copy} className="brutalist-button w-full justify-center">
             <Copy className="h-4 w-4" />
             {copied ? "Copied!" : "Copy Address"}
           </button>
@@ -761,7 +760,7 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
 
   return (
     <div className="space-y-4 max-w-lg">
-      <div className="glass rounded-2xl p-6">
+      <div className="brutalist-card rounded-2xl p-6">
         <h3 className="mb-5 font-display text-base font-semibold">Profile Settings</h3>
         <div className="space-y-4">
           <div>
@@ -783,7 +782,7 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
               {wallet.address ?? "Not connected"}
             </div>
           </div>
-          <button onClick={saveProfile} className="liquid-btn w-full justify-center">
+          <button onClick={saveProfile} className="brutalist-button w-full justify-center">
             {saved ? (
               <>
                 <CheckCircle2 className="h-4 w-4" /> Saved!
@@ -795,7 +794,7 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
         </div>
       </div>
 
-      <div className="glass rounded-2xl p-6">
+      <div className="brutalist-card rounded-2xl p-6">
         <h3 className="mb-4 font-display text-base font-semibold">Network Details</h3>
         <div className="space-y-2">
           {[
@@ -806,7 +805,7 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
           ].map(({ k, v }) => (
             <div
               key={k}
-              className="flex items-start justify-between gap-4 rounded-xl border border-[var(--orbit-edge)] bg-black/20 px-4 py-3"
+              className="flex items-start justify-between gap-4 rounded-xl border border-[var(--orbit-edge)] bg-[var(--orbit-panel)] px-4 py-3"
             >
               <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] shrink-0">
                 {k}
@@ -820,7 +819,7 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
       </div>
 
       {wallet.address && (
-        <div className="glass rounded-2xl border border-[var(--orbit-danger)]/20 p-6">
+        <div className="brutalist-card rounded-2xl border border-[var(--orbit-danger)]/20 p-6">
           <h3 className="mb-3 font-display text-base font-semibold text-[var(--orbit-danger)]">
             Disconnect Wallet
           </h3>
@@ -846,7 +845,7 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass max-w-md rounded-3xl p-10 text-center"
+        className="brutalist-card max-w-md rounded-3xl p-10 text-center"
       >
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--orbit-accent)]/15">
           <Wallet className="h-8 w-8 text-[var(--orbit-accent)]" />
@@ -856,7 +855,7 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
           Orbit supports Freighter, Albedo, xBull, and Lobstr on Stellar Testnet. New accounts can
           fund themselves with Friendbot.
         </p>
-        <button onClick={onConnect} className="liquid-btn mx-auto mt-7">
+        <button onClick={onConnect} className="brutalist-button mx-auto mt-7">
           <Wallet className="h-4 w-4" /> Connect Wallet
         </button>
       </motion.div>
@@ -888,7 +887,6 @@ export function AppDashboard() {
     withdraw: "Withdraw",
     history: "Transaction History",
     leaderboard: "Leaderboard",
-    simulate: "Vault Simulator",
     faucet: "Testnet Faucet",
     settings: "Settings",
     points: "Points & Referrals",
@@ -938,8 +936,6 @@ export function AppDashboard() {
         return <HistoryTab events={vault.events} loading={vault.loading} />;
       case "leaderboard":
         return <LeaderboardTab events={vault.events} currentAddress={wallet.address} />;
-      case "simulate":
-        return <SimulatorTab state={vault.state} xlmUsdPrice={xlmUsdPrice} />;
       case "faucet":
         return (
           <FaucetTab
@@ -1026,7 +1022,7 @@ export function AppDashboard() {
                 </span>
               </div>
             ) : (
-              <button onClick={wallet.connect} className="liquid-btn py-2 text-sm">
+              <button onClick={wallet.connect} className="brutalist-button py-2 text-sm">
                 <Wallet className="h-4 w-4" /> Connect
               </button>
             )}

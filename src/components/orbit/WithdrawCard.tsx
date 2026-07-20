@@ -81,7 +81,7 @@ export function WithdrawCard({
   }
 
   return (
-    <div className="glass rounded-2xl p-5">
+    <div className="brutalist-card rounded-2xl p-5">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
           Withdraw
@@ -89,7 +89,7 @@ export function WithdrawCard({
         <span className="font-mono text-[10px] text-[var(--orbit-mute)]">shares → XLM</span>
       </div>
       <label className="mt-4 block text-xs text-[var(--orbit-mute)]">Shares to burn</label>
-      <div className="mt-1 flex items-center gap-2 rounded-xl border border-[var(--orbit-edge)] bg-black/30 px-3 py-2.5 focus-within:border-[var(--orbit-accent)]">
+      <div className="mt-1 flex items-center gap-2 rounded-xl border border-[var(--orbit-edge)] bg-[var(--orbit-panel)] px-3 py-2.5 focus-within:border-[var(--orbit-accent)]">
         <input
           id="withdraw-shares"
           inputMode="decimal"
@@ -117,7 +117,7 @@ export function WithdrawCard({
       <button
         onClick={submit}
         disabled={!address || !shares || tooMany || tx.kind === "pending"}
-        className="liquid-btn mt-4 w-full justify-center"
+        className="brutalist-button mt-4 w-full justify-center"
         style={{
           background:
             "linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.02)), color-mix(in oklab, var(--orbit-warn) 22%, transparent)",

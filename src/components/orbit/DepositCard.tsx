@@ -154,7 +154,7 @@ export function DepositCard({
   }
 
   return (
-    <div className="glass rounded-2xl p-5">
+    <div className="brutalist-card rounded-2xl p-5">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
           Deposit
@@ -179,7 +179,7 @@ export function DepositCard({
       />
 
       {/* Zap Toggle */}
-      <div className="mt-4 flex items-center justify-between bg-black/20 p-2 rounded-lg border border-[var(--orbit-edge)]">
+      <div className="mt-4 flex items-center justify-between bg-[var(--orbit-panel)] p-2 rounded-lg border border-[var(--orbit-edge)]">
         <span className="text-xs text-[var(--orbit-mute)]">⚡ Zap Deposit (Cross-Asset)</span>
         <button
           onClick={() => setUseZap(!useZap)}
@@ -222,7 +222,7 @@ export function DepositCard({
       <button
         onClick={submit}
         disabled={!address || !amount || insufficient || tx.kind === "pending"}
-        className={`liquid-btn mt-4 w-full justify-center ${useZap ? "bg-[var(--orbit-accent)]/20 border-[var(--orbit-accent)]" : ""}`}
+        className={`brutalist-button mt-4 w-full justify-center ${useZap ? "bg-[var(--orbit-accent)]/20 border-[var(--orbit-accent)]" : ""}`}
       >
         {tx.kind === "pending"
           ? "Signing…"
