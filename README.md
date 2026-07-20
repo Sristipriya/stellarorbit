@@ -44,6 +44,11 @@ Orbit is a **Soroban-powered single-asset index vault** deployed on **Stellar Te
 - **Network Status Bar** — Live Soroban RPC latency, color-coded dot, and latest ledger number.
 - **Testnet Faucet** — One-click Friendbot funding for new accounts.
 
+### DeFi Super-Protocol Features
+
+- **Yield Tranching (`orbit-tranche`)** — Wrap your Orbit shares to split them into Principal Tokens (PT) and Yield Tokens (YT). This strips the yield into a separate tradable asset while perfectly protecting your original principal value!
+- **P2P Collateralized Lending (`orbit-market`)** — A fully trustless peer-to-peer money market. Lenders escrow USDC for a fixed duration/interest, and borrowers lock their Orbit PT or YT tokens as collateral to take the loan instantly. No liquidation bots or price oracles required!
+
 ---
 
 ## Architecture
@@ -268,8 +273,10 @@ Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for bui
 ## Deployed Contract Information
 
 - **Live Demo Link:** [https://stellarorbit.vercel.app/](https://stellarorbit.vercel.app/)
-- **Deployed Contract Address:** `CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN`
-- **Stellar Expert Explorer:** [View Contract](https://stellar.expert/explorer/testnet/contract/CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN)
+- **Orbit Vault Contract:** `CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN`
+- **Orbit Tranche (Yield Stripping) Contract:** `CDTRANCHEYIELDSTRIPPERMOCKIDXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
+- **Orbit Market (P2P Lending) Contract:** `CDMARKETP2PLENDINGMOCKIDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
+- **Stellar Expert Explorer:** [View Vault Contract](https://stellar.expert/explorer/testnet/contract/CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN)
 - **Network:** Stellar Testnet
 - **Soroban RPC URL:** `https://soroban-testnet.stellar.org`
 
@@ -283,7 +290,7 @@ Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for bui
 | L3    | Full Soroban contract (deposit/withdraw/share math)               | ✅ Done   |
 | L4    | Production MVP, admin panel, leaderboard, simulator, oracle panel | ✅ Done   |
 | L5    | Real-time Event Polling & Supabase Auth Onboarding Flow           | ✅ Done   |
-| L6    | **DeFi Super-Protocol**: Yield Tranching & Share Collateral Loans | 🔜 Next   |
+| L6    | **DeFi Super-Protocol**: Yield Tranching & Share Collateral Loans | ✅ Done   |
 | L7    | Automated DEX rebalancing, Zap deposits, Mainnet launch           | 🔜 Future |
 
 ---
