@@ -16,7 +16,8 @@ export type Tab =
   | "health"
   | "faucet"
   | "settings"
-  | "points";
+  | "points"
+  | "defi";
 
 const MOBILE_TABS: { id: Tab; label: string; icon: React.FC<{ className?: string }> }[] = [
   { id: "portfolio", label: "Home", icon: LayoutDashboard },

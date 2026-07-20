@@ -28,6 +28,7 @@ import {
   Activity,
   BarChart2,
   Sparkles,
+  Layers,
 } from "lucide-react";
 import { DepositCard } from "./DepositCard";
 import { WithdrawCard } from "./WithdrawCard";
@@ -57,6 +58,7 @@ import { SkeletonStatCards, SkeletonChart, SkeletonRows } from "./SkeletonCards"
 import { fetchXlmUsdPrice, xlmToUsd } from "@/lib/oracle-price";
 import { useNotifications } from "@/lib/notifications";
 import { PointsTab } from "./PointsTab";
+import { DefiTab } from "./DefiTab";
 import { handleReferralFromUrl } from "@/lib/points";
 import { VAULTS, DEFAULT_VAULT_ID } from "@/lib/stellar/vaults";
 import { VaultSelector } from "./VaultSelector";
@@ -173,6 +175,7 @@ const NAV_ITEMS: { id: Tab; label: string; icon: React.FC<{ className?: string }
   { id: "portfolio", label: "Portfolio", icon: LayoutDashboard },
   { id: "deposit", label: "Deposit", icon: ArrowDownToLine },
   { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
+  { id: "defi", label: "DeFi", icon: Layers },
   { id: "points", label: "Points & Refs", icon: Zap },
   { id: "history", label: "History", icon: History },
   { id: "leaderboard", label: "Leaderboard", icon: Trophy },
@@ -770,6 +773,7 @@ export function AppDashboard() {
     history: "Transaction History",
     leaderboard: "Leaderboard",
     faucet: "Testnet Faucet",
+    defi: "DeFi Super-Protocol",
     settings: "Settings",
     points: "Points & Referrals",
     analyze: "Portfolio Analyzer",
@@ -832,6 +836,8 @@ export function AppDashboard() {
         return <VaultHealthMonitor state={vault.state} onRefresh={vault.refresh} />;
       case "faucet":
         return <FaucetTab address={wallet.address} onFunded={() => wallet.refreshBalance(wallet.address!)} />;
+      case "defi":
+        return <DefiTab />;
       case "points":
         return <PointsTab address={wallet.address} state={vault.state} />;
       case "settings":
