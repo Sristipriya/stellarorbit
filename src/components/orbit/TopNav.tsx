@@ -16,6 +16,9 @@ export function TopNav({ inApp = false }: { inApp?: boolean }) {
           <Link to="/" className="hover:text-[var(--orbit-ink)]">
             Home
           </Link>
+          <Link to="/analytics" className="hover:text-[var(--orbit-ink)]">
+            Analytics
+          </Link>
           <a
             href="https://developers.stellar.org/docs"
             target="_blank"

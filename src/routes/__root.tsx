@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { NotificationProvider } from "../lib/notifications";
+import { FeedbackWidget } from "@/components/orbit/FeedbackWidget";
 
 function NotFoundComponent() {
   return (
@@ -145,7 +146,7 @@ function RootComponent() {
   return (
     <NotificationProvider>
       <QueryClientProvider client={queryClient}>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <FeedbackWidget />
         <Outlet />
         <Toaster
           theme="dark"
