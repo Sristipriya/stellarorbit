@@ -285,7 +285,6 @@ export async function deposit(
     const { txHash, retval } = await invokeContract<bigint>(address, "deposit", [
       addrArg(address),
       i128Arg(amountStroops),
-      referrer ? addrArg(referrer) : voidArg(), // Option<Address> in Soroban
     ], vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     const pts = Math.floor(Number(amountStroops) / 10000000);
