@@ -36,6 +36,7 @@ import { FundBanner } from "./FundBanner";
 import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { useWallet } from "@/hooks/use-wallet";
 import { useVault } from "@/hooks/use-vault";
+import { OnboardingModal } from "@/components/orbit/OnboardingModal";
 import { supabase } from "@/lib/supabase";
 import { type ActivityEvent } from "@/lib/stellar/events";
 import {
@@ -729,11 +730,36 @@ export function AppDashboard() {
   const [activeTab, setActiveTab] = useState<ExtendedTab>("portfolio");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [xlmUsdPrice, setXlmUsdPrice] = useState<number | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
 
   useEffect(() => {
     fetchXlmUsdPrice().then(setXlmUsdPrice);
     handleReferralFromUrl();
   }, []);
+
+  useEffect(() => {
+    if (wallet.address && !hasCheckedProfile) {
+      const checkProfile = async () => {
+        try {
+          const { data } = await supabase
+            .from("profiles")
+            .select("display_name")
+            .eq("wallet_address", wallet.address)
+            .single();
+          
+          if (data && !data.display_name) {
+            setShowOnboarding(true);
+          }
+        } catch (e) {
+          // Ignore
+        } finally {
+          setHasCheckedProfile(true);
+        }
+      };
+      checkProfile();
+    }
+  }, [wallet.address, hasCheckedProfile]);
 
   const showFundBanner = wallet.address && wallet.balance && !wallet.balance.funded;
 
@@ -936,6 +962,13 @@ export function AppDashboard() {
 
       {/* Mobile bottom nav */}
       <MobileBottomNav active={activeTab as Tab} onSelect={(t) => setActiveTab(t as ExtendedTab)} />
+
+      {showOnboarding && wallet.address && (
+        <OnboardingModal
+          walletAddress={wallet.address}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
     </div>
   );
 }
