@@ -24,6 +24,7 @@ pub trait TokenInterface {
     fn mint(minter: Address, to: Address, amount: i128);
     fn burn(minter: Address, from: Address, amount: i128);
     fn transfer(from: Address, to: Address, amount: i128);
+    fn transfer_from(spender: Address, from: Address, to: Address, amount: i128);
     fn balance(id: Address) -> i128;
 }
 
@@ -51,6 +52,8 @@ impl OrbitTranche {
     }
 
     /// Mint PT and YT by depositing Orbit Shares.
+    /// The user must first call `approve(user, tranche, amount)` on the oXLM
+    /// share token so the tranche can pull shares via transfer_from.
     pub fn mint(env: Env, from: Address, share_amount: i128) {
         from.require_auth();
         assert!(share_amount > 0, "amount must be positive");
@@ -60,9 +63,15 @@ impl OrbitTranche {
         let yt_token: Address = env.storage().instance().get(&DataKey::YtToken).unwrap();
         let vault: Address = env.storage().instance().get(&DataKey::Vault).unwrap();
 
-        // 1. Transfer shares from user to this contract
+        // 1. Pull shares from user to this contract via transfer_from (allowance-based).
+        //    User must have called approve(user, tranche_contract, amount) beforehand.
         let token = TokenClient::new(&env, &share_token);
-        token.transfer(&from, &env.current_contract_address(), &share_amount);
+        token.transfer_from(
+            &env.current_contract_address(),
+            &from,
+            &env.current_contract_address(),
+            &share_amount,
+        );
 
         // 2. Mint 1 PT and 1 YT for each share
         let pt_client = TokenClient::new(&env, &pt_token);

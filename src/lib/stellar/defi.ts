@@ -1,11 +1,12 @@
 import {
   ORBIT_USDC_TOKEN_ID,
+  ORBIT_OXLM_SHARE_TOKEN_ID,
   stroopsToXlm,
   xlmToStroops,
   HAS_REAL_CONTRACT,
 } from "./network";
 import { VaultMeta } from "./vaults";
-import { readContract, invokeContract, addrArg } from "./soroban";
+import { readContract, invokeContract, addrArg, i128Arg } from "./soroban";
 import { nativeToScVal } from "@stellar/stellar-sdk";
 
 export interface LoanOffer {
@@ -75,10 +76,30 @@ export async function fetchDefiState(address: string, vault?: VaultMeta): Promis
   };
 }
 
-export async function wrapShares(address: string, amountXlm: string, trancheId: string) {
+export async function wrapShares(address: string, amountXlm: string, trancheId: string, shareTokenId?: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No tranche contract deployed.");
   const amountStrp = xlmToStroops(amountXlm);
-  return invokeContract(address, "mint", [addrArg(address), nativeToScVal(amountStrp, "i128")], trancheId);
+  const tokenId = shareTokenId || ORBIT_OXLM_SHARE_TOKEN_ID;
+  if (!tokenId) throw new Error("oXLM share token ID not configured.");
+
+  // Step 1: Approve the tranche contract to pull oXLM shares on behalf of user.
+  // This avoids nested require_auth inside the tranche's mint -> oXLM.transfer_from call.
+  // Expiration ledger ~1000 ledgers from now (~1.5 hours), plenty for this session.
+  const EXPIRY_LEDGER = 99999999; // far future ledger - safe for testnet
+  await invokeContract(
+    address,
+    "approve",
+    [
+      addrArg(address),        // from (owner)
+      addrArg(trancheId),      // spender (tranche contract)
+      i128Arg(amountStrp),     // amount
+      nativeToScVal(EXPIRY_LEDGER, { type: "u32" }), // expiration_ledger
+    ],
+    tokenId,
+  );
+
+  // Step 2: Mint PT + YT tokens by calling tranche.mint
+  return invokeContract(address, "mint", [addrArg(address), i128Arg(amountStrp)], trancheId);
 }
 
 export async function createLendOffer(address: string, usdcAmount: string, interestAmount: string, colTokenId: string, colAmount: string, marketId: string) {
