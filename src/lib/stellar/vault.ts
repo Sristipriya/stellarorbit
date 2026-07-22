@@ -282,10 +282,12 @@ export async function deposit(
   const vault = getVaultById(vaultId);
 
   if (HAS_REAL_CONTRACT && vault?.contractId) {
-    const { txHash, retval } = await invokeContract<bigint>(address, "deposit", [
-      addrArg(address),
-      i128Arg(amountStroops),
-    ], vault.contractId);
+    const args: import("./soroban").ScArg[] = [
+        addrArg(address),
+        i128Arg(amountStroops),
+        referrer ? addrArg(referrer) : voidArg(),
+      ];
+      const { txHash, retval } = await invokeContract<bigint>(address, "deposit", args, vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     const pts = Math.floor(Number(amountStroops) / 10000000);
     if (pts > 0) awardPoints(address, pts);

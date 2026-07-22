@@ -3,7 +3,7 @@ use soroban_sdk::{contract, contractimpl, Address, Env, contractclient};
 
 #[contractclient(name = "VaultClient")]
 pub trait VaultInterface {
-    fn deposit(env: Env, from: Address, amount: i128) -> i128;
+    fn deposit(env: Env, from: Address, amount: i128, referrer: Option<Address>) -> i128;
 }
 
 #[contractclient(name = "PointsClient")]
@@ -44,7 +44,7 @@ impl OrbitZapRouter {
         // 3. Deposit into vault on behalf of the router.
         // The vault will pull the native asset from the router's balance.
         let vault_client = VaultClient::new(&env, &vault);
-        let shares = vault_client.deposit(&env.current_contract_address(), &out_amount);
+        let shares = vault_client.deposit(&env.current_contract_address(), &out_amount, &None);
 
         // 4. Transfer the received vault shares to the user.
         let share_client = TokenClient::new(&env, &share_token);
