@@ -283,11 +283,15 @@ export async function deposit(
 
   if (HAS_REAL_CONTRACT && vault?.contractId) {
     const args: import("./soroban").ScArg[] = [
-        addrArg(address),
-        i128Arg(amountStroops),
-        referrer ? addrArg(referrer) : voidArg(),
-      ];
-      const { txHash, retval } = await invokeContract<bigint>(address, "deposit", args, vault.contractId);
+      addrArg(address),
+      i128Arg(amountStroops),
+    ];
+    // The XLM vault was updated to expect 3 arguments (including referrer), 
+    // while USDC and INDEX vaults still use the older 2-argument contract.
+    if (vaultId === "xlm" || vaultId === "orbit-xlm") {
+      args.push(referrer ? addrArg(referrer) : voidArg());
+    }
+    const { txHash, retval } = await invokeContract<bigint>(address, "deposit", args, vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     const pts = Math.floor(Number(amountStroops) / 10000000);
     if (pts > 0) awardPoints(address, pts);
