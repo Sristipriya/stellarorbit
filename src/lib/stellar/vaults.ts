@@ -35,6 +35,14 @@ export type VaultMeta = {
   icon: string; // emoji
 };
 
+import {
+  ORBIT_VAULT_CONTRACT_ID,
+  ORBIT_TRANCHE_CONTRACT_ID,
+  ORBIT_MARKET_CONTRACT_ID,
+  ORBIT_PT_TOKEN_ID,
+  ORBIT_YT_TOKEN_ID,
+} from "./network";
+
 // ── Native XLM SAC on Testnet ─────────────────────────────────────────────
 const XLM_SAC = "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC";
 
@@ -48,12 +56,12 @@ export const VAULTS: VaultMeta[] = [
     name: "Orbit XLM Vault",
     description: "Deposit XLM, earn real yield via Blend Protocol lending.",
     assetSymbol: "XLM",
-    contractId: import.meta.env.VITE_ORBIT_VAULT_CONTRACT_ID as string | undefined,
+    contractId: import.meta.env.VITE_ORBIT_VAULT_CONTRACT_ID || ORBIT_VAULT_CONTRACT_ID,
     assetId: XLM_SAC,
-    trancheId: import.meta.env.VITE_ORBIT_TRANCHE_CONTRACT_ID,
-    marketId: import.meta.env.VITE_ORBIT_MARKET_CONTRACT_ID,
-    ptId: import.meta.env.VITE_ORBIT_PT_TOKEN_ID,
-    ytId: import.meta.env.VITE_ORBIT_YT_TOKEN_ID,
+    trancheId: import.meta.env.VITE_ORBIT_TRANCHE_CONTRACT_ID || ORBIT_TRANCHE_CONTRACT_ID,
+    marketId: import.meta.env.VITE_ORBIT_MARKET_CONTRACT_ID || ORBIT_MARKET_CONTRACT_ID,
+    ptId: import.meta.env.VITE_ORBIT_PT_TOKEN_ID || ORBIT_PT_TOKEN_ID,
+    ytId: import.meta.env.VITE_ORBIT_YT_TOKEN_ID || ORBIT_YT_TOKEN_ID,
     strategy: "Blend Protocol Lending",
     risk: "low",
     color: "oklch(0.82 0.16 195)",
