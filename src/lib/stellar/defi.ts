@@ -49,17 +49,18 @@ export async function fetchDefiState(address: string, vault?: VaultMeta): Promis
       const count = await readContract<number>("get_offer_count", [], vault.marketId).catch(() => 0);
       for (let i = 1; i <= count; i++) {
         const offer = await readContract<any>("get_offer", [nativeToScVal(i, "u32")], vault.marketId).catch(() => null);
-      if (offer && offer.is_active) {
-        offers.push({
-          id: i,
-          lender: offer.lender,
-          usdc_amount: BigInt(offer.usdc_amount),
-          interest_amount: BigInt(offer.interest_amount),
-          max_duration_ledgers: offer.max_duration_ledgers,
-          required_collateral_token: offer.required_collateral_token,
-          required_collateral_amount: BigInt(offer.required_collateral_amount),
-          is_active: offer.is_active,
-        });
+        if (offer && offer.is_active) {
+          offers.push({
+            id: i,
+            lender: offer.lender,
+            usdc_amount: BigInt(offer.usdc_amount),
+            interest_amount: BigInt(offer.interest_amount),
+            max_duration_ledgers: offer.max_duration_ledgers,
+            required_collateral_token: offer.required_collateral_token,
+            required_collateral_amount: BigInt(offer.required_collateral_amount),
+            is_active: offer.is_active,
+          });
+        }
       }
     }
   } catch (err) {
