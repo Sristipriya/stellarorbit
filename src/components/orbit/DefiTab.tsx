@@ -2,10 +2,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layers, ArrowRightLeft, ArrowRight, ShieldAlert, BadgeCent, Loader2 } from "lucide-react";
 import { useDeFi } from "../../hooks/use-defi";
+import { useVault } from "../../hooks/use-vault";
+import { useNotifications } from "../../lib/notifications";
 import { ORBIT_PT_TOKEN_ID } from "../../lib/stellar/network";
 
 export function DefiTab() {
   const defi = useDeFi();
+  const { state: vaultState } = useVault();
+  const { addNotification } = useNotifications();
   const [wrapAmount, setWrapAmount] = useState("");
   const [borrowAmount, setBorrowAmount] = useState("");
   const [lendAmount, setLendAmount] = useState("");
@@ -42,7 +46,7 @@ export function DefiTab() {
             <div className="rounded-xl border border-[var(--orbit-edge)] bg-white/[0.02] p-4">
               <div className="flex justify-between font-mono text-[10px] text-[var(--orbit-mute)] mb-2">
                 <span>Amount to Wrap (Orbit Shares)</span>
-                <span>Balance: 0.00</span>
+                <span>Balance: {vaultState.shares}</span>
               </div>
               <div className="relative">
                 <input
@@ -79,8 +83,13 @@ export function DefiTab() {
 
             <button 
               className="liquid-btn w-full mt-4" 
-              disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping}
-              onClick={() => defi.wrap(wrapAmount).then(() => setWrapAmount(""))}
+              disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping || Number(wrapAmount) > Number(vaultState.shares)}
+              onClick={() => defi.wrap(wrapAmount).then(() => {
+                setWrapAmount("");
+                addNotification("Success", "Shares wrapped into PT and YT", "success");
+              }).catch(err => {
+                addNotification("Error", "Failed to wrap shares", "error");
+              })}
             >
               {defi.isWrapping ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : (
                 <>Wrap Shares <ArrowRight className="h-4 w-4 ml-1" /></>
@@ -129,7 +138,12 @@ export function DefiTab() {
                 <button 
                   className="liquid-btn text-[var(--orbit-ok)]" 
                   disabled={!lendAmount || !lendInterest || defi.isLending}
-                  onClick={() => defi.lend(lendAmount, lendInterest, ORBIT_PT_TOKEN_ID!, "100").then(() => { setLendAmount(""); setLendInterest(""); })}
+                  onClick={() => defi.lend(lendAmount, lendInterest, ORBIT_PT_TOKEN_ID!, "100").then(() => { 
+                    setLendAmount(""); setLendInterest(""); 
+                    addNotification("Success", "Loan offer created", "success");
+                  }).catch(err => {
+                    addNotification("Error", "Failed to create offer", "error");
+                  })}
                 >
                   {defi.isLending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Create Offer (Requires 100 PT Collateral)"}
                 </button>
@@ -156,7 +170,11 @@ export function DefiTab() {
                       </div>
                       <button 
                         className="liquid-btn px-4 py-1.5 text-[10px]"
-                        onClick={() => defi.borrow(offer.id)}
+                        onClick={() => defi.borrow(offer.id).then(() => {
+                          addNotification("Success", "Successfully borrowed USDC", "success");
+                        }).catch(err => {
+                          addNotification("Error", "Borrow failed", "error");
+                        })}
                       >
                         Borrow
                       </button>
