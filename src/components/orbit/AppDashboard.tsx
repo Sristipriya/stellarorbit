@@ -728,6 +728,7 @@ export type ExtendedTab = Tab | "analyze" | "health";
 export function AppDashboard() {
   const wallet = useWallet();
   const [activeVaultId, setActiveVaultId] = useState<string>(DEFAULT_VAULT_ID);
+  const activeVault = VAULTS.find(v => v.id === activeVaultId);
   const vault = useVault(wallet.address, activeVaultId);
   const { add } = useNotifications();
   const [activeTab, setActiveTab] = useState<ExtendedTab>("portfolio");
