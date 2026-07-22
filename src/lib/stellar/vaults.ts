@@ -25,6 +25,10 @@ export type VaultMeta = {
   assetSymbol: string;
   contractId: string | undefined;
   assetId: string;
+  trancheId?: string;
+  marketId?: string;
+  ptId?: string;
+  ytId?: string;
   strategy: string;
   risk: "low" | "medium" | "high";
   color: string; // CSS color string
@@ -44,10 +48,12 @@ export const VAULTS: VaultMeta[] = [
     name: "Orbit XLM Vault",
     description: "Deposit XLM, earn real yield via Blend Protocol lending.",
     assetSymbol: "XLM",
-    contractId:
-      (import.meta.env.VITE_ORBIT_VAULT_CONTRACT_ID as string | undefined) ||
-      "CDRDDSKIZW4Q2PTA2B3RFAX4ILY5ZPGJF2IQNPQPNKJ3EQFTORD3MCIX",
+    contractId: import.meta.env.VITE_ORBIT_VAULT_CONTRACT_ID as string | undefined,
     assetId: XLM_SAC,
+    trancheId: import.meta.env.VITE_ORBIT_TRANCHE_CONTRACT_ID,
+    marketId: import.meta.env.VITE_ORBIT_MARKET_CONTRACT_ID,
+    ptId: import.meta.env.VITE_ORBIT_PT_TOKEN_ID,
+    ytId: import.meta.env.VITE_ORBIT_YT_TOKEN_ID,
     strategy: "Blend Protocol Lending",
     risk: "low",
     color: "oklch(0.82 0.16 195)",
@@ -60,6 +66,10 @@ export const VAULTS: VaultMeta[] = [
     assetSymbol: "USDC",
     contractId: import.meta.env.VITE_ORBIT_USDC_CONTRACT_ID as string | undefined,
     assetId: USDC_SAC,
+    trancheId: import.meta.env.VITE_ORBIT_USDC_TRANCHE_ID,
+    marketId: import.meta.env.VITE_ORBIT_USDC_MARKET_ID,
+    ptId: import.meta.env.VITE_ORBIT_USDC_PT_ID,
+    ytId: import.meta.env.VITE_ORBIT_USDC_YT_ID,
     strategy: "Blend Lending + Aquarius LP",
     risk: "low",
     color: "oklch(0.78 0.13 225)",
@@ -72,6 +82,10 @@ export const VAULTS: VaultMeta[] = [
     assetSymbol: "XLM+USDC",
     contractId: import.meta.env.VITE_ORBIT_INDEX_CONTRACT_ID as string | undefined,
     assetId: XLM_SAC, // Index primarily denominated in XLM
+    trancheId: import.meta.env.VITE_ORBIT_INDEX_TRANCHE_ID,
+    marketId: import.meta.env.VITE_ORBIT_INDEX_MARKET_ID,
+    ptId: import.meta.env.VITE_ORBIT_INDEX_PT_ID,
+    ytId: import.meta.env.VITE_ORBIT_INDEX_YT_ID,
     strategy: "Auto-Rebalanced Basket",
     risk: "medium",
     color: "oklch(0.82 0.17 155)",

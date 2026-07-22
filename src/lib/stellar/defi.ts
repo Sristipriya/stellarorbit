@@ -1,13 +1,10 @@
 import {
-  ORBIT_TRANCHE_CONTRACT_ID,
-  ORBIT_MARKET_CONTRACT_ID,
-  ORBIT_PT_TOKEN_ID,
-  ORBIT_YT_TOKEN_ID,
   ORBIT_USDC_TOKEN_ID,
   stroopsToXlm,
   xlmToStroops,
   HAS_REAL_CONTRACT,
 } from "./network";
+import { VaultMeta } from "./vaults";
 import { readContract, invokeContract, addrArg } from "./soroban";
 import { nativeToScVal } from "@stellar/stellar-sdk";
 
@@ -29,8 +26,8 @@ export interface DefiState {
   activeOffers: LoanOffer[];
 }
 
-export async function fetchDefiState(address: string): Promise<DefiState> {
-  if (!HAS_REAL_CONTRACT || !address) {
+export async function fetchDefiState(address: string, vault?: VaultMeta): Promise<DefiState> {
+  if (!HAS_REAL_CONTRACT || !address || !vault?.ptId || !vault?.ytId) {
     return {
       ptBalance: "0.0000",
       ytBalance: "0.0000",
@@ -40,17 +37,18 @@ export async function fetchDefiState(address: string): Promise<DefiState> {
   }
 
   const [pt, yt, usdc] = await Promise.all([
-    readContract<bigint>("balance", [addrArg(address)], ORBIT_PT_TOKEN_ID!).catch(() => 0n),
-    readContract<bigint>("balance", [addrArg(address)], ORBIT_YT_TOKEN_ID!).catch(() => 0n),
+    readContract<bigint>("balance", [addrArg(address)], vault.ptId).catch(() => 0n),
+    readContract<bigint>("balance", [addrArg(address)], vault.ytId).catch(() => 0n),
     readContract<bigint>("balance", [addrArg(address)], ORBIT_USDC_TOKEN_ID!).catch(() => 0n),
   ]);
 
   // Read offers from market (simplification, reading all offers)
   const offers: LoanOffer[] = [];
   try {
-    const count = await readContract<number>("get_offer_count", [], ORBIT_MARKET_CONTRACT_ID!).catch(() => 0);
-    for (let i = 1; i <= count; i++) {
-      const offer = await readContract<any>("get_offer", [nativeToScVal(i, "u32")], ORBIT_MARKET_CONTRACT_ID!).catch(() => null);
+    if (vault.marketId) {
+      const count = await readContract<number>("get_offer_count", [], vault.marketId).catch(() => 0);
+      for (let i = 1; i <= count; i++) {
+        const offer = await readContract<any>("get_offer", [nativeToScVal(i, "u32")], vault.marketId).catch(() => null);
       if (offer && offer.is_active) {
         offers.push({
           id: i,
@@ -76,13 +74,13 @@ export async function fetchDefiState(address: string): Promise<DefiState> {
   };
 }
 
-export async function wrapShares(address: string, amountXlm: string) {
+export async function wrapShares(address: string, amountXlm: string, trancheId: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No tranche contract deployed.");
   const amountStrp = xlmToStroops(amountXlm);
-  return invokeContract(address, "mint", [addrArg(address), nativeToScVal(amountStrp, "i128")], ORBIT_TRANCHE_CONTRACT_ID!);
+  return invokeContract(address, "mint", [addrArg(address), nativeToScVal(amountStrp, "i128")], trancheId);
 }
 
-export async function createLendOffer(address: string, usdcAmount: string, interestAmount: string, colTokenId: string, colAmount: string) {
+export async function createLendOffer(address: string, usdcAmount: string, interestAmount: string, colTokenId: string, colAmount: string, marketId: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No market contract deployed.");
   const usdcStrp = xlmToStroops(usdcAmount);
   const intStrp = xlmToStroops(interestAmount);
@@ -95,15 +93,15 @@ export async function createLendOffer(address: string, usdcAmount: string, inter
     nativeToScVal(100000, "u32"), // ~1 week duration
     addrArg(colTokenId),
     nativeToScVal(colStrp, "i128")
-  ], ORBIT_MARKET_CONTRACT_ID!);
+  ], marketId);
 }
 
-export async function borrow(address: string, offerId: number) {
+export async function borrow(address: string, offerId: number, marketId: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No market contract deployed.");
-  return invokeContract(address, "borrow", [addrArg(address), nativeToScVal(offerId, "u32")], ORBIT_MARKET_CONTRACT_ID!);
+  return invokeContract(address, "borrow", [addrArg(address), nativeToScVal(offerId, "u32")], marketId);
 }
 
-export async function repay(address: string, offerId: number) {
+export async function repay(address: string, offerId: number, marketId: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No market contract deployed.");
-  return invokeContract(address, "repay", [addrArg(address), nativeToScVal(offerId, "u32")], ORBIT_MARKET_CONTRACT_ID!);
+  return invokeContract(address, "repay", [addrArg(address), nativeToScVal(offerId, "u32")], marketId);
 }

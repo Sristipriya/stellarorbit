@@ -40,7 +40,7 @@ pub enum DataKey {
 
 #[soroban_sdk::contractclient(name = "TokenClient")]
 pub trait TokenInterface {
-    fn transfer(env: Env, from: Address, to: Address, amount: i128);
+    fn transfer(from: Address, to: Address, amount: i128);
 }
 
 #[contract]

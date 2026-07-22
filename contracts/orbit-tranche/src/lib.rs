@@ -21,15 +21,15 @@ pub enum DataKey {
 
 #[soroban_sdk::contractclient(name = "TokenClient")]
 pub trait TokenInterface {
-    fn mint(env: Env, minter: Address, to: Address, amount: i128);
-    fn burn(env: Env, minter: Address, from: Address, amount: i128);
-    fn transfer(env: Env, from: Address, to: Address, amount: i128);
-    fn balance(env: Env, id: Address) -> i128;
+    fn mint(minter: Address, to: Address, amount: i128);
+    fn burn(minter: Address, from: Address, amount: i128);
+    fn transfer(from: Address, to: Address, amount: i128);
+    fn balance(id: Address) -> i128;
 }
 
 #[soroban_sdk::contractclient(name = "VaultClient")]
 pub trait VaultInterface {
-    fn preview_share_price(env: Env) -> i128; // returns scaled price (1e7)
+    fn preview_share_price() -> i128; // returns scaled price (1e7)
 }
 
 #[contract]

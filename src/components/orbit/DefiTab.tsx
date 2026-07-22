@@ -4,11 +4,11 @@ import { Layers, ArrowRightLeft, ArrowRight, ShieldAlert, BadgeCent, Loader2 } f
 import { useDeFi } from "../../hooks/use-defi";
 import { useVault } from "../../hooks/use-vault";
 import { useNotifications } from "../../lib/notifications";
-import { ORBIT_PT_TOKEN_ID } from "../../lib/stellar/network";
+import { stroopsToXlm } from "../../lib/stellar/network";
 
 export function DefiTab() {
   const defi = useDeFi();
-  const { state: vaultState } = useVault();
+  const { state: vaultState, activeVault } = useVault();
   const { addNotification } = useNotifications();
   const [wrapAmount, setWrapAmount] = useState("");
   const [borrowAmount, setBorrowAmount] = useState("");
@@ -46,7 +46,7 @@ export function DefiTab() {
             <div className="rounded-xl border border-[var(--orbit-edge)] bg-white/[0.02] p-4">
               <div className="flex justify-between font-mono text-[10px] text-[var(--orbit-mute)] mb-2">
                 <span>Amount to Wrap (Orbit Shares)</span>
-                <span>Balance: {vaultState.shares}</span>
+                <span>Balance: {stroopsToXlm(vaultState.userSharesStroops)}</span>
               </div>
               <div className="relative">
                 <input
@@ -83,7 +83,7 @@ export function DefiTab() {
 
             <button 
               className="liquid-btn w-full mt-4" 
-              disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping || Number(wrapAmount) > Number(vaultState.shares)}
+              disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping || Number(wrapAmount) > Number(stroopsToXlm(vaultState.userSharesStroops))}
               onClick={() => defi.wrap(wrapAmount).then(() => {
                 setWrapAmount("");
                 addNotification("Success", "Shares wrapped into PT and YT", "success");
@@ -137,8 +137,8 @@ export function DefiTab() {
                 </div>
                 <button 
                   className="liquid-btn text-[var(--orbit-ok)]" 
-                  disabled={!lendAmount || !lendInterest || defi.isLending}
-                  onClick={() => defi.lend(lendAmount, lendInterest, ORBIT_PT_TOKEN_ID!, "100").then(() => { 
+                  disabled={defi.isLending || !lendAmount || !lendInterest || !activeVault?.ptId}
+                  onClick={() => defi.lend(lendAmount, lendInterest, activeVault.ptId!, "100").then(() => { 
                     setLendAmount(""); setLendInterest(""); 
                     addNotification("Success", "Loan offer created", "success");
                   }).catch(err => {
