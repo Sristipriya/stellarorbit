@@ -61,6 +61,9 @@ async function pollRealEvents(address: string | null, contractId: string): Promi
     const eventAddress = typeof from === "string" ? from : String(from);
     if (address && eventAddress !== address) continue;
 
+    const ledgerDiff = fetchedLatestLedger - ev.ledger;
+    const approximateAt = Date.now() - (ledgerDiff * 5500); // ~5.5 seconds per ledger
+
     out.push({
       id: key,
       kind,
@@ -68,7 +71,7 @@ async function pollRealEvents(address: string | null, contractId: string): Promi
       amountStroops: toBigInt(amount),
       sharesStroops: toBigInt(shares),
       txHash: ev.txHash,
-      at: Date.now(),
+      at: approximateAt,
       confirmed: true,
     });
   }

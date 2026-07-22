@@ -132,6 +132,8 @@ function DailyVolumeChart({ events }: { events: any[] }) {
 
 function AnalyticsPage() {
   const xlmVault = useVault(null, "xlm");
+  const usdcVault = useVault(null, "usdc");
+  const indexVault = useVault(null, "index");
   const { address } = useWallet();
   const [dbUsers, setDbUsers] = useState<any[]>([]);
   const [xlmUsd, setXlmUsd] = useState<number | null>(null);
