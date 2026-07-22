@@ -1,327 +1,255 @@
 <div align="center">
 
-# 🌌 Orbit Protocol
+# Orbit Protocol
 
-### _The first full-stack DeFi protocol built entirely on Stellar Soroban_
+### Full-Stack RWA & Yield Protocol on Stellar Soroban
 
-**Earn real yield · Split your returns · Lend with collateral · All on Stellar Testnet**
+Earn real yield · Yield Tranching · Peer-to-Peer Collateral Lending · Built on Stellar Testnet
 
-[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-stellarorbit.vercel.app-6366f1?style=for-the-badge)](https://stellarorbit.vercel.app/)
-[![Demo Video](https://img.shields.io/badge/▶%20Demo%20Video-YouTube-ff0000?style=for-the-badge&logo=youtube)](https://youtu.be/Git4e0q-HzY)
-[![Feedback Form](https://img.shields.io/badge/📋%20User%20Feedback-Google%20Sheets-22c55e?style=for-the-badge)](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
-[![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-0ea5e9?style=for-the-badge)](https://stellar.org)
-[![Soroban](https://img.shields.io/badge/Powered%20by-Soroban%20Smart%20Contracts-8b5cf6?style=for-the-badge)](https://soroban.stellar.org)
-[![PWA](https://img.shields.io/badge/Progressive-Web%20App-10b981?style=for-the-badge)](#)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-stellarorbit.vercel.app-6366f1?style=flat-square)](https://stellarorbit.vercel.app/)
+[![Demo Video](https://img.shields.io/badge/Demo%20Video-YouTube-ff0000?style=flat-square&logo=youtube)](https://youtu.be/Git4e0q-HzY)
+[![Feedback Form](https://img.shields.io/badge/User%20Feedback-Google%20Sheets-22c55e?style=flat-square)](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
+[![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-0ea5e9?style=flat-square)](https://stellar.org)
+[![Soroban](https://img.shields.io/badge/Contracts-Soroban-8b5cf6?style=flat-square)](https://soroban.stellar.org)
+[![PWA](https://img.shields.io/badge/PWA-Supported-10b981?style=flat-square)](#)
 
-### 📺 [Watch the Full Demo on YouTube →](https://youtu.be/Git4e0q-HzY) · 📋 [Submit / View User Feedback →](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
+[Watch Full Demo on YouTube](https://youtu.be/Git4e0q-HzY) · [Submit / View User Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
 
 </div>
 
 ---
 
-## ✨ What Is Orbit?
+## Overview
 
-Orbit is a **complete DeFi ecosystem** built natively on Stellar using Soroban smart contracts. It's not just a yield vault — it's a full protocol stack that lets you:
+Orbit is a decentralized finance protocol built natively on Stellar using Soroban smart contracts. It provides a complete yield vault, yield tranching, and collateralized money market stack:
 
-1. **Deposit XLM** → Earn real yield from Blend Protocol lending
-2. **Split your yield** → Separate your principal from future earnings using Yield Tranching
-3. **Borrow against your position** → Use your Orbit tokens as collateral in a trustless P2P market
-4. **Track everything** → Real-time analytics, leaderboards, and portfolio insights — all from on-chain data
-
-> Built in 6 phases over ~2 months, Orbit demonstrates that **institutional-grade DeFi is possible on Stellar today**.
+1. **Vault Deposits**: Deposit XLM into Soroban vaults to generate real yield via Blend Protocol cross-contract lending.
+2. **Yield Tranching**: Wrap vault shares into Principal Tokens (PT) and Yield Tokens (YT) to separate base capital from variable yield.
+3. **P2P Collateralized Lending**: Use PT or YT tokens as collateral to borrow USDC in a trustless money market without liquidators.
+4. **On-Chain Analytics**: Real-time TVL, volume, APY tracking, and global leaderboards derived directly from live Soroban ledger events.
 
 ---
 
-## 🔴 Live On Testnet
+## Live Deployment
 
 | Resource | Details |
 |----------|---------|
-| 🌐 **Live App** | [stellarorbit.vercel.app](https://stellarorbit.vercel.app/) |
-| 📺 **Demo Video** | [Watch on YouTube](https://youtu.be/Git4e0q-HzY) |
-| 📋 **User Feedback Form** | [View / Submit Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) |
-| 🔗 **Network** | Stellar Testnet |
-| 📡 **Soroban RPC** | `https://soroban-testnet.stellar.org` |
-| 💸 **Latest Transaction** | [`3ae1b42a...d1d224`](https://stellar.expert/explorer/testnet/tx/3ae1b42a21f5364498bc5c4b72537e03f7c34578598f8c694ad919745cd1d224) |
+| **Live Web App** | [stellarorbit.vercel.app](https://stellarorbit.vercel.app/) |
+| **Demo Video** | [Watch on YouTube](https://youtu.be/Git4e0q-HzY) |
+| **User Feedback Form** | [View / Submit Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) |
+| **Network** | Stellar Testnet |
+| **Soroban RPC** | `https://soroban-testnet.stellar.org` |
+| **Latest Verified Transaction** | [`3ae1b42a...d1d224`](https://stellar.expert/explorer/testnet/tx/3ae1b42a21f5364498bc5c4b72537e03f7c34578598f8c694ad919745cd1d224) |
 
 ---
 
-## 🏗️ Deployed Smart Contracts
+## Smart Contract Deployments
 
-All contracts are live on **Stellar Testnet** and fully functional.
+All contracts are deployed on Stellar Testnet and fully integrated into the dApp.
 
 | Contract | Address | Explorer |
 |----------|---------|---------|
-| 🏦 **Orbit XLM Vault** | `CBLDIHKSHOXC3Q3R2YNCT54OPTX5QRALNYKK3UDNZ4KAQD7DEINJYV5P` | [View ↗](https://stellar.expert/explorer/testnet/contract/CBLDIHKSHOXC3Q3R2YNCT54OPTX5QRALNYKK3UDNZ4KAQD7DEINJYV5P) |
-| 🪙 **oXLM Share Token** | `CDVS3OBGU6JERC4MZAW6BW75HLMVW5QFBCHUKPV5VEWGVXGJBRR5HIAJ` | [View ↗](https://stellar.expert/explorer/testnet/contract/CDVS3OBGU6JERC4MZAW6BW75HLMVW5QFBCHUKPV5VEWGVXGJBRR5HIAJ) |
-| ✂️ **Orbit Tranche v2** | `CBOCF47NMQAT7TS4X4CTS7D3MPAD4MIPMOBZPUE5EOM52WTAIOOVJDCU` | [View ↗](https://stellar.expert/explorer/testnet/contract/CBOCF47NMQAT7TS4X4CTS7D3MPAD4MIPMOBZPUE5EOM52WTAIOOVJDCU) |
-| 📜 **PT Token** | `CDPI7TU3B7ZW3RMT3NINGI22MCBMKUI6L52YYDA7Y3ZCIRD4FQPT4JQL` | [View ↗](https://stellar.expert/explorer/testnet/contract/CDPI7TU3B7ZW3RMT3NINGI22MCBMKUI6L52YYDA7Y3ZCIRD4FQPT4JQL) |
-| 🌾 **YT Token** | `CB6ZGGBSIB3EJYME3KI7MGKBJZELXI4HWGDSANLRZI74DULFKQZSRKCR` | [View ↗](https://stellar.expert/explorer/testnet/contract/CB6ZGGBSIB3EJYME3KI7MGKBJZELXI4HWGDSANLRZI74DULFKQZSRKCR) |
-| 🤝 **P2P Market** | `CBU7OPCENTV6XT33IYNBNYVC7YU2PNQD4X22TBAI4R72Q2QBVMERLGWT` | [View ↗](https://stellar.expert/explorer/testnet/contract/CBU7OPCENTV6XT33IYNBNYVC7YU2PNQD4X22TBAI4R72Q2QBVMERLGWT) |
-| 💵 **Test USDC** | `CBM6JPPGBESHXXPW6YKGSM2W6CVEL7KHQ6WDWXVDBSY2QWHD4K6R4N2I` | [View ↗](https://stellar.expert/explorer/testnet/contract/CBM6JPPGBESHXXPW6YKGSM2W6CVEL7KHQ6WDWXVDBSY2QWHD4K6R4N2I) |
+| **Orbit XLM Vault** | `CBLDIHKSHOXC3Q3R2YNCT54OPTX5QRALNYKK3UDNZ4KAQD7DEINJYV5P` | [View Contract](https://stellar.expert/explorer/testnet/contract/CBLDIHKSHOXC3Q3R2YNCT54OPTX5QRALNYKK3UDNZ4KAQD7DEINJYV5P) |
+| **oXLM Share Token** | `CDVS3OBGU6JERC4MZAW6BW75HLMVW5QFBCHUKPV5VEWGVXGJBRR5HIAJ` | [View Contract](https://stellar.expert/explorer/testnet/contract/CDVS3OBGU6JERC4MZAW6BW75HLMVW5QFBCHUKPV5VEWGVXGJBRR5HIAJ) |
+| **Orbit Tranche v2** | `CBOCF47NMQAT7TS4X4CTS7D3MPAD4MIPMOBZPUE5EOM52WTAIOOVJDCU` | [View Contract](https://stellar.expert/explorer/testnet/contract/CBOCF47NMQAT7TS4X4CTS7D3MPAD4MIPMOBZPUE5EOM52WTAIOOVJDCU) |
+| **PT Token** | `CDPI7TU3B7ZW3RMT3NINGI22MCBMKUI6L52YYDA7Y3ZCIRD4FQPT4JQL` | [View Contract](https://stellar.expert/explorer/testnet/contract/CDPI7TU3B7ZW3RMT3NINGI22MCBMKUI6L52YYDA7Y3ZCIRD4FQPT4JQL) |
+| **YT Token** | `CB6ZGGBSIB3EJYME3KI7MGKBJZELXI4HWGDSANLRZI74DULFKQZSRKCR` | [View Contract](https://stellar.expert/explorer/testnet/contract/CB6ZGGBSIB3EJYME3KI7MGKBJZELXI4HWGDSANLRZI74DULFKQZSRKCR) |
+| **P2P Market** | `CBU7OPCENTV6XT33IYNBNYVC7YU2PNQD4X22TBAI4R72Q2QBVMERLGWT` | [View Contract](https://stellar.expert/explorer/testnet/contract/CBU7OPCENTV6XT33IYNBNYVC7YU2PNQD4X22TBAI4R72Q2QBVMERLGWT) |
+| **Test USDC** | `CBM6JPPGBESHXXPW6YKGSM2W6CVEL7KHQ6WDWXVDBSY2QWHD4K6R4N2I` | [View Contract](https://stellar.expert/explorer/testnet/contract/CBM6JPPGBESHXXPW6YKGSM2W6CVEL7KHQ6WDWXVDBSY2QWHD4K6R4N2I) |
 
 ---
 
-## 🖼️ Screenshots
+## Screenshots
 
-### 🏠 Landing Page
+### Landing Page
 ![Landing Page](docs/screenshots/landing.png)
-> The Orbit landing page hero with orbit animation, key stats, and primary CTA to get started.
+> Orbit landing page hero with interactive orbit visualization and application entry points.
 
 ---
 
-### 🖥️ App Dashboard
+### App Dashboard
 ![Dashboard](docs/screenshots/dashboard.png)
-> The full vault dashboard — balances, share position, oracle price panel, and recent activity feed.
+> Primary application dashboard featuring share position tracking, oracle feeds, and network latency status.
 
 ---
 
-### 💸 Deposit Flow
+### Deposit Flow
 ![Deposit Success](docs/screenshots/Deposit.png)
-> Deposit flow showing XLM input, share preview, and the success card with transaction hash after completion.
+> Deposit interaction card displaying asset balance, share preview calculations, and confirmation details.
 
 ---
 
-### 🔗 Transaction Hash
+### Transaction Hash Details
 ![Transaction Hash](docs/screenshots/Transaction%20Hash.png)
-> A close-up of the on-chain transaction hash shown after every deposit or withdrawal.
+> On-chain transaction confirmation detail with direct verification link to Stellar Expert.
 
 ---
 
-### ⚙️ CI/CD Pipeline
+### CI/CD Pipeline
 ![CI/CD Pipeline](docs/screenshots/CI%20CD%20pipeline.png)
-> GitHub Actions workflow showing the automated build, test, and deploy pipeline for the smart contracts and frontend.
+> Continuous integration build and automated deployment workflow.
 
 ---
 
-### 📊 Analytics Dashboard
+### Analytics Dashboard
 ![Analytics Dashboard](Screenshots/Analytic%20%20Dashboard.png)
-> Real-time TVL, deposit volume, and multi-day APY charts powered by live Soroban event polling — no backend indexer required.
+> Real-time TVL, deposit volume, and historical APY metrics generated from Soroban RPC event polling.
 
 ---
 
-### 💰 Yield Tracking
+### Yield Tracking
 ![Yield Tracking](Screenshots/Yeild%20Tracking.png)
-> Track your Principal Tokens (PT) and Yield Tokens (YT) in real time. See exactly how much yield you've generated versus your locked principal.
+> Real-time Principal Token (PT) and Yield Token (YT) position monitoring and accrued return metrics.
 
 ---
 
-### 🤝 P2P Lending Market
+### P2P Lending Market
 ![P2P Lending Market](Screenshots/P2p%20lending%20market.png)
-> A fully trustless peer-to-peer money market. Lenders post USDC offers with fixed terms, borrowers lock Orbit tokens as collateral and take loans instantly — no liquidation bots needed.
+> Peer-to-peer money market interface for creating fixed-term loan offers and borrowing against collateral.
 
 ---
 
-### 📈 Portfolio Analyzer
+### Portfolio Analyzer
 ![Portfolio Analyzer](Screenshots/Portfolio%20Analyzer.png)
-> Visual compound growth projections, strategy comparison charts, and your complete position breakdown across all Orbit assets.
+> Portfolio breakdown and compound growth projection tools.
 
 ---
 
-### 🏥 Vault Health Monitor
+### Vault Health Monitor
 ![Vault Health Monitor](Screenshots/Vault%20Health%20Monitor.png)
-> Live vault health metrics — TVL utilization, idle assets, APY trend, and performance fee tracking, all pulled directly from the Soroban contract.
+> Live vault state telemetry including utilization rates, idle balances, and performance fee metrics.
 
 ---
 
-### 🏆 Leaderboard
+### Global Leaderboard
 ![Leaderboard](Screenshots/leaderboard.png)
-> Global depositor rankings derived entirely from on-chain Soroban events. Your rank updates in real time as others deposit.
+> Participant standings calculated dynamically from on-chain contract events.
 
 ---
 
-### 🎁 Referral & Points System
+### Points & Referral System
 ![Referral Points](Screenshots/referal%20point.png)
-> Earn Orbit Points for every deposit and referral. Share your referral link to climb the leaderboard and unlock protocol rewards.
+> Protocol gamification interface tracking earned points and referral activity.
 
 ---
 
-### 📋 Transaction History
+### Transaction History
 ![Transaction History](Screenshots/transaction%20History.png)
-> Full deposit/withdrawal history with Stellar Explorer links for every transaction.
+> Searchable history of deposits and redemptions.
 
 ---
 
-### 💳 Transaction Details
+### Transaction Confirmation
 ![Transaction](Screenshots/Transaction.png)
-> On-chain transaction confirmation card showing your deposit amount, shares minted, and a direct link to the Stellar Explorer.
+> Transaction status modal containing receipt data and block explorer links.
 
 ---
 
-## 🔄 System Architecture & Full Flow
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        USER JOURNEY                                  │
+│                            USER FLOW                                │
 └─────────────────────────────────────────────────────────────────────┘
 
-  User connects wallet (Freighter / Albedo / Lobstr / xBull)
+  User Wallet (Freighter / Albedo / Lobstr / xBull)
         │
         ▼
-  ┌─────────────┐     deposit XLM      ┌──────────────────────────────┐
+  ┌─────────────┐     Deposit XLM      ┌──────────────────────────────┐
   │  Orbit App  │ ──────────────────▶  │   orbit-vault (Soroban)      │
-  │  (Next.js / │                      │                              │
-  │  TanStack)  │ ◀──────────────────  │  • Accepts XLM deposits      │
-  └─────────────┘   mint oXLM shares   │  • Mints oXLM share tokens   │
-        │                              │  • Tracks TVL / NAV          │
-        │                              │  • Harvest admin yield       │
+  │ (TanStack)  │                      │                              │
+  │             │ ◀──────────────────  │  • Mints oXLM share tokens   │
+  └─────────────┘   Mint oXLM shares   │  • Tracks TVL & Share NAV    │
+        │                              │  • Manages yield strategy    │
         │                              └──────────────┬───────────────┘
         │                                             │
-        │                                             │ yield strategy
+        │                                             │ Yield Strategy
         │                                             ▼
         │                              ┌──────────────────────────────┐
-        │                              │   Blend Protocol Pool        │
-        │                              │   (cross-contract lending)   │
-        │                              │   Real APY flows back        │
+        │                              │     Blend Protocol Pool      │
+        │                              │  (Cross-Contract Lending)    │
         │                              └──────────────────────────────┘
         │
-        │  YIELD TRANCHING (New Feature!)
+        │  YIELD TRANCHING
         │
-        ├──── user calls Wrap Shares ──▶ ┌────────────────────────────┐
-        │                                │  orbit-tranche (Soroban)   │
-        │                                │                            │
-        │   ┌─── PT Token (Principal) ── │  Splits oXLM shares into:  │
-        │   │                            │  • PT: redeem for exact    │
-        │   └─── YT Token (Yield) ────── │       principal value      │
-        │                                │  • YT: claim yield above   │
-        │                                │       principal            │
-        │                                └────────────────────────────┘
+        ├──── Wrap Shares ───────────▶ ┌──────────────────────────────┐
+        │                              │  orbit-tranche (Soroban)     │
+        │   ┌─── PT Token (Principal)─ │                              │
+        │   │                          │  Splits oXLM into:           │
+        │   └─── YT Token (Yield)───── │  • PT: Fixed Principal value │
+        │                              │  • YT: Variable Yield claims │
+        │                              └──────────────────────────────┘
         │
-        │  P2P COLLATERAL MARKET (New Feature!)
+        │  P2P MONEY MARKET
         │
-        └──── Lender posts USDC ────────▶ ┌────────────────────────────┐
-             Borrower locks PT/YT ──────▶ │  orbit-market (Soroban)    │
-                                           │                            │
-             Borrower gets USDC ◀───────── │  • Fixed term / interest   │
-             Loan repaid + unlock ◀─────── │  • No liquidation needed   │
-                                           │  • Trustless escrow        │
-                                           └────────────────────────────┘
+        └──── Create Offer / Borrow ─▶ ┌──────────────────────────────┐
+                                       │  orbit-market (Soroban)      │
+                                       │  • Trustless Escrow          │
+                                       │  • Fixed Terms & Collateral  │
+                                       └──────────────────────────────┘
 
 ─────────────────────────────────────────────────────────────────────
-                     FRONTEND DATA FLOW
+                     DATA INFRASTRUCTURE
 ─────────────────────────────────────────────────────────────────────
 
-  Soroban RPC ──▶ fetchContractEvents() ──▶ Analytics Charts
-                                         ──▶ Leaderboard Rankings
-                                         ──▶ Transaction History
-                                         ──▶ TVL / Volume Metrics
-
-  Supabase ──▶ User auth + display names ──▶ Global Leaderboard
-            ──▶ Referral tracking        ──▶ Orbit Points system
-
-  SEP-40 Oracle ──▶ XLM/USD price feed ──▶ USD TVL, portfolio value
+  Soroban RPC ──▶ fetchContractEvents() ──▶ Analytics & Leaderboards
+  Supabase ──▶ User Profiles & Auth ──▶ Global Leaderboard Names
+  SEP-40 Oracle ──▶ XLM/USD Price Feed ──▶ Portfolio Valuation
 ```
 
 ---
 
-## 🚀 Feature Highlights
+## Key Features
 
-### ✅ Core Vault (Phases 1–4)
-| Feature | Description |
-|---------|-------------|
-| 🔐 **Multi-Wallet Connect** | Freighter, Albedo, Lobstr, xBull via StellarWalletsKit |
-| 💳 **Deposit & Withdraw** | Real Soroban contract calls with wallet signing |
-| 🪙 **SEP-41 Share Token** | oXLM — a transferable token representing your vault share |
-| 📊 **Live Analytics** | TVL, volume, APY charts from real on-chain events |
-| 🏆 **Leaderboard** | Global depositor rankings from Soroban events |
-| 🌐 **PWA** | Installable on mobile & desktop, works offline |
-| 💰 **Fiat On-Ramp** | Buy crypto with fiat via SEP-24 |
-| 🤖 **Zap Deposits** | Deposit any Stellar asset (auto-routed through Soroswap) |
-
-### ✅ DeFi Super-Protocol (Phases 5–6) — **NEW**
-| Feature | Description |
-|---------|-------------|
-| ✂️ **Yield Tranching** | Split oXLM shares into PT (principal) + YT (yield) tokens |
-| 🔒 **Principal Protection** | PT holders redeem exact XLM value deposited — zero impermanent loss |
-| 🌾 **Yield Speculation** | YT holders claim all variable yield generated above principal |
-| 🤝 **P2P Collateral Loans** | Lend USDC or borrow against PT/YT as collateral |
-| 📊 **Yield Dashboard** | Real-time PT/YT balance tracking and yield projections |
-| 🎯 **Orbit Points** | Earn points for deposits and referrals |
-| 👥 **Referral System** | Share your link, earn bonus points when friends deposit |
+| Component | Functionality |
+|-----------|---------------|
+| **Multi-Wallet Support** | Integrated via StellarWalletsKit for seamless connection across wallets. |
+| **Soroban Smart Vaults** | SEP-41 compliant `oXLM` share token minting with NAV calculations. |
+| **Yield Tranching** | Split shares into PT (principal protection) and YT (yield speculation) tokens. |
+| **P2P Collateral Market** | Escrow-based lending market utilizing PT/YT tokens as collateral. |
+| **Live Event Polling** | Real-time on-chain indexing without third-party middleware. |
+| **Mobile PWA** | Progressive Web App support for mobile and desktop environments. |
+| **SEP-40 Price Oracles** | Live USD valuation of vault assets and user share balances. |
 
 ---
 
-## ⚡ How It Works — Step by Step
-
-### Step 1: Get Testnet XLM
-Click "Fund Wallet" in the app → Friendbot sends you 10,000 testnet XLM instantly.
-
-### Step 2: Deposit XLM
-Enter an amount → your wallet pops up → sign → XLM is locked in the Soroban vault and you receive **oXLM shares**.
-
-### Step 3: Earn Yield
-The vault deploys your XLM into Blend Protocol lending. Yield accrues automatically, reflected in the rising share price.
-
-### Step 4: (Optional) Wrap Shares — Yield Tranching
-Go to **DeFi Super-Protocol** → Wrap your oXLM shares:
-- You get **PT tokens** — redeem later for your exact original XLM value
-- You get **YT tokens** — claim all yield generated while your position is open
-
-### Step 5: (Optional) Use as Collateral
-In the **P2P Market**, lock your PT/YT as collateral to borrow USDC instantly from other users — or become a lender by posting USDC offers.
-
-### Step 6: Withdraw
-Burn your oXLM shares → receive XLM back at current NAV. If share price rose, you profit the difference.
-
----
-
-## 🧱 Project Structure
-
-```
-stellarorbit/
-├── contracts/
-│   ├── orbit-vault/          Soroban vault — deposit, withdraw, share math, harvest
-│   ├── orbit-share-token/    SEP-41 oXLM share token with minter access control
-│   ├── orbit-tranche/        Yield stripping — split shares into PT + YT tokens
-│   ├── orbit-market/         P2P collateral lending — create_offer, borrow, repay
-│   ├── orbit-points/         On-chain points tracking for gamification
-│   └── orbit-zap-router/     Cross-asset deposit router (mock DEX for testnet)
-│
-├── src/
-│   ├── routes/               TanStack Start page routes
-│   ├── components/orbit/     All UI components (dashboard, deposit, withdraw, defi, etc.)
-│   ├── hooks/                React hooks (use-vault, use-wallet, use-defi)
-│   └── lib/stellar/          Soroban helpers (network, vault, events, soroban RPC)
-│
-├── Screenshots/              UI screenshots for this README
-├── docs/                     Architecture diagrams and docs
-└── scripts/                  Deploy scripts for Soroban contracts
-```
-
----
-
-## 🛠️ Local Development
+## Technical Setup
 
 ### Prerequisites
-- Node 20+ and `bun` or `npm`
-- Rust with `wasm32v1-none` target (for contract builds)
-- `stellar-cli` v27+ (`cargo install stellar-cli`)
-- A Stellar wallet (Freighter recommended)
+
+- Node.js 20+
+- Rust with `wasm32v1-none` compilation target
+- `stellar-cli` v27+
 
 ### Quick Start
 
 ```bash
-# Clone
+# Clone the repository
 git clone https://github.com/Sristipriya/stellarorbit.git
 cd stellarorbit
 
 # Install dependencies
 npm install
 
-# Copy env template
+# Configure environment
 cp .env.example .env
 
-# Start dev server
-npm run dev   # http://localhost:8080
+# Run development server
+npm run dev
 ```
 
-### Build Contracts
+---
+
+## Contract Build Commands
 
 ```bash
-# Build a specific contract (requires stellar-cli)
+# Build tranche contract
 stellar contract build --package orbit-tranche
+
+# Build vault contract
 stellar contract build --package orbit-vault
 
-# Deploy to testnet
+# Deploy to Testnet
 stellar contract deploy \
   --wasm target/wasm32v1-none/release/orbit_vault.wasm \
   --source-account orbit-deployer \
@@ -330,53 +258,6 @@ stellar contract deploy \
 
 ---
 
-## 🔐 Environment Variables
+## License & Disclaimer
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `VITE_ORBIT_VAULT_CONTRACT_ID` | No | Overrides default vault contract |
-| `VITE_ORBIT_TRANCHE_CONTRACT_ID` | No | Overrides default tranche contract |
-| `VITE_SUPABASE_URL` | No | Supabase project URL for user auth |
-| `VITE_SUPABASE_ANON_KEY` | No | Supabase anon key |
-| `VITE_ADMIN_USER` | No | Admin panel username (default: `admin`) |
-| `VITE_ADMIN_PASS` | No | Admin panel password (default: `orbit2024`) |
-
-> All contract IDs are hardcoded in `src/lib/stellar/network.ts` — no env vars needed to run the live version.
-
----
-
-## 🗺️ Roadmap
-
-| Phase | Feature | Status |
-|-------|---------|--------|
-| L1–L2 | Wallet connect + vault foundation | ✅ Complete |
-| L3 | Full Soroban vault contract | ✅ Complete |
-| L4 | Admin panel, leaderboard, simulator, oracle | ✅ Complete |
-| L5 | Real-time events + Supabase auth | ✅ Complete |
-| L6 | **Yield Tranching + P2P Lending Market** | ✅ Complete |
-| L7 | Automated DEX rebalancing, Mainnet launch | 🔜 Planned |
-
----
-
-## 🛡️ Security Notes
-
-- All contracts use Soroban's native auth framework (`require_auth`)
-- The tranche contract uses allowance-based `transfer_from` to avoid nested auth issues with wallet extensions
-- Share token minter access is controlled by `set_minter` — only the vault can mint oXLM
-- PT/YT token minting is restricted to the tranche contract
-
----
-
-## 📄 Disclaimer
-
-This is a **testnet-only** project built for demonstration and competition purposes. Not financial advice. All tokens are worthless testnet assets. Do not send real funds.
-
----
-
-<div align="center">
-
-**Built with ❤️ on Stellar Soroban**
-
-[Live Demo](https://stellarorbit.vercel.app/) · [📺 Demo Video](https://youtu.be/Git4e0q-HzY) · [Stellar Explorer](https://stellar.expert/explorer/testnet/contract/CBLDIHKSHOXC3Q3R2YNCT54OPTX5QRALNYKK3UDNZ4KAQD7DEINJYV5P) · [Latest Transaction](https://stellar.expert/explorer/testnet/tx/3ae1b42a21f5364498bc5c4b72537e03f7c34578598f8c694ad919745cd1d224)
-
-</div>
+Testnet deployment built for demonstration and evaluation purposes. All assets are on Stellar Testnet and carry no monetary value.
