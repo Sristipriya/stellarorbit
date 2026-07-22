@@ -7,9 +7,12 @@
 **Earn real yield · Split your returns · Lend with collateral · All on Stellar Testnet**
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-stellarorbit.vercel.app-6366f1?style=for-the-badge)](https://stellarorbit.vercel.app/)
+[![Demo Video](https://img.shields.io/badge/▶%20Demo%20Video-YouTube-ff0000?style=for-the-badge&logo=youtube)](https://youtu.be/Git4e0q-HzY)
 [![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-0ea5e9?style=for-the-badge)](https://stellar.org)
 [![Soroban](https://img.shields.io/badge/Powered%20by-Soroban%20Smart%20Contracts-8b5cf6?style=for-the-badge)](https://soroban.stellar.org)
 [![PWA](https://img.shields.io/badge/Progressive-Web%20App-10b981?style=for-the-badge)](#)
+
+### 📺 [Watch the Full Demo on YouTube →](https://youtu.be/Git4e0q-HzY)
 
 </div>
 
@@ -33,6 +36,7 @@ Orbit is a **complete DeFi ecosystem** built natively on Stellar using Soroban s
 | Resource | Details |
 |----------|---------|
 | 🌐 **Live App** | [stellarorbit.vercel.app](https://stellarorbit.vercel.app/) |
+| 📺 **Demo Video** | [Watch on YouTube](https://youtu.be/Git4e0q-HzY) |
 | 🔗 **Network** | Stellar Testnet |
 | 📡 **Soroban RPC** | `https://soroban-testnet.stellar.org` |
 | 💸 **Latest Transaction** | [`3ae1b42a...d1d224`](https://stellar.expert/explorer/testnet/tx/3ae1b42a21f5364498bc5c4b72537e03f7c34578598f8c694ad919745cd1d224) |
@@ -341,6 +345,6 @@ This is a **testnet-only** project built for demonstration and competition purpo
 
 **Built with ❤️ on Stellar Soroban**
 
-[Live Demo](https://stellarorbit.vercel.app/) · [Stellar Explorer](https://stellar.expert/explorer/testnet/contract/CBLDIHKSHOXC3Q3R2YNCT54OPTX5QRALNYKK3UDNZ4KAQD7DEINJYV5P) · [Latest Transaction](https://stellar.expert/explorer/testnet/tx/3ae1b42a21f5364498bc5c4b72537e03f7c34578598f8c694ad919745cd1d224)
+[Live Demo](https://stellarorbit.vercel.app/) · [📺 Demo Video](https://youtu.be/Git4e0q-HzY) · [Stellar Explorer](https://stellar.expert/explorer/testnet/contract/CBLDIHKSHOXC3Q3R2YNCT54OPTX5QRALNYKK3UDNZ4KAQD7DEINJYV5P) · [Latest Transaction](https://stellar.expert/explorer/testnet/tx/3ae1b42a21f5364498bc5c4b72537e03f7c34578598f8c694ad919745cd1d224)
 
 </div>
