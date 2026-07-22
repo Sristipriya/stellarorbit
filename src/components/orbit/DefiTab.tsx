@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Layers, ArrowRightLeft, ArrowRight, ShieldAlert, BadgeCent, TrendingUp } from "lucide-react";
+import { Layers, ArrowRightLeft, ArrowRight, ShieldAlert, BadgeCent, Loader2 } from "lucide-react";
+import { useDeFi } from "../../hooks/use-defi";
+import { ORBIT_PT_TOKEN_ID } from "../../lib/stellar/network";
 
 export function DefiTab() {
+  const defi = useDeFi();
   const [wrapAmount, setWrapAmount] = useState("");
   const [borrowAmount, setBorrowAmount] = useState("");
   const [lendAmount, setLendAmount] = useState("");
+  const [lendInterest, setLendInterest] = useState("");
 
   return (
     <div className="space-y-6">
@@ -62,19 +66,25 @@ export function DefiTab() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-[var(--orbit-edge)] bg-white/[0.02] p-4 text-center">
-                <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">You Receive</div>
-                <div className="font-display text-xl font-bold text-[var(--orbit-ink)]">{wrapAmount || "0.00"}</div>
+                <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">Your PT Balance</div>
+                <div className="font-display text-xl font-bold text-[var(--orbit-ink)]">{defi.ptBalance}</div>
                 <div className="font-mono text-[10px] font-bold text-[var(--orbit-accent)]">PT (Principal)</div>
               </div>
               <div className="rounded-xl border border-[var(--orbit-edge)] bg-white/[0.02] p-4 text-center">
-                <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">You Receive</div>
-                <div className="font-display text-xl font-bold text-[var(--orbit-ink)]">{wrapAmount || "0.00"}</div>
+                <div className="font-mono text-[10px] text-[var(--orbit-mute)] mb-1">Your YT Balance</div>
+                <div className="font-display text-xl font-bold text-[var(--orbit-ink)]">{defi.ytBalance}</div>
                 <div className="font-mono text-[10px] font-bold text-[var(--orbit-ok)]">YT (Yield)</div>
               </div>
             </div>
 
-            <button className="orbit-btn orbit-btn-primary w-full mt-4" disabled={!wrapAmount || Number(wrapAmount) <= 0}>
-              Wrap Shares <ArrowRight className="h-4 w-4 ml-1" />
+            <button 
+              className="liquid-btn w-full mt-4" 
+              disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping}
+              onClick={() => defi.wrap(wrapAmount).then(() => setWrapAmount(""))}
+            >
+              {defi.isWrapping ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : (
+                <>Wrap Shares <ArrowRight className="h-4 w-4 ml-1" /></>
+              )}
             </button>
           </div>
         </motion.div>
@@ -97,19 +107,31 @@ export function DefiTab() {
           </div>
 
           <div className="space-y-6">
-            {/* Lend Section */}
             <div className="rounded-xl border border-[var(--orbit-edge)] p-4 bg-white/[0.01]">
               <h4 className="font-display text-sm font-semibold mb-3">Lend USDC</h4>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  placeholder="USDC Amount"
-                  value={lendAmount}
-                  onChange={(e) => setLendAmount(e.target.value)}
-                  className="flex-1 rounded-lg border border-[var(--orbit-edge)] bg-white/[0.03] px-3 py-2 font-mono text-sm outline-none focus:border-[var(--orbit-ok)]"
-                />
-                <button className="orbit-btn border border-[var(--orbit-ok)]/50 text-[var(--orbit-ok)] hover:bg-[var(--orbit-ok)]/10" disabled={!lendAmount}>
-                  Create Offer
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="USDC Amount"
+                    value={lendAmount}
+                    onChange={(e) => setLendAmount(e.target.value)}
+                    className="flex-1 rounded-lg border border-[var(--orbit-edge)] bg-white/[0.03] px-3 py-2 font-mono text-sm outline-none focus:border-[var(--orbit-ok)]"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Interest (USDC)"
+                    value={lendInterest}
+                    onChange={(e) => setLendInterest(e.target.value)}
+                    className="flex-1 rounded-lg border border-[var(--orbit-edge)] bg-white/[0.03] px-3 py-2 font-mono text-sm outline-none focus:border-[var(--orbit-ok)]"
+                  />
+                </div>
+                <button 
+                  className="liquid-btn text-[var(--orbit-ok)]" 
+                  disabled={!lendAmount || !lendInterest || defi.isLending}
+                  onClick={() => defi.lend(lendAmount, lendInterest, ORBIT_PT_TOKEN_ID!, "100").then(() => { setLendAmount(""); setLendInterest(""); })}
+                >
+                  {defi.isLending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Create Offer (Requires 100 PT Collateral)"}
                 </button>
               </div>
             </div>
@@ -118,30 +140,29 @@ export function DefiTab() {
             <div className="rounded-xl border border-[var(--orbit-edge)] p-4 bg-white/[0.01]">
               <h4 className="font-display text-sm font-semibold mb-3 flex items-center justify-between">
                 <span>Active Offers</span>
-                <span className="font-mono text-[9px] bg-[var(--orbit-ok)]/20 text-[var(--orbit-ok)] px-2 py-0.5 rounded-full">3 Live</span>
+                <span className="font-mono text-[9px] bg-[var(--orbit-ok)]/20 text-[var(--orbit-ok)] px-2 py-0.5 rounded-full">{defi.activeOffers.length} Live</span>
               </h4>
               
-              <div className="space-y-2">
-                {/* Mock Offer 1 */}
-                <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--orbit-edge)] bg-black/40 hover:border-[var(--orbit-accent)]/50 transition-colors">
-                  <div>
-                    <div className="font-mono text-xs font-bold">1,000 USDC</div>
-                    <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-0.5">@ 5% APY • 30 Days</div>
-                  </div>
-                  <button className="orbit-btn orbit-btn-primary px-3 py-1.5 text-[10px]">
-                    Borrow
-                  </button>
-                </div>
-                {/* Mock Offer 2 */}
-                <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--orbit-edge)] bg-black/40 hover:border-[var(--orbit-accent)]/50 transition-colors">
-                  <div>
-                    <div className="font-mono text-xs font-bold">500 USDC</div>
-                    <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-0.5">@ 4.5% APY • 14 Days</div>
-                  </div>
-                  <button className="orbit-btn orbit-btn-primary px-3 py-1.5 text-[10px]">
-                    Borrow
-                  </button>
-                </div>
+              <div className="space-y-2 max-h-[150px] overflow-y-auto">
+                {defi.activeOffers.length === 0 ? (
+                  <p className="font-mono text-xs text-[var(--orbit-mute)] text-center py-4">No active loan offers.</p>
+                ) : (
+                  defi.activeOffers.map((offer) => (
+                    <div key={offer.id} className="flex items-center justify-between p-3 rounded-lg border border-[var(--orbit-edge)] bg-black/40 hover:border-[var(--orbit-accent)]/50 transition-colors">
+                      <div>
+                        <div className="font-mono text-xs font-bold">{Number(offer.usdc_amount) / 10000000} USDC</div>
+                        <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-0.5">Repay {Number(offer.usdc_amount + offer.interest_amount) / 10000000} USDC total</div>
+                        <div className="font-mono text-[9px] text-[var(--orbit-mute)] mt-0.5">Col: {Number(offer.required_collateral_amount) / 10000000} PT</div>
+                      </div>
+                      <button 
+                        className="liquid-btn px-4 py-1.5 text-[10px]"
+                        onClick={() => defi.borrow(offer.id)}
+                      >
+                        Borrow
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             

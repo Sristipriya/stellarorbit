@@ -273,10 +273,13 @@ Screenshot of the GitHub Actions workflow run showing the CI/CD pipeline for bui
 ## Deployed Contract Information
 
 - **Live Demo Link:** [https://stellarorbit.vercel.app/](https://stellarorbit.vercel.app/)
-- **Orbit Vault Contract:** `CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN`
-- **Orbit Tranche (Yield Stripping) Contract:** `CCDQKZTBYLMGL35ZDVBZ6IIVH6HOZ7SVCIAUH5T6YIUTL6KDIBB4QDUV`
-- **Orbit Market (P2P Lending) Contract:** `CBPGA3ELHHUTPFTHYXMUWOVZY7Q7QNYUXY7EWTKWY7DKJDHEKVM65G67`
-- **Stellar Expert Explorer:** [View Vault Contract](https://stellar.expert/explorer/testnet/contract/CDASKDOFEVUOFAHE6H4HJXIAR4YVJWJ4FARU6RNX4RCKBG3WX6V3AIBN)
+- **Orbit Vault Contract:** `CCFL7JYTNJSFRZGXNUYPBGUEUAJTO5QONF64ISGVFAJP52FZZCZND6AX`
+- **Orbit Tranche (Yield Stripping) Contract:** `CBOSRRNB2OS6CE7LWDJJZCB6IYBYCNIUVRKSD7IPMIOUYJSH3DKL5F23`
+- **Orbit Market (P2P Lending) Contract:** `CBU7OPCENTV6XT33IYNBNYVC7YU2PNQD4X22TBAI4R72Q2QBVMERLGWT`
+- **Orbit PT Token:** `CDUJ6L2HPZLT5GK52EMTUQ4OENRTEGWMJVNPFOURX4PYYNI4V677MBM2`
+- **Orbit YT Token:** `CDR6RDJQU7VKDUIJLBXM2ND5FX4X6AGM5GCDPL2S2HRL6U3VA6L4BZNG`
+- **Test USDC Token:** `CBM6JPPGBESHXXPW6YKGSM2W6CVEL7KHQ6WDWXVDBSY2QWHD4K6R4N2I`
+- **Stellar Expert Explorer:** [View Vault Contract](https://stellar.expert/explorer/testnet/contract/CCFL7JYTNJSFRZGXNUYPBGUEUAJTO5QONF64ISGVFAJP52FZZCZND6AX)
 - **Network:** Stellar Testnet
 - **Soroban RPC URL:** `https://soroban-testnet.stellar.org`
 

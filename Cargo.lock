@@ -1275,6 +1275,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "orbit-market"
+version = "0.1.0"
+dependencies = [
+ "orbit-tranche",
+ "soroban-sdk 27.0.0",
+]
+
+[[package]]
 name = "orbit-points"
 version = "0.1.0"
 dependencies = [
@@ -1285,6 +1293,14 @@ dependencies = [
 name = "orbit-share-token"
 version = "0.1.0"
 dependencies = [
+ "soroban-sdk 27.0.0",
+]
+
+[[package]]
+name = "orbit-tranche"
+version = "0.1.0"
+dependencies = [
+ "orbit-vault",
  "soroban-sdk 27.0.0",
 ]
 

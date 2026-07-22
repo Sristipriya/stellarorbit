@@ -71,9 +71,9 @@ function DailyVolumeChart({ events }: { events: any[] }) {
     <div>
       <div className="flex items-end gap-1.5 w-full" style={{ height: 140 }}>
         {sortedDays.map((day, i) => {
-          const depH = (buckets[day].dep / maxVal) * 100;
-          const wdH = (buckets[day].wd / maxVal) * 100;
-          const total = depH + wdH;
+          const depH = Math.max(2, (buckets[day].dep / maxVal) * 100);
+          const wdH = Math.max(2, (buckets[day].wd / maxVal) * 100);
+          const total = buckets[day].dep + buckets[day].wd;
           return (
             <div key={day} className="flex flex-1 flex-col items-center gap-0.5 group relative">
               {/* Tooltip */}
