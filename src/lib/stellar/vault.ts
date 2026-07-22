@@ -285,10 +285,8 @@ export async function deposit(
     const args: import("./soroban").ScArg[] = [
       addrArg(address),
       i128Arg(amountStroops),
+      referrer ? addrArg(referrer) : voidArg(),
     ];
-    
-    // We pass 2 arguments because the deployed contracts on Vercel 
-    // are still using the old signature without the referrer parameter.
     const { txHash, retval } = await invokeContract<bigint>(address, "deposit", args, vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     const pts = Math.floor(Number(amountStroops) / 10000000);
