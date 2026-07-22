@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { DefiState, fetchDefiState, wrapShares, createLendOffer, borrow, repay } from "../lib/stellar/defi";
 import { useWallet } from "./use-wallet";
-import { useVault } from "./use-vault";
+import { getVaultById } from "../lib/stellar/vaults";
+import { ORBIT_TRANCHE_CONTRACT_ID } from "../lib/stellar/network";
 
-export function useDeFi() {
+export function useDeFi(vaultId: string = "xlm") {
   const { address } = useWallet();
-  const { activeVault } = useVault();
+  const activeVault = getVaultById(vaultId);
   const [state, setState] = useState<DefiState>({
     ptBalance: "0.0000",
     ytBalance: "0.0000",
@@ -34,10 +35,13 @@ export function useDeFi() {
   }, [refresh]);
 
   const wrap = async (amountXlm: string) => {
-    if (!address || !activeVault?.trancheId) return;
+    const trancheId = activeVault?.trancheId || ORBIT_TRANCHE_CONTRACT_ID;
+    if (!address || !trancheId) {
+      throw new Error("Wallet not connected or tranche contract missing.");
+    }
     setIsWrapping(true);
     try {
-      await wrapShares(address, amountXlm, activeVault.trancheId);
+      await wrapShares(address, amountXlm, trancheId);
       await refresh();
     } catch (err) {
       console.error("Wrap error:", err);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layers, ArrowRightLeft, ArrowRight, ShieldAlert, BadgeCent, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { useDeFi } from "../../hooks/use-defi";
 import { useVault } from "../../hooks/use-vault";
 import { useWallet } from "../../hooks/use-wallet";
@@ -20,13 +21,13 @@ export function DefiTab({
   vaultState?: VaultState;
   activeVault?: VaultMeta;
 } = {}) {
-  const defi = useDeFi();
   const wallet = useWallet();
   const address = propAddress !== undefined ? propAddress : wallet.address;
+  const defi = useDeFi(propVaultId);
   const vault = useVault(address, propVaultId);
   const vaultState = propVaultState ?? vault.state;
   const activeVault = propActiveVault ?? getVaultById(propVaultId);
-  const { addNotification } = useNotifications();
+  const notif = useNotifications();
   const [wrapAmount, setWrapAmount] = useState("");
   const [borrowAmount, setBorrowAmount] = useState("");
   const [lendAmount, setLendAmount] = useState("");
@@ -103,9 +104,12 @@ export function DefiTab({
               disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping || Number(wrapAmount) > Number(stroopsToXlm(vaultState.userSharesStroops))}
               onClick={() => defi.wrap(wrapAmount).then(() => {
                 setWrapAmount("");
-                addNotification("Success", "Shares wrapped into PT and YT", "success");
+                toast.success("Shares wrapped into PT and YT");
+                notif?.add({ kind: "success", title: "Shares Wrapped", message: `Wrapped ${wrapAmount} shares into PT & YT` });
               }).catch(err => {
-                addNotification("Error", "Failed to wrap shares", "error");
+                const msg = err instanceof Error ? err.message : String(err);
+                toast.error(`Wrap failed: ${msg}`);
+                notif?.add({ kind: "error", title: "Wrap Failed", message: msg });
               })}
             >
               {defi.isWrapping ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : (
@@ -157,9 +161,12 @@ export function DefiTab({
                   disabled={defi.isLending || !lendAmount || !lendInterest || !activeVault?.ptId}
                   onClick={() => defi.lend(lendAmount, lendInterest, activeVault.ptId!, "100").then(() => { 
                     setLendAmount(""); setLendInterest(""); 
-                    addNotification("Success", "Loan offer created", "success");
+                    toast.success("Loan offer created");
+                    notif?.add({ kind: "success", title: "Loan Offer Created" });
                   }).catch(err => {
-                    addNotification("Error", "Failed to create offer", "error");
+                    const msg = err instanceof Error ? err.message : String(err);
+                    toast.error(`Offer failed: ${msg}`);
+                    notif?.add({ kind: "error", title: "Offer Failed", message: msg });
                   })}
                 >
                   {defi.isLending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Create Offer (Requires 100 PT Collateral)"}
