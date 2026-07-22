@@ -61,6 +61,36 @@ All contracts are live on **Stellar Testnet** and fully functional.
 
 ## 🖼️ Screenshots
 
+### 🏠 Landing Page
+![Landing Page](docs/screenshots/landing.png)
+> The Orbit landing page hero with orbit animation, key stats, and primary CTA to get started.
+
+---
+
+### 🖥️ App Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+> The full vault dashboard — balances, share position, oracle price panel, and recent activity feed.
+
+---
+
+### 💸 Deposit Flow
+![Deposit Success](docs/screenshots/Deposit.png)
+> Deposit flow showing XLM input, share preview, and the success card with transaction hash after completion.
+
+---
+
+### 🔗 Transaction Hash
+![Transaction Hash](docs/screenshots/Transaction%20Hash.png)
+> A close-up of the on-chain transaction hash shown after every deposit or withdrawal.
+
+---
+
+### ⚙️ CI/CD Pipeline
+![CI/CD Pipeline](docs/screenshots/CI%20CD%20pipeline.png)
+> GitHub Actions workflow showing the automated build, test, and deploy pipeline for the smart contracts and frontend.
+
+---
+
 ### 📊 Analytics Dashboard
 ![Analytics Dashboard](Screenshots/Analytic%20%20Dashboard.png)
 > Real-time TVL, deposit volume, and multi-day APY charts powered by live Soroban event polling — no backend indexer required.
@@ -112,36 +142,6 @@ All contracts are live on **Stellar Testnet** and fully functional.
 ### 💳 Transaction Details
 ![Transaction](Screenshots/Transaction.png)
 > On-chain transaction confirmation card showing your deposit amount, shares minted, and a direct link to the Stellar Explorer.
-
----
-
-### 🏠 Landing Page
-![Landing Page](docs/screenshots/landing.png)
-> The Orbit landing page hero with orbit animation, key stats, and primary CTA to get started.
-
----
-
-### 💸 Deposit Flow
-![Deposit Success](docs/screenshots/Deposit.png)
-> Deposit flow showing XLM input, share preview, and the success card with transaction hash after completion.
-
----
-
-### 🖥️ App Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
-> The full vault dashboard — balances, share position, oracle price panel, and recent activity feed.
-
----
-
-### 🔗 Transaction Hash
-![Transaction Hash](docs/screenshots/Transaction%20Hash.png)
-> A close-up of the on-chain transaction hash shown after every deposit or withdrawal.
-
----
-
-### ⚙️ CI/CD Pipeline
-![CI/CD Pipeline](docs/screenshots/CI%20CD%20pipeline.png)
-> GitHub Actions workflow showing the automated build, test, and deploy pipeline for the smart contracts and frontend.
 
 ---
 
