@@ -78,7 +78,7 @@ export function VaultCard({ vault, isSelected, tvlXlm, apyPct, onClick }: VaultC
       <p className="text-xs text-[var(--orbit-mute)] mb-4 line-clamp-2">{vault.description}</p>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {[
           {
             label: "TVL",

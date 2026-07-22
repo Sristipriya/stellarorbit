@@ -29,17 +29,17 @@ export function VaultOverview({ state }: { state: VaultState }) {
         </h3>
         <span className="font-mono text-[10px] text-[var(--orbit-mute)]">XLM · single-asset</span>
       </div>
-      <div className="mt-4 grid grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3"
+            className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3 min-w-0"
           >
             <div className="text-[10px] uppercase tracking-widest text-[var(--orbit-mute)]">
               {s.label}
             </div>
             <div
-              className={`mt-1 font-display text-xl ${s.accent ? "text-[var(--orbit-accent)]" : ""}`}
+              className={`mt-1 font-display text-lg sm:text-xl font-semibold truncate ${s.accent ? "text-[var(--orbit-accent)]" : ""}`}
             >
               {s.value}
             </div>

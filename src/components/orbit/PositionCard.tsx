@@ -29,7 +29,7 @@ export function PositionCard({
         </h3>
         <span className="font-mono text-xs text-[var(--orbit-mute)]">{shortAddr(address)}</span>
       </div>
-      <div className="mt-4 grid grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Stat
           label="XLM Wallet"
           value={xlmBalance ? `${Number(xlmBalance).toFixed(4)} XLM` : "—"}
@@ -43,9 +43,9 @@ export function PositionCard({
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3">
+    <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/20 p-3 min-w-0">
       <div className="text-[10px] uppercase tracking-widest text-[var(--orbit-mute)]">{label}</div>
-      <div className={`mt-1 font-display text-xl ${accent ? "text-[var(--orbit-accent)]" : ""}`}>
+      <div className={`mt-1 font-display text-lg sm:text-xl font-semibold truncate ${accent ? "text-[var(--orbit-accent)]" : ""}`}>
         {value}
       </div>
     </div>

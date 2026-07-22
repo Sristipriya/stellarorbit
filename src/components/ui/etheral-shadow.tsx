@@ -75,21 +75,25 @@ export function EtheralShadow({
   const animationDuration = animation ? mapRange(animation.speed, 1, 100, 1000, 50) : 1;
 
   useEffect(() => {
-    if (feColorMatrixRef.current && animationEnabled) {
+    // Check if low power or mobile to skip heavy JS filter mutation
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    if (feColorMatrixRef.current && animationEnabled && !isMobile) {
       if (hueRotateAnimation.current) {
         hueRotateAnimation.current.stop();
       }
       hueRotateMotionValue.set(0);
+      let lastVal = -1;
       hueRotateAnimation.current = animate(hueRotateMotionValue, 360, {
-        duration: animationDuration / 25,
+        duration: animationDuration / 15,
         repeat: Infinity,
         repeatType: "loop",
-        repeatDelay: 0,
         ease: "linear",
-        delay: 0,
         onUpdate: (value: number) => {
-          if (feColorMatrixRef.current) {
-            feColorMatrixRef.current.setAttribute("values", String(value));
+          // Throttle updates to ~30fps equivalent to save mobile GPU/CPU
+          const rounded = Math.floor(value / 3) * 3;
+          if (feColorMatrixRef.current && rounded !== lastVal) {
+            lastVal = rounded;
+            feColorMatrixRef.current.setAttribute("values", String(rounded));
           }
         },
       });

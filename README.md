@@ -8,11 +8,12 @@
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-stellarorbit.vercel.app-6366f1?style=for-the-badge)](https://stellarorbit.vercel.app/)
 [![Demo Video](https://img.shields.io/badge/▶%20Demo%20Video-YouTube-ff0000?style=for-the-badge&logo=youtube)](https://youtu.be/Git4e0q-HzY)
+[![Feedback Form](https://img.shields.io/badge/📋%20User%20Feedback-Google%20Sheets-22c55e?style=for-the-badge)](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
 [![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-0ea5e9?style=for-the-badge)](https://stellar.org)
 [![Soroban](https://img.shields.io/badge/Powered%20by-Soroban%20Smart%20Contracts-8b5cf6?style=for-the-badge)](https://soroban.stellar.org)
 [![PWA](https://img.shields.io/badge/Progressive-Web%20App-10b981?style=for-the-badge)](#)
 
-### 📺 [Watch the Full Demo on YouTube →](https://youtu.be/Git4e0q-HzY)
+### 📺 [Watch the Full Demo on YouTube →](https://youtu.be/Git4e0q-HzY) · 📋 [Submit / View User Feedback →](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
 
 </div>
 
@@ -37,6 +38,7 @@ Orbit is a **complete DeFi ecosystem** built natively on Stellar using Soroban s
 |----------|---------|
 | 🌐 **Live App** | [stellarorbit.vercel.app](https://stellarorbit.vercel.app/) |
 | 📺 **Demo Video** | [Watch on YouTube](https://youtu.be/Git4e0q-HzY) |
+| 📋 **User Feedback Form** | [View / Submit Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) |
 | 🔗 **Network** | Stellar Testnet |
 | 📡 **Soroban RPC** | `https://soroban-testnet.stellar.org` |
 | 💸 **Latest Transaction** | [`3ae1b42a...d1d224`](https://stellar.expert/explorer/testnet/tx/3ae1b42a21f5364498bc5c4b72537e03f7c34578598f8c694ad919745cd1d224) |

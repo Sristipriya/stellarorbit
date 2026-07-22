@@ -511,5 +511,38 @@
   pointer-events: none;
 }
 
+/* ── Hardware Acceleration & Performance Optimizations ── */
+.glass, .orbit-card, .cert-card, .liquid-btn {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
 
+@media (max-width: 768px) {
+  .glass {
+    backdrop-filter: blur(8px) saturate(120%);
+  }
+  .liquid-btn, .orbit-btn {
+    backdrop-filter: blur(6px);
+  }
+  .mobile-bottom-nav {
+    backdrop-filter: blur(12px);
+  }
+}
 
+/* ── Mobile Responsive Table & Card Containers ── */
+.responsive-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 0.5rem;
+}
+
+.responsive-table-wrap table {
+  min-width: 580px;
+}
+
+@media (max-width: 640px) {
+  .orbit-card {
+    padding: 1rem !important;
+  }
+}

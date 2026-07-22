@@ -62,7 +62,7 @@ export function OraclePricePanel({ state }: { state: VaultState }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="rounded-xl border border-[var(--orbit-edge)] bg-black/30 p-3">
           <div className="font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-mute)] mb-1.5">
             XLM / USD
