@@ -800,7 +800,14 @@ export function AppDashboard() {
             <DepositCard
               address={wallet.address}
               state={vault.state}
-              walletBalance={wallet.balance?.xlm ?? null}
+              walletBalance={
+                activeVault?.assetSymbol === "USDC"
+                  ? wallet.balance?.usdc ?? null
+                  : activeVault?.assetSymbol === "INDEX"
+                  ? wallet.balance?.index ?? null
+                  : wallet.balance?.xlm ?? null
+              }
+              assetSymbol={activeVault?.assetSymbol || "XLM"}
               vaultId={activeVaultId}
               onDone={vault.refresh}
               onNotify={add}

@@ -10,13 +10,16 @@ import {
 } from "@/lib/stellar/wallet";
 import { fetchXlmBalance } from "@/lib/stellar/balance";
 import { registerUser } from "@/lib/points";
+import { readContract, addrArg } from "@/lib/stellar/soroban";
+import { ORBIT_USDC_TOKEN_ID, ORBIT_INDEX_TOKEN_ID } from "@/lib/stellar/network";
+import { stroopsToXlm } from "@/lib/utils";
 
 const LS_ADDR = "orbit:wallet:address";
 const LS_WALLET = "orbit:wallet:id";
 
 export function useWallet() {
   const [address, setAddress] = useState<string | null>(null);
-  const [balance, setBalance] = useState<{ funded: boolean; xlm: string } | null>(null);
+  const [balance, setBalance] = useState<{ funded: boolean; xlm: string; usdc: string; index: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<WalletError | null>(null);
 
@@ -50,7 +53,15 @@ export function useWallet() {
 
   const refreshBalance = useCallback(async (addr: string) => {
     const b = await fetchXlmBalance(addr);
-    setBalance(b);
+    const [usdcBalance, indexBalance] = await Promise.all([
+      readContract<bigint>("balance", [addrArg(addr)], ORBIT_USDC_TOKEN_ID!).catch(() => 0n),
+      readContract<bigint>("balance", [addrArg(addr)], ORBIT_INDEX_TOKEN_ID!).catch(() => 0n),
+    ]);
+    setBalance({
+      ...b,
+      usdc: stroopsToXlm(usdcBalance),
+      index: stroopsToXlm(indexBalance),
+    });
   }, []);
 
   useEffect(() => {

@@ -25,6 +25,7 @@ export function DepositCard({
   state,
   walletBalance,
   vaultId,
+  assetSymbol,
   onDone,
   onNotify,
 }: {
@@ -32,6 +33,7 @@ export function DepositCard({
   state: VaultState;
   walletBalance: string | null;
   vaultId?: string;
+  assetSymbol: string;
   onDone: () => void;
   onNotify?: (n: Omit<Notification, "id" | "at" | "read">) => void;
 }) {
@@ -217,7 +219,7 @@ export function DepositCard({
           You'll receive ≈{" "}
           <span className="text-[var(--orbit-accent)]">{stroopsToXlm(previewShares)} shares</span>
         </span>
-        {walletBalance && <span>Wallet: {Number(walletBalance).toFixed(4)} XLM</span>}
+        {walletBalance && <span>Wallet: {Number(walletBalance).toFixed(4)} {assetSymbol}</span>}
       </div>
       <button
         onClick={submit}
