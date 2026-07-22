@@ -816,17 +816,19 @@ export function AppDashboard() {
           </div>
         );
       case "withdraw":
-        return (
-          <div className="max-w-md">
-            <WithdrawCard
-              address={wallet.address}
-              state={vault.state}
-              vaultId={activeVaultId}
-              onDone={vault.refresh}
-              onNotify={add}
-            />
-          </div>
-        );
+          return (
+            <div className="flex w-full items-center justify-center pt-10">
+              <div className="w-full max-w-md">
+                <WithdrawCard
+                  address={wallet.address}
+                  state={vault.state}
+                  vaultId={activeVaultId}
+                  onDone={vault.refresh}
+                  onNotify={add}
+                />
+              </div>
+            </div>
+          );
       case "history":
         return <HistoryTab events={vault.events} loading={vault.loading} />;
       case "leaderboard":

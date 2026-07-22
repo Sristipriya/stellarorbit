@@ -156,7 +156,7 @@ export function DepositCard({
   }
 
   return (
-    <div className="brutalist-card rounded-2xl p-5">
+    <div className="glass rounded-3xl p-6">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm uppercase tracking-[0.2em] text-[var(--orbit-mute)]">
           Deposit

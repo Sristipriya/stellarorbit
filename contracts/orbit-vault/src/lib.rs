@@ -47,15 +47,15 @@ pub enum DataKey {
 
 #[soroban_sdk::contractclient(name = "ShareTokenClient")]
 pub trait ShareTokenInterface {
-    fn mint(env: Env, minter: Address, to: Address, amount: i128);
-    fn burn(env: Env, minter: Address, from: Address, amount: i128);
-    fn balance(env: Env, id: Address) -> i128;
+    fn mint(minter: Address, to: Address, amount: i128);
+    fn burn(minter: Address, from: Address, amount: i128);
+    fn balance(id: Address) -> i128;
 }
 
 #[soroban_sdk::contractclient(name = "BlendPoolClient")]
 pub trait BlendPoolInterface {
-    fn supply(env: Env, from: Address, reserve: Address, amount: i128);
-    fn withdraw(env: Env, from: Address, reserve: Address, amount: i128, to: Address);
+    fn supply(from: Address, reserve: Address, amount: i128);
+    fn withdraw(from: Address, reserve: Address, amount: i128, to: Address);
 }
 
 #[derive(Clone)]
