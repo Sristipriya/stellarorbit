@@ -8,8 +8,8 @@ import {
   xlmToStroops,
   HAS_REAL_CONTRACT,
 } from "./network";
-import { readContract, invokeContract, addrArg, nativeToScVal } from "./soroban";
-import * as SorobanClient from "@stellar/stellar-sdk";
+import { readContract, invokeContract, addrArg } from "./soroban";
+import { nativeToScVal } from "@stellar/stellar-sdk";
 
 export interface LoanOffer {
   id: number;
