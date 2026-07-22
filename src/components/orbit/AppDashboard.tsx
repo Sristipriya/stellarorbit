@@ -847,7 +847,14 @@ export function AppDashboard() {
       case "faucet":
         return <FaucetTab address={wallet.address} onFunded={() => wallet.refreshBalance(wallet.address!)} />;
       case "defi":
-        return <DefiTab />;
+        return (
+          <DefiTab
+            address={wallet.address}
+            activeVaultId={activeVaultId}
+            vaultState={vault.state}
+            activeVault={activeVault}
+          />
+        );
       case "points":
         return <PointsTab address={wallet.address} state={vault.state} />;
       case "settings":

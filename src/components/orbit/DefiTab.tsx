@@ -3,12 +3,29 @@ import { motion } from "framer-motion";
 import { Layers, ArrowRightLeft, ArrowRight, ShieldAlert, BadgeCent, Loader2 } from "lucide-react";
 import { useDeFi } from "../../hooks/use-defi";
 import { useVault } from "../../hooks/use-vault";
+import { useWallet } from "../../hooks/use-wallet";
 import { useNotifications } from "../../lib/notifications";
 import { stroopsToXlm } from "../../lib/stellar/network";
+import { getVaultById, type VaultMeta } from "../../lib/stellar/vaults";
+import type { VaultState } from "../../lib/stellar/vault";
 
-export function DefiTab() {
+export function DefiTab({
+  address: propAddress,
+  activeVaultId: propVaultId = "xlm",
+  vaultState: propVaultState,
+  activeVault: propActiveVault,
+}: {
+  address?: string | null;
+  activeVaultId?: string;
+  vaultState?: VaultState;
+  activeVault?: VaultMeta;
+} = {}) {
   const defi = useDeFi();
-  const { state: vaultState, activeVault } = useVault();
+  const wallet = useWallet();
+  const address = propAddress !== undefined ? propAddress : wallet.address;
+  const vault = useVault(address, propVaultId);
+  const vaultState = propVaultState ?? vault.state;
+  const activeVault = propActiveVault ?? getVaultById(propVaultId);
   const { addNotification } = useNotifications();
   const [wrapAmount, setWrapAmount] = useState("");
   const [borrowAmount, setBorrowAmount] = useState("");
