@@ -11,8 +11,8 @@ import {
 import { fetchXlmBalance } from "@/lib/stellar/balance";
 import { registerUser } from "@/lib/points";
 import { readContract, addrArg } from "@/lib/stellar/soroban";
-import { ORBIT_USDC_TOKEN_ID, ORBIT_INDEX_TOKEN_ID } from "@/lib/stellar/network";
-import { stroopsToXlm } from "@/lib/utils";
+import { ORBIT_USDC_TOKEN_ID, ORBIT_INDEX_TOKEN_ID, stroopsToXlm } from "@/lib/stellar/network";
+import { cn } from "@/lib/utils";
 
 const LS_ADDR = "orbit:wallet:address";
 const LS_WALLET = "orbit:wallet:id";
