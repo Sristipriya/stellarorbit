@@ -79,7 +79,7 @@ export async function fetchDefiState(address: string): Promise<DefiState> {
 export async function wrapShares(address: string, amountXlm: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No tranche contract deployed.");
   const amountStrp = xlmToStroops(amountXlm);
-  return invokeContract("mint", [addrArg(address), nativeToScVal(amountStrp, "i128")], ORBIT_TRANCHE_CONTRACT_ID!);
+  return invokeContract(address, "mint", [addrArg(address), nativeToScVal(amountStrp, "i128")], ORBIT_TRANCHE_CONTRACT_ID!);
 }
 
 export async function createLendOffer(address: string, usdcAmount: string, interestAmount: string, colTokenId: string, colAmount: string) {
@@ -88,7 +88,7 @@ export async function createLendOffer(address: string, usdcAmount: string, inter
   const intStrp = xlmToStroops(interestAmount);
   const colStrp = xlmToStroops(colAmount);
 
-  return invokeContract("create_offer", [
+  return invokeContract(address, "create_offer", [
     addrArg(address),
     nativeToScVal(usdcStrp, "i128"),
     nativeToScVal(intStrp, "i128"),
@@ -100,10 +100,10 @@ export async function createLendOffer(address: string, usdcAmount: string, inter
 
 export async function borrow(address: string, offerId: number) {
   if (!HAS_REAL_CONTRACT) throw new Error("No market contract deployed.");
-  return invokeContract("borrow", [addrArg(address), nativeToScVal(offerId, "u32")], ORBIT_MARKET_CONTRACT_ID!);
+  return invokeContract(address, "borrow", [addrArg(address), nativeToScVal(offerId, "u32")], ORBIT_MARKET_CONTRACT_ID!);
 }
 
 export async function repay(address: string, offerId: number) {
   if (!HAS_REAL_CONTRACT) throw new Error("No market contract deployed.");
-  return invokeContract("repay", [addrArg(address), nativeToScVal(offerId, "u32")], ORBIT_MARKET_CONTRACT_ID!);
+  return invokeContract(address, "repay", [addrArg(address), nativeToScVal(offerId, "u32")], ORBIT_MARKET_CONTRACT_ID!);
 }
