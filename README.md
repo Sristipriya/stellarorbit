@@ -115,6 +115,36 @@ All contracts are live on **Stellar Testnet** and fully functional.
 
 ---
 
+### 🏠 Landing Page
+![Landing Page](docs/screenshots/landing.png)
+> The Orbit landing page hero with orbit animation, key stats, and primary CTA to get started.
+
+---
+
+### 💸 Deposit Flow
+![Deposit Success](docs/screenshots/Deposit.png)
+> Deposit flow showing XLM input, share preview, and the success card with transaction hash after completion.
+
+---
+
+### 🖥️ App Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+> The full vault dashboard — balances, share position, oracle price panel, and recent activity feed.
+
+---
+
+### 🔗 Transaction Hash
+![Transaction Hash](docs/screenshots/Transaction%20Hash.png)
+> A close-up of the on-chain transaction hash shown after every deposit or withdrawal.
+
+---
+
+### ⚙️ CI/CD Pipeline
+![CI/CD Pipeline](docs/screenshots/CI%20CD%20pipeline.png)
+> GitHub Actions workflow showing the automated build, test, and deploy pipeline for the smart contracts and frontend.
+
+---
+
 ## 🔄 System Architecture & Full Flow
 
 ```
