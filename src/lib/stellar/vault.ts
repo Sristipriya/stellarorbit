@@ -286,11 +286,9 @@ export async function deposit(
       addrArg(address),
       i128Arg(amountStroops),
     ];
-    // The XLM vault was updated to expect 3 arguments (including referrer), 
-    // while USDC and INDEX vaults still use the older 2-argument contract.
-    if (vaultId === "xlm" || vaultId === "orbit-xlm") {
-      args.push(referrer ? addrArg(referrer) : voidArg());
-    }
+    
+    // We pass 2 arguments because the deployed contracts on Vercel 
+    // are still using the old signature without the referrer parameter.
     const { txHash, retval } = await invokeContract<bigint>(address, "deposit", args, vault.contractId);
     const sharesMinted = retval == null ? 0n : BigInt(retval);
     const pts = Math.floor(Number(amountStroops) / 10000000);
