@@ -125,31 +125,26 @@ export function buildReferralLink(walletAddress: string): string {
   return `${base}/app?ref=${code}`;
 }
 
-/** Initialize a user's profile in Supabase on connection */
+/** Initialize or update a user's profile directly in Supabase DB */
 export async function registerUser(walletAddress: string) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !walletAddress) return;
   try {
-    const { data: existing } = await supabase
-      .from("profiles")
-      .select("wallet_address")
-      .eq("wallet_address", walletAddress)
-      .single();
+    const code = getMyReferralCode(walletAddress);
+    const referredBy = getReferrerCode();
+    
+    // Prevent self-referral
+    const finalReferredBy = (referredBy && referredBy !== code) ? referredBy : null;
 
-    if (!existing) {
-      const code = getMyReferralCode(walletAddress);
-      const referredBy = getReferrerCode();
-      
-      // Prevent self-referral
-      const finalReferredBy = (referredBy && referredBy !== code) ? referredBy : null;
-
-      await supabase.from("profiles").insert({
+    await supabase.from("profiles").upsert(
+      {
         wallet_address: walletAddress,
         referral_code: code,
         referred_by: finalReferredBy,
-        points: 0
-      });
-    }
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "wallet_address" }
+    );
   } catch (e) {
-    console.error("Failed to register user", e);
+    console.error("[Orbit DB] Failed to register user profile in Supabase", e);
   }
 }
