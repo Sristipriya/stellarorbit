@@ -249,7 +249,7 @@ function HowItWorks() {
       </div>
     </section>
   );
-
+}
 
 function BuiltForStellar() {
   const specs = [
