@@ -23,16 +23,11 @@ export function TopNav({ inApp = false }: { inApp?: boolean }) {
           <Link to="/analytics" className="hover:text-[var(--orbit-ink)]">
             Analytics
           </Link>
-          <a
-            href="https://developers.stellar.org/docs"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-[var(--orbit-ink)]"
-          >
+          <Link to="/docs" className="hover:text-[var(--orbit-ink)]">
             Docs
-          </a>
+          </Link>
           <a
-            href="https://github.com"
+            href="https://github.com/Sristipriya/stellarorbit"
             target="_blank"
             rel="noreferrer"
             className="hover:text-[var(--orbit-ink)]"

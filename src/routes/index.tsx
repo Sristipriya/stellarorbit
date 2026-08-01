@@ -32,14 +32,14 @@ function Index() {
       <div className="relative z-10">
         <TopNav />
         <AnimatedHero
-          trustBadge={{ text: "Soroban · Testnet · Single-Asset Vault" }}
-          headline={{ line1: "Index vault for", line2: "on-chain assets" }}
-          subtitle="Orbit is a Soroban-powered index vault. Deposit XLM, receive shares, withdraw at share value. Architected to grow into a multi-asset RWA index using SEP-40 oracles."
+          trustBadge={{ text: "Soroban · Testnet · Full DeFi Protocol Stack" }}
+          headline={{ line1: "Institutional DeFi for", line2: "Stellar Soroban" }}
+          subtitle="Earn organic yield via Blend Protocol, split capital into Principal (PT) & Yield (YT) tokens, and borrow USDC with collateral — all powered by Soroban WASM smart contracts."
           buttons={{
-            primary: { text: "Enter App →", href: "/app" },
+            primary: { text: "Launch App →", href: "/app" },
             secondary: {
-              text: "View Docs",
-              href: "https://developers.stellar.org/docs/build/smart-contracts",
+              text: "Explore Docs →",
+              href: "/docs",
             },
           }}
         />
@@ -49,9 +49,36 @@ function Index() {
         <Architecture />
         <FAQ />
         <Roadmap />
+        <BottomCTA />
         <Footer />
       </div>
     </div>
+  );
+}
+
+function BottomCTA() {
+  return (
+    <section className="relative border-t border-[var(--orbit-edge)] bg-black/60 backdrop-blur-md py-20">
+      <div className="mx-auto max-w-5xl px-6 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-[var(--orbit-accent)]/30 bg-[var(--orbit-accent)]/10 px-4 py-1.5 font-mono text-xs text-[var(--orbit-accent)] mb-6">
+          Ready for Launch on Testnet
+        </div>
+        <h2 className="font-display text-4xl font-bold tracking-tight text-white md:text-5xl">
+          Experience Next-Gen DeFi on Stellar Today
+        </h2>
+        <p className="mx-auto mt-4 max-w-2xl text-base text-[var(--orbit-mute)]">
+          Connect Freighter, Albedo, or Lobstr. Fund test XLM with Friendbot in 1-click and start earning & tranching yield in seconds.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Link to="/app" className="liquid-btn text-base px-8 py-3.5 font-bold">
+            Launch Application →
+          </Link>
+          <Link to="/docs" className="liquid-btn-ghost text-base px-8 py-3.5 font-bold">
+            Read Documentation
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -180,25 +207,30 @@ function HowItWorks() {
   const steps = [
     {
       n: "01",
-      title: "Connect & fund",
-      body: "Connect Freighter, Albedo, xBull, or Lobstr. New accounts can fund themselves with Friendbot in one click.",
+      title: "Connect & Deposit",
+      body: "Connect Freighter, Albedo, xBull, or Lobstr. Deposit XLM to receive SEP-41 oXLM vault share tokens.",
     },
     {
       n: "02",
-      title: "Deposit, receive shares",
-      body: "Deposit XLM into the Orbit vault. The Soroban contract mints shares proportional to your deposit.",
+      title: "Earn Organic APY",
+      body: "Vault capital works on Blend Protocol lending pools, compounding NAV per share automatically.",
     },
     {
       n: "03",
-      title: "Withdraw at NAV",
-      body: "Burn shares to withdraw your portion of the vault. As assets grow, share price grows with them.",
+      title: "Yield Tranching",
+      body: "Wrap oXLM shares to split into PT (100% principal protection) & YT (100% variable yield claim) tokens.",
+    },
+    {
+      n: "04",
+      title: "P2P Collateral Loans",
+      body: "Lock PT/YT as collateral to borrow USDC instantly in an escrow-based money market without liquidators.",
     },
   ];
   return (
     <section className="relative border-t border-[var(--orbit-edge)]">
       <div className="mx-auto max-w-7xl px-6 py-20">
         <SectionLabel>How Orbit Works</SectionLabel>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           {steps.map((s, i) => (
             <motion.div
               key={s.n}
@@ -209,15 +241,15 @@ function HowItWorks() {
               className="glass rounded-2xl p-6"
             >
               <div className="font-mono text-xs text-[var(--orbit-accent)]">{s.n}</div>
-              <div className="mt-3 font-display text-2xl">{s.title}</div>
-              <p className="mt-2 text-sm text-[var(--orbit-mute)]">{s.body}</p>
+              <div className="mt-3 font-display text-xl font-bold">{s.title}</div>
+              <p className="mt-2 text-xs text-[var(--orbit-mute)] leading-relaxed">{s.body}</p>
             </motion.div>
           ))}
         </div>
       </div>
     </section>
   );
-}
+
 
 function BuiltForStellar() {
   const specs = [
