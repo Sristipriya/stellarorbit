@@ -745,6 +745,13 @@ export function AppDashboard() {
   useEffect(() => {
     if (wallet.address && !hasCheckedProfile) {
       const checkProfile = async () => {
+        // Check if user has already completed or dismissed onboarding for this wallet
+        const isDone = typeof window !== "undefined" && localStorage.getItem(`orbit:onboarding:done:${wallet.address}`);
+        if (isDone) {
+          setHasCheckedProfile(true);
+          return;
+        }
+
         try {
           const { data } = await supabase
             .from("profiles")

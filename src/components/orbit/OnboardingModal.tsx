@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { authenticateWithWallet, getSIWSSession } from "@/lib/stellar/auth";
-import { Rocket, CheckCircle2, ShieldCheck } from "lucide-react";
+import { Rocket, CheckCircle2 } from "lucide-react";
 
 interface OnboardingModalProps {
   walletAddress: string;
@@ -13,6 +13,13 @@ export function OnboardingModal({ walletAddress, onComplete }: OnboardingModalPr
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const markDoneAndClose = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`orbit:onboarding:done:${walletAddress}`, "true");
+    }
+    onComplete();
+  };
 
   async function handleSave() {
     if (!name.trim()) return;
@@ -35,13 +42,12 @@ export function OnboardingModal({ walletAddress, onComplete }: OnboardingModalPr
 
       setSuccess(true);
       setTimeout(() => {
-        onComplete();
-      }, 1200);
+        markDoneAndClose();
+      }, 1000);
     } catch (e) {
-      console.error("[Orbit Auth] Failed to save authenticated profile", e);
-      // Fallback completion so UX is never blocked
+      console.error("[Orbit Auth] Failed to save profile", e);
       setSuccess(true);
-      setTimeout(() => onComplete(), 1000);
+      setTimeout(() => markDoneAndClose(), 800);
     } finally {
       setLoading(false);
     }
@@ -56,8 +62,8 @@ export function OnboardingModal({ walletAddress, onComplete }: OnboardingModalPr
       >
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
         
-        <div className="relative mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20 shadow-[0_0_30px_var(--orbit-accent-soft)]">
-          <Rocket className="h-8 w-8 text-[var(--orbit-accent)]" />
+        <div className="relative mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20 shadow-[0_0_30px_var(--orbit-accent-soft)]">
+          <Rocket className="h-7 w-7 text-[var(--orbit-accent)]" />
         </div>
         
         <h2 className="text-center font-display text-2xl font-bold text-white mb-2">
@@ -65,13 +71,8 @@ export function OnboardingModal({ walletAddress, onComplete }: OnboardingModalPr
         </h2>
         
         <p className="text-center text-sm text-[var(--orbit-mute)] mb-6">
-          Set a verified display name to personalize your presence on the global leaderboard.
+          Set a display name to personalize your presence on the global leaderboard.
         </p>
-
-        <div className="mb-6 flex items-center gap-2 rounded-xl border border-[var(--orbit-accent)]/20 bg-[var(--orbit-accent)]/5 px-3 py-2 text-xs text-[var(--orbit-accent)]">
-          <ShieldCheck className="h-4 w-4 shrink-0" />
-          <span>Cryptographically authenticated via SIWS</span>
-        </div>
 
         <div className="space-y-4">
           <div>
@@ -84,7 +85,7 @@ export function OnboardingModal({ walletAddress, onComplete }: OnboardingModalPr
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSave()}
               placeholder="e.g. Satoshi"
-              className="orbit-input text-lg py-3 px-4 w-full bg-black/40 border-white/10 focus:border-[var(--orbit-accent)] focus:ring-1 focus:ring-[var(--orbit-accent)]"
+              className="orbit-input text-base py-3 px-4 w-full bg-black/40 border-white/10 focus:border-[var(--orbit-accent)] focus:ring-1 focus:ring-[var(--orbit-accent)]"
               disabled={loading || success}
             />
           </div>
@@ -95,17 +96,17 @@ export function OnboardingModal({ walletAddress, onComplete }: OnboardingModalPr
             className="group relative flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--orbit-accent)] px-4 py-3.5 font-display text-sm font-bold text-black transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 shadow-[0_0_20px_var(--orbit-accent-soft)] overflow-hidden"
           >
             {success ? (
-              <><CheckCircle2 className="h-4 w-4" /> Account Verified & Saved</>
+              <><CheckCircle2 className="h-4 w-4" /> Profile Saved</>
             ) : loading ? (
-              "Authenticating Wallet & Saving..."
+              "Saving Profile..."
             ) : (
-              "Complete Verified Setup"
+              "Save Display Name"
             )}
           </button>
           
           {!success && !loading && (
             <button
-              onClick={onComplete}
+              onClick={markDoneAndClose}
               className="w-full text-center mt-2 font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)] hover:text-white transition-colors"
             >
               Skip for now
