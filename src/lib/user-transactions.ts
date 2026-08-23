@@ -272,8 +272,94 @@ export async function getAllTransactions(limit = 100): Promise<UserTransaction[]
       .limit(limit);
 
     if (error || !data) return [];
-    return data as UserTransaction[];
+
+    // Deduplicate by tx_hash
+    const seen = new Set<string>();
+    const deduplicated: UserTransaction[] = [];
+    for (const t of data as UserTransaction[]) {
+      if (!seen.has(t.tx_hash)) {
+        seen.add(t.tx_hash);
+        deduplicated.push(t);
+      }
+    }
+    return deduplicated;
   } catch {
+    return [];
+  }
+}
+
+export interface UserWithTransactions {
+  walletAddress: string;
+  displayName: string;
+  createdAt: string;
+  lastSeenAt: string;
+  points: number;
+  referralCode: string | null;
+  referredBy: string | null;
+  transactionCount: number;
+  transactions: Array<{
+    id: string;
+    txHash: string;
+    type: string;
+    amount: string;
+    asset: string;
+    vaultId: string;
+    createdAt: string;
+    status: string;
+  }>;
+}
+
+/**
+ * Fetches up to `limit` unique users with their strictly-isolated, 100% duplicate-free transactions.
+ */
+export async function getUsersWithTransactions(limit = 100): Promise<UserWithTransactions[]> {
+  try {
+    // 1. Fetch top unique profiles
+    const users = await getAllUsers(limit);
+    if (!users || users.length === 0) return [];
+
+    // 2. Fetch all transactions
+    const txs = await getAllTransactions(limit * 20);
+
+    // 3. Map transactions strictly to each user with guaranteed zero duplicates
+    const result: UserWithTransactions[] = users.map((u) => {
+      const seenTxHashes = new Set<string>();
+      const userTxs: UserWithTransactions["transactions"] = [];
+
+      for (const t of txs) {
+        if (t.wallet_address.toLowerCase() === u.wallet_address.toLowerCase()) {
+          if (!seenTxHashes.has(t.tx_hash)) {
+            seenTxHashes.add(t.tx_hash);
+            userTxs.push({
+              id: t.id,
+              txHash: t.tx_hash,
+              type: t.type,
+              amount: t.amount,
+              asset: t.asset,
+              vaultId: t.vault_id,
+              createdAt: t.created_at,
+              status: t.status,
+            });
+          }
+        }
+      }
+
+      return {
+        walletAddress: u.wallet_address,
+        displayName: u.display_name || "Anonymous User",
+        createdAt: u.created_at,
+        lastSeenAt: u.last_seen_at,
+        points: Number(u.points || 0),
+        referralCode: u.referral_code,
+        referredBy: u.referred_by,
+        transactionCount: userTxs.length,
+        transactions: userTxs,
+      };
+    });
+
+    return result;
+  } catch (err) {
+    console.error("[Orbit User DB] Failed to fetch users with transactions:", err);
     return [];
   }
 }
