@@ -6,7 +6,7 @@
 //! YT: Can be redeemed for the variable yield generated above the `base_value`.
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env,
+    contract, contractimpl, contracttype, symbol_short, Address, Env, IntoVal
 };
 
 #[derive(Clone)]
@@ -66,10 +66,33 @@ impl OrbitTranche {
         // 1. Pull shares from user to this contract via transfer_from (allowance-based).
         //    User must have called approve(user, tranche_contract, amount) beforehand.
         let token = TokenClient::new(&env, &share_token);
+
+        let spender = env.current_contract_address();
+        let to = env.current_contract_address();
+        
+        env.authorize_as_current_contract(soroban_sdk::vec![
+            &env,
+            soroban_sdk::auth::InvokerContractAuthEntry::Contract(
+                soroban_sdk::auth::SubContractInvocation {
+                    context: soroban_sdk::auth::ContractContext {
+                        contract: share_token.clone(),
+                        fn_name: soroban_sdk::Symbol::new(&env, "transfer_from"),
+                        args: (
+                            spender.clone(),
+                            from.clone(),
+                            to.clone(),
+                            share_amount,
+                        ).into_val(&env),
+                    },
+                    sub_invocations: soroban_sdk::vec![&env],
+                }
+            )
+        ]);
+
         token.transfer_from(
-            &env.current_contract_address(),
+            &spender,
             &from,
-            &env.current_contract_address(),
+            &to,
             &share_amount,
         );
 
@@ -167,3 +190,4 @@ impl OrbitTranche {
         env.events().publish((symbol_short!("ClaimYT"),), (from, yt_amount, shares_to_return));
     }
 }
+
