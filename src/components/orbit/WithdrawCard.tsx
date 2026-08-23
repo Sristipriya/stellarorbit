@@ -89,16 +89,15 @@ export function WithdrawCard({
       onNotify?.({ kind: "success", title: "Withdrawal Successful", message: msg, txHash });
     } catch (e) {
       const w = classifyError(e);
-      setTx({ kind: "error", title: "Withdraw failed", message: w.message });
-      setRaw(
-        e instanceof Error
-          ? (e.stack ?? e.message)
-          : typeof e === "object" && e !== null
-            ? JSON.stringify(e, Object.getOwnPropertyNames(e))
-            : String(e),
-      );
-      toast.error("Withdraw failed", { description: w.message });
-      onNotify?.({ kind: "error", title: "Withdrawal Failed", message: w.message });
+      setTx({
+        kind: "error",
+        title: w.title,
+        message: w.message,
+        suggestion: w.suggestion,
+      });
+      setRaw(w.rawDetails || (e instanceof Error ? e.stack ?? e.message : String(e)));
+      toast.error(w.title, { description: w.message });
+      onNotify?.({ kind: "error", title: w.title, message: w.message });
     }
   }
 

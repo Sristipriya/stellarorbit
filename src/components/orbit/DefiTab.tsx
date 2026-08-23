@@ -9,6 +9,7 @@ import { useNotifications } from "../../lib/notifications";
 import { stroopsToXlm } from "../../lib/stellar/network";
 import { getVaultById, type VaultMeta } from "../../lib/stellar/vaults";
 import type { VaultState } from "../../lib/stellar/vault";
+import { classifyError } from "../../lib/stellar/wallet";
 
 export function DefiTab({
   address: propAddress,
@@ -107,9 +108,9 @@ export function DefiTab({
                 toast.success("Shares wrapped into PT and YT");
                 notif?.add({ kind: "success", title: "Shares Wrapped", message: `Wrapped ${wrapAmount} shares into PT & YT` });
               }).catch(err => {
-                const msg = err instanceof Error ? err.message : String(err);
-                toast.error(`Wrap failed: ${msg}`);
-                notif?.add({ kind: "error", title: "Wrap Failed", message: msg });
+                const w = classifyError(err);
+                toast.error(w.title, { description: w.message });
+                notif?.add({ kind: "error", title: w.title, message: w.message });
               })}
             >
               {defi.isWrapping ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : (
@@ -164,9 +165,9 @@ export function DefiTab({
                     toast.success("Loan offer created");
                     notif?.add({ kind: "success", title: "Loan Offer Created" });
                   }).catch(err => {
-                    const msg = err instanceof Error ? err.message : String(err);
-                    toast.error(`Offer failed: ${msg}`);
-                    notif?.add({ kind: "error", title: "Offer Failed", message: msg });
+                    const w = classifyError(err);
+                    toast.error(w.title, { description: w.message });
+                    notif?.add({ kind: "error", title: w.title, message: w.message });
                   })}
                 >
                   {defi.isLending ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Create Offer (Requires 100 PT Collateral)"}
@@ -195,9 +196,12 @@ export function DefiTab({
                       <button 
                         className="liquid-btn px-4 py-1.5 text-[10px]"
                         onClick={() => defi.borrow(offer.id).then(() => {
-                          addNotification("Success", "Successfully borrowed USDC", "success");
+                          toast.success("Successfully borrowed USDC");
+                          notif?.add({ kind: "success", title: "Borrow Successful", message: "Borrowed USDC against collateral" });
                         }).catch(err => {
-                          addNotification("Error", "Borrow failed", "error");
+                          const w = classifyError(err);
+                          toast.error(w.title, { description: w.message });
+                          notif?.add({ kind: "error", title: w.title, message: w.message });
                         })}
                       >
                         Borrow
