@@ -322,6 +322,15 @@ All contracts are deployed on Stellar Testnet and fully integrated into the dApp
 
 ---
 
+## 🆕 What's New
+
+| Feature | Description |
+|---------|-------------|
+| **Supabase Wallet & Transaction Persistence** `NEW` | Every user's wallet address, display name, creation timestamp, and user-scoped transaction hashes are now stored in Supabase. Powers persistent identity, enriched leaderboard data, and cross-session transaction history. |
+| **Idempotent Transaction Aggregation & CLI Exporter** `NEW` | A zero-duplicate transaction aggregation engine that de-duplicates user transactions across sessions, combined with a CLI-driven export pipeline (`scripts/export-users.mjs`) for bulk user data extraction. |
+
+---
+
 ## Key Features
 
 | Component | Functionality |
@@ -333,6 +342,8 @@ All contracts are deployed on Stellar Testnet and fully integrated into the dApp
 | **Live Event Polling** | Real-time on-chain indexing without third-party middleware. |
 | **Mobile PWA** | Progressive Web App support for mobile and desktop environments. |
 | **SEP-40 Price Oracles** | Live USD valuation of vault assets and user share balances. |
+| **Supabase Wallet & Tx Persistence** `NEW` | Stores wallet metadata and user-scoped transaction hashes in Supabase for persistent identity and history. |
+| **Tx Aggregation & CLI Exporter** `NEW` | Idempotent transaction aggregation engine with a CLI pipeline for bulk user data export. |
 
 ---
 
