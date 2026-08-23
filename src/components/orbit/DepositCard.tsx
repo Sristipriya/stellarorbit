@@ -77,7 +77,10 @@ export function DepositCard({
   async function submit() {
     if (!address || !vaultId) return;
     setRaw(undefined);
-    setTx({ kind: "pending", label: `Depositing ${amount} ${currentAsset}…` });
+    setTx({ 
+      kind: "pending", 
+      label: useZap ? `Signing 2 txs (Approve → Zap)…` : `Depositing ${amount} ${currentAsset}…` 
+    });
     try {
       let txHash, sharesMinted, amountStroops;
 

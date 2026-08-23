@@ -324,6 +324,22 @@ export async function zapDeposit(
   if (amountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
 
   try {
+    const EXPIRY_LEDGER = 99999999;
+    
+    // Step 1: Approve the Zap Router to pull input tokens
+    await invokeContract(
+      userAddress,
+      "approve",
+      [
+        addrArg(userAddress), // from (owner)
+        addrArg(routerId),    // spender (zap router)
+        i128Arg(amountStroops), // amount
+        nativeToScVal(EXPIRY_LEDGER, { type: "u32" }), // expiration_ledger
+      ],
+      inputTokenId,
+    );
+
+    // Step 2: Invoke Zap Router
     const { txHash, retval } = await invokeContract<bigint>(
       userAddress,
       "zap_deposit",
@@ -334,6 +350,7 @@ export async function zapDeposit(
         addrArg(vaultId),
         addrArg(shareTokenId),
         addrArg(pointsContractId),
+        voidArg(), // amm_router: Option<Address> -> None
       ],
       routerId,
     );

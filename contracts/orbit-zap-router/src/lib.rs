@@ -3,17 +3,29 @@ use soroban_sdk::{contract, contractimpl, Address, Env, contractclient};
 
 #[contractclient(name = "VaultClient")]
 pub trait VaultInterface {
-    fn deposit(env: Env, from: Address, amount: i128, referrer: Option<Address>) -> i128;
+    fn deposit(from: Address, amount: i128, referrer: Option<Address>) -> i128;
 }
 
 #[contractclient(name = "PointsClient")]
 pub trait PointsInterface {
-    fn add_points(env: Env, caller: Address, user: Address, amount: i128);
+    fn add_points(caller: Address, user: Address, amount: i128);
 }
 
 #[contractclient(name = "TokenClient")]
 pub trait TokenInterface {
-    fn transfer(env: Env, from: Address, to: Address, amount: i128);
+    fn transfer(from: Address, to: Address, amount: i128);
+    fn transfer_from(spender: Address, from: Address, to: Address, amount: i128);
+}
+
+#[contractclient(name = "AmmRouterClient")]
+pub trait AmmRouterInterface {
+    fn swap_exact_tokens_for_tokens(
+        amount_in: i128,
+        amount_out_min: i128,
+        path: soroban_sdk::Vec<Address>,
+        to: Address,
+        deadline: u64,
+    ) -> soroban_sdk::Vec<i128>;
 }
 
 #[contract]
@@ -30,16 +42,32 @@ impl OrbitZapRouter {
         vault: Address,
         share_token: Address,
         points_contract: Address,
+        amm_router: Option<Address>, // Ready for real DEX integration
     ) -> i128 {
         user.require_auth();
 
-        // 1. Take input token from user (acts as the mock swap payment)
+        // 1. Pull input token from user using Allowance pattern (transfer_from)
+        // User must call `approve` on the input token beforehand.
         let input_client = TokenClient::new(&env, &input_token);
-        input_client.transfer(&user, &env.current_contract_address(), &amount);
+        input_client.transfer_from(
+            &env.current_contract_address(),
+            &user,
+            &env.current_contract_address(),
+            &amount,
+        );
 
-        // 2. Mock Swap: We pretend 1:1 exchange rate for the demo.
-        // The router must be pre-funded with the vault's native asset by the admin.
-        let out_amount = amount;
+        let out_amount = if let Some(_router) = amm_router {
+            // Real AMM path would go here:
+            // 1. Approve AMM to spend input token
+            // 2. Call AmmRouterClient::new(&env, &router).swap_exact_tokens_for_tokens(...)
+            // 3. out_amount = result.last().unwrap()
+            // For now, we panic if a router is provided since we don't have the path/deadline args
+            panic!("AMM integration not yet deployed on testnet");
+        } else {
+            // Mock Swap: We pretend 1:1 exchange rate for the demo.
+            // The router must be pre-funded with the vault's native asset by the admin.
+            amount
+        };
 
         // 3. Deposit into vault on behalf of the router.
         // The vault will pull the native asset from the router's balance.
