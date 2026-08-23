@@ -324,6 +324,8 @@ All contracts are deployed on Stellar Testnet and fully integrated into the dApp
 
 ## 🆕 What's New
 
+> 💬 **Based on user feedback**, we've shipped two highly requested features to Orbit. Thank you to everyone who submitted suggestions — your input directly shaped these improvements.
+
 | Feature | Description |
 |---------|-------------|
 | **Production-Grade Zap Router** `NEW` | Upgraded `orbit-zap-router` to a production-grade allowance pattern — users can now atomically swap and deposit in a single transaction with proper token approval flows built into the Soroban contract and frontend. |
