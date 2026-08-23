@@ -304,10 +304,10 @@ function BuiltForStellar() {
 
 function Roadmap() {
   const items = [
-    { level: "L1·L2", title: "Wallet + Vault", state: "Now", done: true },
-    { level: "L3", title: "Full Soroban", state: "Next", done: true },
-    { level: "L4·L5", title: "RWA Index", state: "Soon", done: false },
-    { level: "L6", title: "Mainnet", state: "Future", done: false },
+    { level: "Phase 1", title: "Wallet + Vault", state: "Completed", done: true },
+    { level: "Phase 2", title: "Full Soroban", state: "Completed", done: true },
+    { level: "Phase 3", title: "RWA Index", state: "Active", done: true },
+    { level: "Phase 4", title: "Mainnet Launch", state: "Next", done: false },
   ];
   return (
     <section className="relative border-t border-[var(--orbit-edge)]">
