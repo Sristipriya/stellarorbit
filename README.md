@@ -14,7 +14,7 @@ Earn real yield · Yield Tranching · Peer-to-Peer Collateral Lending · Built o
 [![PWA](https://img.shields.io/badge/PWA-Supported-10b981?style=flat-square)](#)
 [![Pitch Deck](https://img.shields.io/badge/Pitch%20Deck-View%20on%20Google%20Slides-f59e0b?style=flat-square&logo=google-drive)](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)
 
-[Watch Full Demo on YouTube](https://youtu.be/Git4e0q-HzY) · [Submit / View User Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) · [📊 View Pitch Deck](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)
+[Watch Full Demo on YouTube](https://youtu.be/Git4e0q-HzY) · [Submit / View User Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) · [View Pitch Deck](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)
 
 </div>
 
@@ -323,25 +323,25 @@ All contracts are deployed on Stellar Testnet and fully integrated into the dApp
 
 ---
 
-## 👥 User Onboarding, Feedback & Iteration Analysis
+## User Onboarding, Feedback & Iteration Analysis
 
-### 📊 50+ Testnet User Onboarding Campaign
+### 50+ Testnet User Onboarding Campaign
 To validate real-world usability and stress-test the protocol, we conducted an extensive user onboarding campaign on Stellar Testnet. 
 
-* 📋 **Google Form / Responses Sheet**: [View 50+ User Responses on Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
-* 💾 **Local Dataset**: [`scripts/spreadsheet.csv`](scripts/spreadsheet.csv) (Contains 53 verified user records with wallet addresses, ratings, and detailed feedback)
+* **Google Form / Responses Sheet**: [View 50+ User Responses on Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
+* **Local Dataset**: [`scripts/spreadsheet.csv`](scripts/spreadsheet.csv) (Contains 53 verified user records with wallet addresses, ratings, and detailed feedback)
 
-#### 📈 Key Feedback Metrics
+#### Key Feedback Metrics
 | Metric | Result | Insight |
 |--------|--------|---------|
 | **Total Onboarded Users** | **53 Verified Testnet Users** | 100% connected with valid `G...` Stellar addresses |
-| **Average Experience Rating** | **4.72 / 5.00 ⭐** | 83% rated 5/5, 17% rated 4/5 |
+| **Average Experience Rating** | **4.72 / 5.00 (94.4%)** | 83% rated 5/5, 17% rated 4/5 |
 | **Mainnet Adoption Intent** | **88.7% Yes Definitely** | Strong appetite for real-money deployment on Stellar |
 | **Most Used Features** | **P2P Market (43%), Vault (32%), Tranching (25%)** | High engagement with dual-token tranche separation |
 
 ---
 
-### 🔄 User Feedback & Implemented Product Improvements (With Git Commits)
+### User Feedback & Implemented Product Improvements (With Git Commits)
 
 Every major user feedback theme was directly addressed with protocol and UI improvements. Direct commit links are documented below:
 
@@ -358,7 +358,7 @@ Every major user feedback theme was directly addressed with protocol and UI impr
 
 ---
 
-### 🚀 Next Phase Project Evolution & Roadmap
+### Next Phase Project Evolution & Roadmap
 
 Based on the feedback collected from our 53 testnet users, the next development phase will focus on:
 
@@ -369,29 +369,29 @@ Based on the feedback collected from our 53 testnet users, the next development 
 
 ---
 
-## 📽️ Product Presentation & Demo Video
+## Product Presentation & Demo Video
 
 | Asset | Link & Details |
 |-------|----------------|
-| **📊 Pitch Deck / PPT** | [Google Drive / Slides Presentation](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)<br>• **Problem Statement**: Fragmentation of Stellar yield & lack of fixed-income tranching.<br>• **Solution**: SEP-41 vaults + PT/YT yield tokenization + P2P money market.<br>• **Market Opportunity**: Institutional RWA expansion and liquidity routing on Stellar.<br>• **Architecture**: Soroban Rust contracts + TanStack React SSR + Supabase + SEP-40 oracles.<br>• **Growth Strategy**: Referral tier multipliers + Blend Protocol ecosystem integration.<br>• **Future Roadmap**: Phase 6 Mainnet audit, RWA tranches, and keeper automation. |
-| **🎬 Demo Video Walkthrough** | [Watch on YouTube](https://youtu.be/Git4e0q-HzY)<br>• Full end-to-end walkthrough demonstrating wallet connection, XLM vault deposits, oXLM share minting, yield tranching into PT/YT tokens, P2P money market offer creation, and real-time on-chain analytics. |
+| **Pitch Deck / Presentation** | [Google Drive / Slides Presentation](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)<br>• **Problem Statement**: Fragmentation of Stellar yield & lack of fixed-income tranching.<br>• **Solution**: SEP-41 vaults + PT/YT yield tokenization + P2P money market.<br>• **Market Opportunity**: Institutional RWA expansion and liquidity routing on Stellar.<br>• **Architecture**: Soroban Rust contracts + TanStack React SSR + Supabase + SEP-40 oracles.<br>• **Growth Strategy**: Referral tier multipliers + Blend Protocol ecosystem integration.<br>• **Future Roadmap**: Phase 6 Mainnet audit, RWA tranches, and keeper automation. |
+| **Demo Video Walkthrough** | [Watch on YouTube](https://youtu.be/Git4e0q-HzY)<br>• Full end-to-end walkthrough demonstrating wallet connection, XLM vault deposits, oXLM share minting, yield tranching into PT/YT tokens, P2P money market offer creation, and real-time on-chain analytics. |
 
 ---
 
-## ✅ Protocol Verification & Submission Checklist Matrix
+## Protocol Verification & Submission Checklist Matrix
 
 | Requirement Item | Status | Verification & Evidence |
 |------------------|--------|-------------------------|
-| **Public GitHub Repository** | ✅ PASS | [github.com/Sristipriya/stellarorbit](https://github.com/Sristipriya/stellarorbit) |
-| **Minimum 20+ Meaningful Commits** | ✅ PASS | **190 commits** on `main` branch with structured conventional commit history |
-| **Live Deployed Application** | ✅ PASS | [stellarorbit.vercel.app](https://stellarorbit.vercel.app/) |
-| **Pitch Deck / PPT Link** | ✅ PASS | [Google Drive Pitch Deck Link](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true) |
-| **Demo Video Walkthrough Link** | ✅ PASS | [YouTube Demo Video](https://youtu.be/Git4e0q-HzY) |
-| **Minimum 50+ Testnet Users Onboarded** | ✅ PASS | **53 verified testnet users** logged with `G...` Stellar addresses in [Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) & `scripts/spreadsheet.csv` |
-| **Real Transaction Activity Proof** | ✅ PASS | Live Soroban contract transactions verified on Stellar Expert (`CDIKVEXGEHC2...`) |
-| **Screenshots of Analytics / Activity** | ✅ PASS | Embedded high-res screenshots for Analytics, Leaderboard, Yield Tracking, and Health Monitor in `README.md` |
-| **User Feedback Iteration Summary** | ✅ PASS | Comprehensive feedback matrix mapping user suggestions to implemented features with **direct Git commit links** |
-| **Next Phase Evolution Outline** | ✅ PASS | Detailed roadmap covering Blend Mainnet, RWA Tranching, and Governance contracts |
+| **Public GitHub Repository** | Verified (PASS) | [github.com/Sristipriya/stellarorbit](https://github.com/Sristipriya/stellarorbit) |
+| **Minimum 20+ Meaningful Commits** | Verified (PASS) | **190 commits** on `main` branch with structured conventional commit history |
+| **Live Deployed Application** | Verified (PASS) | [stellarorbit.vercel.app](https://stellarorbit.vercel.app/) |
+| **Pitch Deck / PPT Link** | Verified (PASS) | [Google Drive Pitch Deck Link](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true) |
+| **Demo Video Walkthrough Link** | Verified (PASS) | [YouTube Demo Video](https://youtu.be/Git4e0q-HzY) |
+| **Minimum 50+ Testnet Users Onboarded** | Verified (PASS) | **53 verified testnet users** logged with `G...` Stellar addresses in [Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) & `scripts/spreadsheet.csv` |
+| **Real Transaction Activity Proof** | Verified (PASS) | Live Soroban contract transactions verified on Stellar Expert (`CDIKVEXGEHC2...`) |
+| **Screenshots of Analytics / Activity** | Verified (PASS) | Embedded high-res screenshots for Analytics, Leaderboard, Yield Tracking, and Health Monitor in `README.md` |
+| **User Feedback Iteration Summary** | Verified (PASS) | Comprehensive feedback matrix mapping user suggestions to implemented features with **direct Git commit links** |
+| **Next Phase Evolution Outline** | Verified (PASS) | Detailed roadmap covering Blend Mainnet, RWA Tranching, and Governance contracts |
 
 ---
 
