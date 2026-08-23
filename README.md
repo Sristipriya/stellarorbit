@@ -12,9 +12,9 @@ Earn real yield · Yield Tranching · Peer-to-Peer Collateral Lending · Built o
 [![Network](https://img.shields.io/badge/Network-Stellar%20Testnet-0ea5e9?style=flat-square)](https://stellar.org)
 [![Soroban](https://img.shields.io/badge/Contracts-Soroban-8b5cf6?style=flat-square)](https://soroban.stellar.org)
 [![PWA](https://img.shields.io/badge/PWA-Supported-10b981?style=flat-square)](#)
-[![Pitch Deck](https://img.shields.io/badge/Pitch%20Deck-Download%20PPT-f59e0b?style=flat-square&logo=microsoft-powerpoint)](Institutional-Grade-Yield-on-Stellar-Soroban%20(1).pptx.pptx)
+[![Pitch Deck](https://img.shields.io/badge/Pitch%20Deck-View%20on%20Google%20Slides-f59e0b?style=flat-square&logo=google-drive)](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)
 
-[Watch Full Demo on YouTube](https://youtu.be/Git4e0q-HzY) · [Submit / View User Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) · [📊 View Pitch Deck](Institutional-Grade-Yield-on-Stellar-Soroban%20(1).pptx.pptx)
+[Watch Full Demo on YouTube](https://youtu.be/Git4e0q-HzY) · [Submit / View User Feedback](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) · [📊 View Pitch Deck](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)
 
 </div>
 
