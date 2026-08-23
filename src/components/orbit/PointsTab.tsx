@@ -139,7 +139,7 @@ export function PointsTab({ address, state }: { address: string | null; state: V
 
         <div className="mt-4 rounded-xl border border-[var(--orbit-ok)]/20 bg-[var(--orbit-ok)]/10 p-3">
           <p className="font-mono text-xs text-[var(--orbit-ok)]">
-            🏆 Top 100 holders at season end receive early access to new vaults + fee discounts.
+            Top 100 participants at season end receive priority vault allocations and fee discounts.
           </p>
         </div>
       </motion.div>
@@ -234,17 +234,17 @@ export function PointsTab({ address, state }: { address: string | null; state: V
                   }`}
                 >
                   <span
-                    className={`font-mono text-sm font-bold w-6 text-center ${
+                    className={`w-6 font-mono text-xs font-bold ${
                       i === 0
-                        ? "text-[var(--orbit-warn)]"
+                        ? "text-[var(--orbit-accent)]"
                         : i === 1
-                          ? "text-slate-400"
+                          ? "text-slate-300"
                           : i === 2
-                            ? "text-amber-700"
+                            ? "text-amber-500"
                             : "text-[var(--orbit-mute)]"
                     }`}
                   >
-                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                   <div className="flex-1 min-w-0">
                     <div

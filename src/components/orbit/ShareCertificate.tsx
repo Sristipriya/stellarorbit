@@ -36,7 +36,7 @@ export function ShareCertificate({
 
   function copyPosition() {
     const text = [
-      `🌌 Orbit Vault Position`,
+      `Orbit Vault Position`,
       `Wallet: ${shortAddr(address)}`,
       `Shares: ${sharesStr}`,
       `Underlying: ${underlyingStr} XLM (${usdVal})`,

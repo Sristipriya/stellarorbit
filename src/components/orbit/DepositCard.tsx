@@ -243,7 +243,7 @@ export function DepositCard({
 
       {useZap && (
         <div className="mt-2.5 text-center text-[10px] font-mono text-[var(--orbit-accent)]/80">
-          Zapping automatically swaps & awards Orbit Points 🏆
+          Cross-asset swap enabled · Earns Orbit Points
         </div>
       )}
 
