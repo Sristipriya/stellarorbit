@@ -115,6 +115,16 @@ export function classifyError(err: unknown): WalletError {
     return { kind: "rejected", message: "Transaction rejected in wallet." };
   }
   if (
+    lower.includes("unreachablecodereached") ||
+    lower.includes("insufficient idle assets") ||
+    lower.includes("divest required")
+  ) {
+    return {
+      kind: "insufficient",
+      message: "Withdrawal exceeds available vault liquidity. Please reduce the withdrawal amount.",
+    };
+  }
+  if (
     lower.includes("insufficient") ||
     lower.includes("underfunded") ||
     lower.includes("op_underfunded")

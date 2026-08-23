@@ -32,6 +32,15 @@ export function WithdrawCard({
     }
   }, [shares, state]);
 
+  // Max withdrawable shares cannot exceed user balance OR vault's available liquidity
+  const maxWithdrawableShares = useMemo(() => {
+    let max = state.userSharesStroops;
+    if (state.totalSharesStroops > 0n && state.totalSharesStroops < max) {
+      max = state.totalSharesStroops;
+    }
+    return max;
+  }, [state.userSharesStroops, state.totalSharesStroops]);
+
   const tooMany = useMemo(() => {
     if (!shares) return false;
     try {
@@ -41,6 +50,19 @@ export function WithdrawCard({
       return false;
     }
   }, [shares, state.userSharesStroops]);
+
+  const exceedsVaultLiquidity = useMemo(() => {
+    if (!shares) return false;
+    try {
+      const s = BigInt(Math.round(Number(shares) * 1e7));
+      return (
+        (state.totalSharesStroops > 0n && s > state.totalSharesStroops) ||
+        (state.totalAssetsStroops > 0n && previewAssets > state.totalAssetsStroops)
+      );
+    } catch {
+      return false;
+    }
+  }, [shares, state.totalSharesStroops, state.totalAssetsStroops, previewAssets]);
 
   async function submit() {
     if (!address) return;
@@ -122,9 +144,9 @@ export function WithdrawCard({
             />
             
             <button
-              onClick={() => setShares(stroopsToXlm(state.userSharesStroops))}
-              disabled={tx.kind === "pending"}
-              className="shrink-0 rounded-lg border border-[var(--orbit-warn)]/30 bg-[var(--orbit-warn)]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-warn)] transition-all hover:bg-[var(--orbit-warn)]/20 hover:border-[var(--orbit-warn)]/50 disabled:opacity-40"
+              onClick={() => setShares(stroopsToXlm(maxWithdrawableShares))}
+              disabled={tx.kind === "pending" || maxWithdrawableShares === 0n}
+              className="shrink-0 rounded-lg border border-[var(--orbit-warn)]/30 bg-[var(--orbit-warn)]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-warn)] transition-all hover:bg-[var(--orbit-warn)]/20 hover:border-[var(--orbit-warn)]/50 disabled:opacity-40 cursor-pointer"
             >
               Max
             </button>
@@ -135,6 +157,13 @@ export function WithdrawCard({
               <span className="tracking-wider">Available Shares</span>
               <span className="text-[var(--orbit-ink)]">{stroopsToXlm(state.userSharesStroops)}</span>
             </div>
+
+            {state.totalAssetsStroops > 0n && state.totalSharesStroops < state.userSharesStroops && (
+              <div className="flex justify-between items-center text-[var(--orbit-mute)]">
+                <span className="tracking-wider text-[var(--orbit-warn)]">Vault Idle Liquidity</span>
+                <span className="text-[var(--orbit-warn)]">{stroopsToXlm(state.totalAssetsStroops)} XLM</span>
+              </div>
+            )}
             
             <div className="h-px w-full bg-[var(--orbit-edge)]/50 my-1" />
             
@@ -149,7 +178,7 @@ export function WithdrawCard({
 
         <button
           onClick={submit}
-          disabled={!address || !shares || tooMany || tx.kind === "pending"}
+          disabled={!address || !shares || tooMany || exceedsVaultLiquidity || tx.kind === "pending"}
           className="group/btn relative mt-8 w-full overflow-hidden rounded-xl bg-[var(--orbit-warn)] px-6 py-4 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[100%] transition-transform duration-700 group-hover/btn:translate-x-[100%]" />
@@ -158,7 +187,9 @@ export function WithdrawCard({
               ? "Withdrawing..."
               : tooMany
                 ? "Insufficient Balance"
-                : "Confirm Withdrawal"}
+                : exceedsVaultLiquidity
+                  ? "Exceeds Vault Liquidity"
+                  : "Confirm Withdrawal"}
           </span>
         </button>
 
