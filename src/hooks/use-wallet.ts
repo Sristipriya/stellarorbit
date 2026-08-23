@@ -10,6 +10,7 @@ import {
 } from "@/lib/stellar/wallet";
 import { fetchXlmBalance } from "@/lib/stellar/balance";
 import { registerUser } from "@/lib/points";
+import { ensureUserProfile } from "@/lib/user-transactions";
 import { readContract, addrArg } from "@/lib/stellar/soroban";
 import { ORBIT_USDC_TOKEN_ID, ORBIT_INDEX_TOKEN_ID, stroopsToXlm } from "@/lib/stellar/network";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ export function useWallet() {
       .then((alive) => {
         if (alive) {
           setAddress(savedAddr);
+          ensureUserProfile(savedAddr);
           registerUser(savedAddr);
         } else {
           // Session is dead — clear everything so the user must reconnect
@@ -79,6 +81,7 @@ export function useWallet() {
       setAddress(addr);
       localStorage.setItem(LS_ADDR, addr);
       if (walletId) localStorage.setItem(LS_WALLET, walletId);
+      await ensureUserProfile(addr);
       await registerUser(addr);
       await refreshBalance(addr);
     } catch (e) {

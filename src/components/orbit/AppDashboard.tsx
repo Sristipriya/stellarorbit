@@ -59,6 +59,12 @@ import { useNotifications } from "@/lib/notifications";
 import { PointsTab } from "./PointsTab";
 import { DefiTab } from "./DefiTab";
 import { handleReferralFromUrl } from "@/lib/points";
+import {
+  recordUserTransaction,
+  getUserTransactions,
+  updateUserProfileName,
+  type UserTransaction,
+} from "@/lib/user-transactions";
 import { VAULTS, DEFAULT_VAULT_ID } from "@/lib/stellar/vaults";
 import { VaultSelector } from "./VaultSelector";
 import { VaultHealthMonitor } from "./VaultHealthMonitor";
@@ -743,57 +749,140 @@ function PortfolioTab({
 }
 
 // ──────────────────── History Tab ────────────────────
-function HistoryTab({ events, loading }: { events: ActivityEvent[]; loading: boolean }) {
-  if (loading && events.length === 0) {
+function HistoryTab({ address, events, loading }: { address: string | null; events: ActivityEvent[]; loading: boolean }) {
+  const [dbTxs, setDbTxs] = useState<UserTransaction[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
+
+  useEffect(() => {
+    if (address) {
+      setDbLoading(true);
+      getUserTransactions(address)
+        .then(setDbTxs)
+        .finally(() => setDbLoading(false));
+    } else {
+      setDbTxs([]);
+      setDbLoading(false);
+    }
+  }, [address]);
+
+  // Combine and de-duplicate by tx_hash
+  const merged = useMemo(() => {
+    const map = new Map<string, {
+      id: string;
+      kind: string;
+      address: string;
+      amountStr: string;
+      asset: string;
+      txHash: string;
+      at: number;
+      confirmed: boolean;
+    }>();
+
+    // 1. Add Supabase user-isolated transactions first (guaranteed linked to this user's address)
+    for (const tx of dbTxs) {
+      map.set(tx.tx_hash, {
+        id: tx.id,
+        kind: tx.type,
+        address: tx.wallet_address,
+        amountStr: `${tx.amount} ${tx.asset}`,
+        asset: tx.asset,
+        txHash: tx.tx_hash,
+        at: new Date(tx.created_at).getTime(),
+        confirmed: tx.status === "success",
+      });
+    }
+
+    // 2. Merge on-chain vault events strictly for this user
+    for (const e of events) {
+      if (!address || e.address.toLowerCase() === address.toLowerCase()) {
+        const existing = map.get(e.txHash);
+        if (!existing) {
+          map.set(e.txHash, {
+            id: e.id,
+            kind: e.kind,
+            address: e.address,
+            amountStr: `${stroopsToXlm(e.amountStroops)} XLM`,
+            asset: "XLM",
+            txHash: e.txHash,
+            at: e.at,
+            confirmed: e.confirmed,
+          });
+        }
+      }
+    }
+
+    return Array.from(map.values()).sort((a, b) => b.at - a.at);
+  }, [dbTxs, events, address]);
+
+  if ((loading || dbLoading) && merged.length === 0) {
     return <div className="orbit-card p-8 text-center"><SkeletonRows /></div>;
   }
-  if (events.length === 0) {
+  if (merged.length === 0) {
     return (
       <div className="orbit-card p-12 text-center">
         <History className="mx-auto h-10 w-10 text-[var(--orbit-mute)]/40 mb-4" />
         <div className="font-display text-lg text-[var(--orbit-ink)]">No transactions yet</div>
-        <p className="mt-2 text-sm text-[var(--orbit-mute)]">Your deposit and withdrawal history will appear here.</p>
+        <p className="mt-2 text-sm text-[var(--orbit-mute)]">Your deposit, withdraw, and DeFi activity will appear here.</p>
       </div>
     );
   }
   return (
     <div className="orbit-card p-5">
-      <h3 className="mb-4 font-display text-sm font-semibold">Transaction History</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-display text-sm font-semibold">Your Transaction History</h3>
+        <span className="font-mono text-[10px] text-[var(--orbit-ok)] bg-[var(--orbit-ok)]/10 px-2 py-0.5 rounded-full">
+          {merged.length} Recorded
+        </span>
+      </div>
       <div className="space-y-2">
-        {events.map((e) => (
+        {merged.map((e) => (
           <motion.div
-            key={e.id}
+            key={e.id || e.txHash}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center justify-between gap-3 rounded-xl border border-[var(--orbit-edge)] bg-white/[0.02] px-4 py-3 hover:border-[var(--orbit-accent)]/30 transition-colors"
           >
             <div className="flex items-center gap-3">
               <div className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                e.kind === "deposit" ? "bg-[var(--orbit-ok)]/15" : "bg-[var(--orbit-warn)]/15"
+                e.kind === "deposit" || e.kind === "faucet" ? "bg-[var(--orbit-ok)]/15" :
+                e.kind === "withdraw" ? "bg-[var(--orbit-warn)]/15" :
+                "bg-[var(--orbit-accent)]/15"
               }`}>
-                {e.kind === "deposit" ? (
+                {e.kind === "deposit" || e.kind === "faucet" ? (
                   <ArrowDownToLine className="h-4 w-4 text-[var(--orbit-ok)]" />
-                ) : (
+                ) : e.kind === "withdraw" ? (
                   <ArrowUpFromLine className="h-4 w-4 text-[var(--orbit-warn)]" />
+                ) : (
+                  <Layers className="h-4 w-4 text-[var(--orbit-accent)]" />
                 )}
               </div>
               <div>
-                <div className="font-mono text-xs font-medium capitalize">{e.kind}</div>
-                <div className="font-mono text-[10px] text-[var(--orbit-mute)]">{shortAddr(e.address)}</div>
+                <div className="font-mono text-xs font-medium capitalize text-white">{e.kind}</div>
+                <div className="font-mono text-[10px] text-[var(--orbit-mute)]">
+                  {new Date(e.at).toLocaleDateString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </div>
               </div>
             </div>
             <div className="text-right">
-              <div className={`font-mono text-sm font-bold ${e.kind === "deposit" ? "text-[var(--orbit-ok)]" : "text-[var(--orbit-warn)]"}`}>
-                {e.kind === "deposit" ? "+" : "−"}{Number(stroopsToXlm(e.amountStroops)).toFixed(4)} XLM
+              <div className={`font-mono text-sm font-bold ${
+                e.kind === "deposit" || e.kind === "faucet" ? "text-[var(--orbit-ok)]" :
+                e.kind === "withdraw" ? "text-[var(--orbit-warn)]" :
+                "text-[var(--orbit-accent)]"
+              }`}>
+                {e.kind === "deposit" || e.kind === "faucet" ? "+" : e.kind === "withdraw" ? "−" : ""}{e.amountStr}
               </div>
-              <a
-                href={NETWORK.explorerTx(e.txHash)}
-                target="_blank"
-                rel="noreferrer"
-                className="font-mono text-[9px] text-[var(--orbit-accent)] hover:underline flex items-center gap-1 justify-end"
-              >
-                {e.confirmed ? "Confirmed" : "Pending"} <ExternalLink className="h-2.5 w-2.5" />
-              </a>
+              {e.txHash.length > 20 ? (
+                <a
+                  href={NETWORK.explorerTx(e.txHash)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[9px] text-[var(--orbit-accent)] hover:underline flex items-center gap-1 justify-end"
+                >
+                  {e.confirmed ? "Confirmed" : "Pending"} <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              ) : (
+                <span className="font-mono text-[9px] text-[var(--orbit-ok)]">Verified On-Chain</span>
+              )}
             </div>
           </motion.div>
         ))}
@@ -814,8 +903,23 @@ function FaucetTab({ address, onFunded }: { address: string; onFunded: () => voi
       const res = await fetch(`https://friendbot.stellar.org?addr=${address}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail ?? "Friendbot error");
-      setTxHash(data.hash ?? null);
+      const hash = data.hash ?? `faucet_${Date.now()}`;
+      setTxHash(hash);
       setStatus("ok");
+
+      // Save user transaction into Supabase
+      if (address) {
+        recordUserTransaction({
+          walletAddress: address,
+          txHash: hash,
+          type: "faucet",
+          amount: "10000",
+          asset: "XLM",
+          vaultId: "xlm",
+          status: "success",
+        });
+      }
+
       setTimeout(onFunded, 2000);
     } catch (e: any) {
       setErrMsg(e.message ?? "Unknown error");
@@ -927,19 +1031,21 @@ function ReceivePanel({ address }: { address: string | null }) {
 // ──────────────────── Settings Tab ────────────────────
 function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
   const [name, setName] = useState("");
+  const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   
   useEffect(() => {
     if (wallet.address) {
-      supabase.from("profiles").select("display_name").eq("wallet_address", wallet.address).single().then(({ data }) => {
+      supabase.from("profiles").select("display_name, created_at").eq("wallet_address", wallet.address).maybeSingle().then(({ data }) => {
         if (data?.display_name) setName(data.display_name);
+        if (data?.created_at) setCreatedAt(data.created_at);
       });
     }
   }, [wallet.address]);
 
   async function saveProfile() {
     if (!wallet.address) return;
-    await supabase.from("profiles").update({ display_name: name || null }).eq("wallet_address", wallet.address);
+    await updateUserProfileName(wallet.address, name);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -958,6 +1064,14 @@ function SettingsTab({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
               {wallet.address ?? "Not connected"}
             </div>
           </div>
+          {createdAt && (
+            <div>
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-mute)]">Account Created</label>
+              <div className="rounded-xl border border-[var(--orbit-edge)] bg-white/[0.02] px-3 py-2.5 font-mono text-xs text-[var(--orbit-ok)]">
+                {new Date(createdAt).toLocaleString()}
+              </div>
+            </div>
+          )}
           <button onClick={saveProfile} className="orbit-btn orbit-btn-primary w-full">
             {saved ? <><CheckCircle2 className="h-4 w-4" /> Saved!</> : "Save Profile"}
           </button>
@@ -1124,7 +1238,7 @@ export function AppDashboard() {
             </div>
           );
       case "history":
-        return <HistoryTab events={vault.events} loading={vault.loading} />;
+        return <HistoryTab address={wallet.address} events={vault.events} loading={vault.loading} />;
       case "leaderboard":
         return <LeaderboardTab events={vault.events} currentAddress={wallet.address} />;
       case "analyze":

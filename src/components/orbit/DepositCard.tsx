@@ -15,6 +15,7 @@ import {
   ORBIT_POINTS_CONTRACT_ID,
 } from "@/lib/stellar/network";
 import { classifyError } from "@/lib/stellar/wallet";
+import { recordUserTransaction } from "@/lib/user-transactions";
 import { TxStatus, type TxState } from "./TxStatus";
 import { toast } from "sonner";
 import { type Notification } from "@/lib/notifications";
@@ -139,6 +140,16 @@ export function DepositCard({
             ? STROOPS_PER_XLM
             : (state.totalAssetsStroops * STROOPS_PER_XLM) / state.totalSharesStroops;
         recordPosition(address, entryPrice, sharesMinted, vaultId ?? "xlm");
+        recordUserTransaction({
+          walletAddress: address,
+          txHash,
+          type: "deposit",
+          amount: Number(amountStroops) / 1e7,
+          asset: currentAsset,
+          vaultId: vaultId ?? "xlm",
+          shares: stroopsToXlm(sharesMinted),
+          status: "success",
+        });
       }
       toast.success(`Deposited ${Number(amountStroops) / 1e7} ${currentAsset}`, {
         description: `Shares: ${stroopsToXlm(sharesMinted)}`,

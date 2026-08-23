@@ -8,8 +8,8 @@ import { useWallet } from "../../hooks/use-wallet";
 import { useNotifications } from "../../lib/notifications";
 import { stroopsToXlm } from "../../lib/stellar/network";
 import { getVaultById, type VaultMeta } from "../../lib/stellar/vaults";
-import type { VaultState } from "../../lib/stellar/vault";
 import { classifyError } from "../../lib/stellar/wallet";
+import { recordUserTransaction } from "../../lib/user-transactions";
 
 export function DefiTab({
   address: propAddress,
@@ -102,8 +102,20 @@ export function DefiTab({
 
             <button 
               className="liquid-btn w-full mt-4" 
-              disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping || Number(wrapAmount) > Number(stroopsToXlm(vaultState.userSharesStroops))}
-              onClick={() => defi.wrap(wrapAmount).then(() => {
+              disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping || Number(wrapAmount) > Number(stroopsToXlm(vaultState?.userSharesStroops || 0n))}
+              onClick={() => defi.wrap(wrapAmount).then((res) => {
+                if (address) {
+                  const txHash = typeof res === "object" && res && "txHash" in res ? String(res.txHash) : `wrap_${Date.now()}`;
+                  recordUserTransaction({
+                    walletAddress: address,
+                    txHash,
+                    type: "wrap",
+                    amount: wrapAmount,
+                    asset: "SHARES",
+                    vaultId: propVaultId,
+                    status: "success",
+                  });
+                }
                 setWrapAmount("");
                 toast.success("Shares wrapped into PT and YT");
                 notif?.add({ kind: "success", title: "Shares Wrapped", message: `Wrapped ${wrapAmount} shares into PT & YT` });
@@ -160,7 +172,19 @@ export function DefiTab({
                 <button 
                   className="liquid-btn text-[var(--orbit-ok)]" 
                   disabled={defi.isLending || !lendAmount || !lendInterest || !activeVault?.ptId}
-                  onClick={() => defi.lend(lendAmount, lendInterest, activeVault.ptId!, "100").then(() => { 
+                  onClick={() => defi.lend(lendAmount, lendInterest, activeVault.ptId!, "100").then((res) => { 
+                    if (address) {
+                      const txHash = typeof res === "object" && res && "txHash" in res ? String(res.txHash) : `lend_${Date.now()}`;
+                      recordUserTransaction({
+                        walletAddress: address,
+                        txHash,
+                        type: "lend",
+                        amount: lendAmount,
+                        asset: "USDC",
+                        vaultId: propVaultId,
+                        status: "success",
+                      });
+                    }
                     setLendAmount(""); setLendInterest(""); 
                     toast.success("Loan offer created");
                     notif?.add({ kind: "success", title: "Loan Offer Created" });
@@ -195,7 +219,19 @@ export function DefiTab({
                       </div>
                       <button 
                         className="liquid-btn px-4 py-1.5 text-[10px]"
-                        onClick={() => defi.borrow(offer.id).then(() => {
+                        onClick={() => defi.borrow(offer.id).then((res) => {
+                          if (address) {
+                            const txHash = typeof res === "object" && res && "txHash" in res ? String(res.txHash) : `borrow_${Date.now()}`;
+                            recordUserTransaction({
+                              walletAddress: address,
+                              txHash,
+                              type: "borrow",
+                              amount: String(Number(offer.usdc_amount) / 10000000),
+                              asset: "USDC",
+                              vaultId: propVaultId,
+                              status: "success",
+                            });
+                          }
                           toast.success("Successfully borrowed USDC");
                           notif?.add({ kind: "success", title: "Borrow Successful", message: "Borrowed USDC against collateral" });
                         }).catch(err => {

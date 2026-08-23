@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { withdraw, quoteAssetsForShares, type VaultState } from "@/lib/stellar/vault";
 import { stroopsToXlm } from "@/lib/stellar/network";
 import { classifyError } from "@/lib/stellar/wallet";
+import { recordUserTransaction } from "@/lib/user-transactions";
 import { TxStatus, type TxState } from "./TxStatus";
 import { toast } from "sonner";
 import { type Notification } from "@/lib/notifications";
@@ -83,6 +84,20 @@ export function WithdrawCard({
       setRaw(`tx_hash=${txHash}`);
       setShares("");
       onDone();
+
+      if (address) {
+        recordUserTransaction({
+          walletAddress: address,
+          txHash,
+          type: "withdraw",
+          amount: stroopsToXlm(assetsOut),
+          asset: "XLM",
+          vaultId: vaultId ?? "xlm",
+          shares: stroopsToXlm(sharesBurned),
+          status: "success",
+        });
+      }
+
       toast.success(`Withdrew ${stroopsToXlm(assetsOut)} XLM`, {
         description: `Shares burned: ${stroopsToXlm(sharesBurned)}`,
       });
