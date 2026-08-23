@@ -65,10 +65,10 @@ import { VaultHealthMonitor } from "./VaultHealthMonitor";
 import { PortfolioAnalyzer } from "./PortfolioAnalyzer";
 
 // ──────────────────── Helpers ──────────────────
-function pricePerShareNum(state: VaultState): number {
-  if (state.totalSharesStroops === 0n) return 1.0;
-  const num = Number(state.totalAssetsStroops);
-  const den = Number(state.totalSharesStroops);
+function pricePerShareNum(state?: VaultState | null): number {
+  if (!state || !state.totalSharesStroops || state.totalSharesStroops === 0n) return 1.0;
+  const num = Number(state.totalAssetsStroops || 0n);
+  const den = Number(state.totalSharesStroops || 0n);
   if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return 1.0;
   return num / den;
 }
@@ -139,12 +139,12 @@ function StatCard({
 export type TimeFrame = "24H" | "7D" | "30D" | "90D" | "1Y" | "ALL";
 
 export function InteractiveYieldChart({
-  priceHistory,
+  priceHistory = [],
   currentPrice = 1.0,
   apyPct = 5.25,
   assetSymbol = "XLM",
 }: {
-  priceHistory: Array<{ timestamp: number; priceScaled: bigint }>;
+  priceHistory?: Array<{ timestamp: number; priceScaled: bigint }> | PriceSnapshot[];
   currentPrice?: number;
   apyPct?: number;
   assetSymbol?: string;
@@ -152,6 +152,9 @@ export function InteractiveYieldChart({
   const [timeframe, setTimeframe] = useState<TimeFrame>("7D");
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [chartMode, setChartMode] = useState<"nav" | "benchmark">("nav");
+
+  const safePrice = Number.isFinite(currentPrice) && currentPrice > 0 ? currentPrice : 1.0;
+  const safeApy = Number.isFinite(apyPct) && apyPct >= 0 ? apyPct : 5.25;
 
   // Generate comprehensive time series combining on-chain history + continuous compounding curve
   const points = useMemo(() => {
@@ -180,10 +183,10 @@ export function InteractiveYieldChart({
     }
 
     const start = now - durationMs;
-    const step = durationMs / (count - 1);
-    const dailyRate = Math.pow(1 + apyPct / 100, 1 / 365) - 1;
+    const step = durationMs / Math.max(1, count - 1);
+    const dailyRate = Math.pow(1 + safeApy / 100, 1 / 365) - 1;
 
-    const basePrice = Math.max(1.0, currentPrice / Math.pow(1 + dailyRate, durationMs / (86400 * 1000)));
+    const basePrice = Math.max(1.0, safePrice / Math.pow(1 + dailyRate, durationMs / (86400 * 1000)));
 
     const result: Array<{
       timestamp: number;
@@ -197,12 +200,9 @@ export function InteractiveYieldChart({
       const t = start + i * step;
       const daysElapsed = (t - start) / (86400 * 1000);
       
-      // Continuous compound formula
       const compoundPrice = basePrice * Math.pow(1 + dailyRate, daysElapsed);
-      
-      // Add subtle micro-variations for live ledger realism
       const noise = (Math.sin(i * 1.5) * 0.00015) + (i / count) * 0.0002;
-      const actualPrice = Math.max(1.0, compoundPrice + (i === count - 1 ? (currentPrice - compoundPrice) : noise));
+      const actualPrice = Math.max(1.0, compoundPrice + (i === count - 1 ? (safePrice - compoundPrice) : noise));
       
       const yieldGain = ((actualPrice - 1.0) / 1.0) * 100;
       const d = new Date(t);
@@ -219,14 +219,13 @@ export function InteractiveYieldChart({
       });
     }
 
-    // Ensure the last point is always current live price
     if (result.length > 0) {
-      result[result.length - 1].price = currentPrice > 0 ? currentPrice : 1.0;
-      result[result.length - 1].yieldGainPct = ((currentPrice - 1.0) / 1.0) * 100;
+      result[result.length - 1].price = safePrice;
+      result[result.length - 1].yieldGainPct = ((safePrice - 1.0) / 1.0) * 100;
     }
 
     return result;
-  }, [timeframe, currentPrice, apyPct]);
+  }, [timeframe, safePrice, safeApy]);
 
   // Compute SVG dimensions and path
   const w = 700;
@@ -235,12 +234,12 @@ export function InteractiveYieldChart({
   const padY = 24;
 
   const prices = points.map((p) => (chartMode === "benchmark" ? p.benchmark : p.price));
-  const minPrice = Math.min(...prices, 1.0);
-  const maxPrice = Math.max(...prices, 1.002);
+  const minPrice = prices.length > 0 ? Math.min(...prices, 1.0) : 1.0;
+  const maxPrice = prices.length > 0 ? Math.max(...prices, 1.002) : 1.002;
   const priceRange = maxPrice - minPrice || 0.001;
 
   const coordinates = points.map((p, i) => {
-    const x = padX + (i / (points.length - 1)) * (w - padX * 2);
+    const x = padX + (i / Math.max(1, points.length - 1)) * (w - padX * 2);
     const val = chartMode === "benchmark" ? p.benchmark : p.price;
     const y = padY + ((maxPrice - val) / priceRange) * (h - padY * 2);
     return { x, y, point: p };
@@ -250,9 +249,9 @@ export function InteractiveYieldChart({
     return i === 0 ? `M ${curr.x},${curr.y}` : `${acc} L ${curr.x},${curr.y}`;
   }, "");
 
-  const firstCoord = coordinates[0];
-  const lastCoord = coordinates[coordinates.length - 1];
-  const areaD = `${pathD} L ${lastCoord.x},${h - padY + 10} L ${firstCoord.x},${h - padY + 10} Z`;
+  const firstCoord = coordinates[0] || { x: padX, y: h - padY };
+  const lastCoord = coordinates[coordinates.length - 1] || { x: w - padX, y: h - padY };
+  const areaD = pathD ? `${pathD} L ${lastCoord.x},${h - padY + 10} L ${firstCoord.x},${h - padY + 10} Z` : "";
 
   // Secondary benchmark comparison line
   const benchmarkPathD = coordinates.reduce((acc, curr, i) => {
@@ -260,9 +259,15 @@ export function InteractiveYieldChart({
     return i === 0 ? `M ${curr.x},${bmY}` : `${acc} L ${curr.x},${bmY}`;
   }, "");
 
-  // Hovered item
-  const activeIndex = hoverIndex !== null ? hoverIndex : coordinates.length - 1;
-  const activeItem = coordinates[activeIndex];
+  // Hovered item with guaranteed fallback
+  const activeIndex = hoverIndex !== null && hoverIndex >= 0 && hoverIndex < coordinates.length
+    ? hoverIndex
+    : Math.max(0, coordinates.length - 1);
+  const activeItem = coordinates[activeIndex] || coordinates[0] || {
+    x: padX,
+    y: padY,
+    point: { price: safePrice, yieldGainPct: 0, dateStr: "Today", timestamp: Date.now() },
+  };
 
   // Period Metrics
   const startPrice = points[0]?.price || 1.0;
