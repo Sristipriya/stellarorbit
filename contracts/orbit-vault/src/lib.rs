@@ -56,6 +56,7 @@ pub trait ShareTokenInterface {
 pub trait BlendPoolInterface {
     fn supply(from: Address, reserve: Address, amount: i128);
     fn withdraw(from: Address, reserve: Address, amount: i128, to: Address);
+    fn claim_yield(reserve: Address, to: Address) -> i128;
 }
 
 #[derive(Clone)]
@@ -479,6 +480,97 @@ impl OrbitVault {
 
         env.events()
             .publish((symbol_short!("Harvest"),), (yield_amount, total_fee_amount));
+    }
+
+    /// Auto-compounding strategy harvest. 
+    /// Can be called by any automated Keeper bot.
+    /// Claims yield from the underlying strategy, deducts fees, and compounds the rest.
+    pub fn harvest_and_reinvest(env: Env, keeper: Address) {
+        keeper.require_auth();
+
+        let pool_addr: Address = env.storage().instance().get(&DataKey::BlendPool).expect("Strategy pool not set");
+        let asset: Address = env.storage().instance().get(&DataKey::Asset).unwrap();
+        
+        // 1. Claim yield from strategy directly into the vault
+        let blend = BlendPoolClient::new(&env, &pool_addr);
+        let yield_amount = blend.claim_yield(&asset, &env.current_contract_address());
+        
+        assert!(yield_amount > 0, "No yield to harvest");
+
+        let perf_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::PerfFeeBps)
+            .unwrap_or(0);
+        let mgmt_fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ManagementFeeBps)
+            .unwrap_or(0);
+
+        let total_assets: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalAssets)
+            .unwrap_or(0);
+
+        let perf_fee_amount = (yield_amount * perf_fee_bps as i128) / 10_000_i128;
+        let mgmt_fee_amount = (total_assets * mgmt_fee_bps as i128) / 10_000_i128;
+        let mut total_fee_amount = perf_fee_amount + mgmt_fee_amount;
+
+        if total_fee_amount > yield_amount { 
+            total_fee_amount = yield_amount; 
+        }
+        let net_yield = yield_amount - total_fee_amount;
+
+        let token = token::Client::new(&env, &asset);
+
+        // 2. Pay protocol fees
+        if total_fee_amount > 0 {
+            let fee_recipient: Address = env
+                .storage()
+                .instance()
+                .get(&DataKey::FeeRecipient)
+                .unwrap();
+            token.transfer(&env.current_contract_address(), &fee_recipient, &total_fee_amount);
+        }
+
+        // 3. Compound the rest (already in our balance, just update the ledger state)
+        let new_total = total_assets + net_yield;
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalAssets, &new_total);
+
+        // 4. Record new price snapshot
+        let total_shares: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalShares)
+            .unwrap_or(0);
+        let snap = PriceSnapshot {
+            timestamp: env.ledger().timestamp(),
+            price_scaled: price_per_share(new_total, total_shares),
+        };
+        let mut history: Vec<PriceSnapshot> = env
+            .storage()
+            .instance()
+            .get(&DataKey::PriceHistory)
+            .unwrap_or(vec![&env]);
+        
+        if history.len() >= MAX_HISTORY {
+            let mut trimmed: Vec<PriceSnapshot> = Vec::new(&env);
+            for i in 1..history.len() {
+                trimmed.push_back(history.get(i).unwrap());
+            }
+            history = trimmed;
+        }
+        history.push_back(snap);
+        env.storage()
+            .instance()
+            .set(&DataKey::PriceHistory, &history);
+
+        env.events()
+            .publish((symbol_short!("AutoHarv"),), (yield_amount, total_fee_amount));
     }
 
     // ─────────────────────────── Internal helpers ─────────────────────────────

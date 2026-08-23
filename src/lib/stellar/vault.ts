@@ -416,28 +416,47 @@ export async function withdraw(
 
 /* ─────────────────────────── Yield (Admin) ─────────────────────────────── */
 
-export async function harvest(
+export async function addStrategyYield(
   adminAddress: string,
   yieldAmountXlm: string,
   vaultId: string
-): Promise<{ txHash: string; yieldAmountStroops: bigint }> {
-  const yieldAmountStroops = xlmToStroops(yieldAmountXlm);
-  if (yieldAmountStroops <= 0n) throw new Error("Enter an amount greater than zero.");
+): Promise<{ txHash: string }> {
+  const amountStroops = xlmToStroops(yieldAmountXlm);
+  const vault = getVaultById(vaultId);
+  if (HAS_REAL_CONTRACT && vault?.contractId) {
+    // We assume the frontend knows ORBIT_YIELD_STRATEGY_ID. We will add it to network.ts later,
+    // or we can just fetch it from the vault if we had a getter.
+    // For now we import it.
+    const { ORBIT_YIELD_STRATEGY_ID, ORBIT_VAULT_CONTRACT_ID } = await import('./network');
+    
+    const { txHash } = await invokeContract<bigint>(adminAddress, "add_mock_yield", [
+      addrArg(adminAddress),
+      addrArg(vaultId === "xlm" ? "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC" : ORBIT_VAULT_CONTRACT_ID!), // reserve
+      i128Arg(amountStroops),
+    ], ORBIT_YIELD_STRATEGY_ID!);
+    return { txHash };
+  }
+  return { txHash: "mock-tx-hash" };
+}
+
+export async function harvest(
+  keeperAddress: string,
+  vaultId: string
+): Promise<{ txHash: string }> {
   const vault = getVaultById(vaultId);
 
   if (HAS_REAL_CONTRACT && vault?.contractId) {
-    const { txHash } = await invokeContract<bigint>(adminAddress, "harvest", [
-      addrArg(adminAddress),
-      i128Arg(yieldAmountStroops),
+    const { txHash } = await invokeContract<bigint>(keeperAddress, "harvest_and_reinvest", [
+      addrArg(keeperAddress),
     ], vault.contractId);
-    return { txHash, yieldAmountStroops };
+    return { txHash };
   }
 
   // Demo mode
-  const memo = `orbit:hrv:${stroopsToXlm(yieldAmountStroops, 4)}`;
-  const txHash = await submitMarkerTx(adminAddress, memo);
+  const txHash = await submitMarkerTx(keeperAddress, "orbit:hrv:auto");
   const s = readDemoState();
-  // Apply 10% performance fee in demo mode too
+  // simulate some yield
+  const yieldAmountStroops = 500000000n; // 50 XLM
   const fee = yieldAmountStroops / 10n;
   const net = yieldAmountStroops - fee;
   s.totalAssets += net;
