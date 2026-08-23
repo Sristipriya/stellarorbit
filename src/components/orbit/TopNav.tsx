@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { OrbitLogo } from "@/components/orbit/OrbitLogo";
 import { useWallet } from "@/hooks/use-wallet";
 import { shortAddr } from "@/lib/stellar/network";
@@ -6,6 +6,8 @@ import { useState } from "react";
 import { LogOut } from "lucide-react";
 
 export function TopNav({ inApp = false }: { inApp?: boolean }) {
+  const { address } = useWallet();
+
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -36,8 +38,8 @@ export function TopNav({ inApp = false }: { inApp?: boolean }) {
           </a>
         </nav>
         {!inApp ? (
-          <Link to="/app" className="liquid-btn text-sm">
-            Enter App
+          <Link to={address ? "/app" : "/auth"} className="liquid-btn text-sm">
+            {address ? "Enter App" : "Login / Signup"}
             <span aria-hidden>→</span>
           </Link>
         ) : (
@@ -54,8 +56,9 @@ export function TopNav({ inApp = false }: { inApp?: boolean }) {
 }
 
 function WalletButton() {
-  const { address, balance, connect, disconnect, loading } = useWallet();
+  const { address, balance, disconnect, loading } = useWallet();
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -67,7 +70,10 @@ function WalletButton() {
 
   if (!address) {
     return (
-      <button onClick={connect} className="brutalist-button px-4 py-2 text-sm font-bold bg-white text-black hover:bg-neutral-200">
+      <button 
+        onClick={() => navigate({ to: "/auth" })} 
+        className="brutalist-button px-4 py-2 text-sm font-bold bg-white text-black hover:bg-neutral-200"
+      >
         Connect Wallet
       </button>
     );
@@ -92,6 +98,7 @@ function WalletButton() {
             onClick={() => {
               disconnect();
               setOpen(false);
+              navigate({ to: "/" });
             }}
             className="flex items-center justify-between px-2 py-2 text-sm font-bold text-red-500 hover:bg-red-500/10 rounded"
           >

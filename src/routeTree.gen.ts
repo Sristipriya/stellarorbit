@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StrategiesRouteImport } from './routes/strategies'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +28,11 @@ const StrategiesRoute = StrategiesRouteImport.update({
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/docs': typeof DocsRoute
   '/strategies': typeof StrategiesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/docs': typeof DocsRoute
   '/strategies': typeof StrategiesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/docs': typeof DocsRoute
   '/strategies': typeof StrategiesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/app'
+    | '/auth'
     | '/docs'
     | '/strategies'
     | '/admin/settings'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/app'
+    | '/auth'
     | '/docs'
     | '/strategies'
     | '/admin/settings'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/app'
+    | '/auth'
     | '/docs'
     | '/strategies'
     | '/admin/settings'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalyticsRoute: typeof AnalyticsRoute
   AppRoute: typeof AppRoute
+  AuthRoute: typeof AuthRoute
   DocsRoute: typeof DocsRoute
   StrategiesRoute: typeof StrategiesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyticsRoute: AnalyticsRoute,
   AppRoute: AppRoute,
+  AuthRoute: AuthRoute,
   DocsRoute: DocsRoute,
   StrategiesRoute: StrategiesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
