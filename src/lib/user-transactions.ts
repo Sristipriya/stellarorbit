@@ -3,6 +3,8 @@ import { supabase } from "./supabase";
 export interface UserProfile {
   wallet_address: string;
   display_name: string | null;
+  email: string | null;
+  phone: string | null;
   created_at: string;
   updated_at: string;
   last_seen_at: string;
@@ -47,6 +49,8 @@ const LOCAL_TX_KEY_PREFIX = "orbit:txs:";
 export async function ensureUserProfile(
   walletAddress: string,
   displayName?: string | null,
+  email?: string | null,
+  phone?: string | null,
 ): Promise<UserProfile | null> {
   if (typeof window === "undefined" || !walletAddress) return null;
 
@@ -69,6 +73,8 @@ export async function ensureUserProfile(
       const newProfile = {
         wallet_address: walletAddress,
         display_name: displayName || null,
+        email: email || null,
+        phone: phone || null,
         created_at: now,
         updated_at: now,
         last_seen_at: now,
