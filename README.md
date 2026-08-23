@@ -326,8 +326,8 @@ All contracts are deployed on Stellar Testnet and fully integrated into the dApp
 
 | Feature | Description |
 |---------|-------------|
-| **Supabase Wallet & Transaction Persistence** `NEW` | Every user's wallet address, display name, creation timestamp, and user-scoped transaction hashes are now stored in Supabase. Powers persistent identity, enriched leaderboard data, and cross-session transaction history. |
-| **Idempotent Transaction Aggregation & CLI Exporter** `NEW` | A zero-duplicate transaction aggregation engine that de-duplicates user transactions across sessions, combined with a CLI-driven export pipeline (`scripts/export-users.mjs`) for bulk user data extraction. |
+| **Production-Grade Zap Router** `NEW` | Upgraded `orbit-zap-router` to a production-grade allowance pattern — users can now atomically swap and deposit in a single transaction with proper token approval flows built into the Soroban contract and frontend. |
+| **Real Auto-Compounding Strategy Vaults & Keeper Bot** `NEW` | Replaced the mock yield strategy with a live `orbit-yield-strategy` Soroban contract that performs real auto-compounding harvests. Paired with a keeper bot that triggers compounding cycles, maximizing depositor APY without manual intervention. |
 
 ---
 
@@ -342,8 +342,9 @@ All contracts are deployed on Stellar Testnet and fully integrated into the dApp
 | **Live Event Polling** | Real-time on-chain indexing without third-party middleware. |
 | **Mobile PWA** | Progressive Web App support for mobile and desktop environments. |
 | **SEP-40 Price Oracles** | Live USD valuation of vault assets and user share balances. |
-| **Supabase Wallet & Tx Persistence** `NEW` | Stores wallet metadata and user-scoped transaction hashes in Supabase for persistent identity and history. |
-| **Tx Aggregation & CLI Exporter** `NEW` | Idempotent transaction aggregation engine with a CLI pipeline for bulk user data export. |
+| **Supabase Wallet & Tx Persistence** | Stores wallet metadata and user-scoped transaction hashes in Supabase for persistent identity and history. |
+| **Production-Grade Zap Router** `NEW` | Atomic swap-and-deposit via upgraded allowance pattern in `orbit-zap-router` Soroban contract. |
+| **Auto-Compounding Vaults & Keeper Bot** `NEW` | Live `orbit-yield-strategy` contract with keeper bot that auto-harvests and compounds depositor yield. |
 
 ---
 
