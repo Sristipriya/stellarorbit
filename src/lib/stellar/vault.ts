@@ -165,63 +165,71 @@ export function quoteAssetsForShares(sharesXlm: string, state: VaultState): bigi
 /* ───────────────────────────── Read state ─────────────────────────────── */
 
 export async function getVaultState(address: string | null, vaultId: string): Promise<VaultState> {
-  const vault = getVaultById(vaultId);
-  const contractId = vault?.contractId;
+  try {
+    const vault = getVaultById(vaultId);
+    const contractId = vault?.contractId;
 
-  if (HAS_REAL_CONTRACT && contractId) {
-    const [totalAssets, totalShares, userShares, apyBps, history] = await Promise.all([
-      readContract<bigint>("total_assets", [], contractId).catch(() => 0n),
-      readContract<bigint>("total_shares", [], contractId).catch(() => 0n),
-      address
-        ? readContract<bigint>("balance_of", [addrArg(address)], contractId).catch(() => 0n)
-        : Promise.resolve(0n),
-      readContract<bigint>("get_apy_bps", [], contractId).catch(() => 0n),
-      readContract<Array<{ timestamp: bigint; price_scaled: bigint }>>("get_price_history", [], contractId).catch(
-        () => [],
-      ),
-    ]);
+    if (HAS_REAL_CONTRACT && contractId) {
+      const [totalAssets, totalShares, userShares, apyBps] = await Promise.all([
+        readContract<bigint>("total_assets", [], contractId).catch(() => 0n),
+        readContract<bigint>("total_shares", [], contractId).catch(() => 0n),
+        address
+          ? readContract<bigint>("balance_of", [addrArg(address)], contractId).catch(() => 0n)
+          : Promise.resolve(0n),
+        readContract<bigint>("get_apy_bps", [], contractId).catch(() => 0n),
+      ]);
+
+      const ta = typeof totalAssets === "bigint" ? totalAssets : BigInt(totalAssets || 0);
+      const ts = typeof totalShares === "bigint" ? totalShares : BigInt(totalShares || 0);
+      const us = typeof userShares === "bigint" ? userShares : BigInt(userShares || 0);
+      const apy = typeof apyBps === "bigint" ? apyBps : BigInt(apyBps || 0);
+
+      return {
+        totalAssetsStroops: ta,
+        totalSharesStroops: ts,
+        userSharesStroops: us,
+        pricePerShareScaled: priceScaled(ta, ts),
+        apyBps: apy,
+      };
+    }
+    const s = readDemoState();
+    const demoHistory = readDemoHistory();
     return {
-      totalAssetsStroops: BigInt(totalAssets),
-      totalSharesStroops: BigInt(totalShares),
-      userSharesStroops: BigInt(userShares),
-      pricePerShareScaled: priceScaled(BigInt(totalAssets), BigInt(totalShares)),
-      apyBps: BigInt(apyBps),
+      totalAssetsStroops: s.totalAssets,
+      totalSharesStroops: s.totalShares,
+      userSharesStroops: address ? (s.balances[address] ?? 0n) : 0n,
+      pricePerShareScaled: priceScaled(s.totalAssets, s.totalShares),
+      apyBps: calcApyBps(demoHistory),
     };
+  } catch (err) {
+    console.error("getVaultState error:", err);
+    return ZERO_STATE;
   }
-  const s = readDemoState();
-  const demoHistory = readDemoHistory();
-  return {
-    totalAssetsStroops: s.totalAssets,
-    totalSharesStroops: s.totalShares,
-    userSharesStroops: address ? (s.balances[address] ?? 0n) : 0n,
-    pricePerShareScaled: priceScaled(s.totalAssets, s.totalShares),
-    apyBps: calcApyBps(demoHistory),
-  };
 }
 
 /** Fetch on-chain price history for the chart. */
 export async function getPriceHistory(vaultId: string): Promise<PriceSnapshot[]> {
-  const vault = getVaultById(vaultId);
-  const contractId = vault?.contractId;
+  try {
+    const vault = getVaultById(vaultId);
+    const contractId = vault?.contractId;
 
-  if (HAS_REAL_CONTRACT && contractId) {
-    try {
+    if (HAS_REAL_CONTRACT && contractId) {
       const raw =
         await readContract<Array<{ timestamp: bigint | number; price_scaled: bigint | number }>>(
           "get_price_history",
           [],
           contractId
-        );
+        ).catch(() => []);
       if (!Array.isArray(raw)) return [];
       return raw.map((e) => ({
-        timestamp: Number(e.timestamp),
-        priceScaled: BigInt(e.price_scaled),
+        timestamp: Number(e.timestamp || 0),
+        priceScaled: typeof e.price_scaled === "bigint" ? e.price_scaled : BigInt(e.price_scaled || STROOPS_PER_XLM),
       }));
-    } catch {
-      return [];
     }
+    return readDemoHistory();
+  } catch {
+    return [];
   }
-  return readDemoHistory();
 }
 
 /* ─────────────────────── Demo-mode marker payment ─────────────────────── */

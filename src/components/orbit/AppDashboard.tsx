@@ -297,28 +297,33 @@ function PortfolioTab({
   priceHistory: PriceSnapshot[];
   xlmUsdPrice: number | null;
 }) {
-  const totalAssetsStr = stroopsToXlm(vault.state.totalAssetsStroops);
-  const totalSharesStr = stroopsToXlm(vault.state.totalSharesStroops);
-  const userSharesStr = stroopsToXlm(vault.state.userSharesStroops);
+  const totalAssetsStr = stroopsToXlm(vault.state?.totalAssetsStroops || 0n);
+  const totalSharesStr = stroopsToXlm(vault.state?.totalSharesStroops || 0n);
+  const userSharesStr = stroopsToXlm(vault.state?.userSharesStroops || 0n);
+  const userSharesStroops = vault.state?.userSharesStroops || 0n;
+  const totalSharesStroops = vault.state?.totalSharesStroops || 0n;
+  const totalAssetsStroops = vault.state?.totalAssetsStroops || 0n;
+
   const underlying =
-    vault.state.totalSharesStroops === 0n
+    totalSharesStroops === 0n
       ? 0n
-      : (vault.state.userSharesStroops * vault.state.totalAssetsStroops) /
-        vault.state.totalSharesStroops;
-  const apyPct = vault.state.apyBps > 0n ? Number(vault.state.apyBps) / 100 : 5.25;
+      : (userSharesStroops * totalAssetsStroops) / totalSharesStroops;
+  const apyPct = (vault.state?.apyBps || 0n) > 0n ? Number(vault.state.apyBps) / 100 : 5.25;
 
   const [pnl, setPnl] = useState<Awaited<ReturnType<typeof computePnl>>>(null);
   useEffect(() => {
-    if (wallet.address && vault.state.userSharesStroops > 0n) {
-      computePnl(wallet.address, vault.state, activeVaultId).then(setPnl);
+    if (wallet.address && userSharesStroops > 0n) {
+      computePnl(wallet.address, vault.state, activeVaultId).then(setPnl).catch(() => setPnl(null));
     } else {
       setPnl(null);
     }
-  }, [wallet.address, vault.state.userSharesStroops, vault.state.pricePerShareScaled, activeVaultId]);
+  }, [wallet.address, userSharesStroops, vault.state?.pricePerShareScaled, activeVaultId]);
 
   const chartValues: number[] =
-    priceHistory.length >= 2
-      ? priceHistory.map((s) => Number(s.priceScaled) / Number(STROOPS_PER_XLM))
+    Array.isArray(priceHistory) && priceHistory.length >= 2
+      ? priceHistory
+          .map((s) => Number(s?.priceScaled || 0) / Number(STROOPS_PER_XLM))
+          .filter((v) => Number.isFinite(v) && v > 0)
       : [1.0, 1.0];
 
   if (vault.loading && vault.state.totalAssetsStroops === 0n) {

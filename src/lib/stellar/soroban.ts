@@ -44,13 +44,21 @@ const READ_SOURCE_PK = "GAWGGVQZTAY77QSRUE74U4PNXTQ5J4PKWBQ2UNMONQFL32TODVK6ECWJ
 export type ScArg = xdr.ScVal;
 
 export function addrArg(g: string): ScArg {
-  return SdkAddress.fromString(g).toScVal();
+  try {
+    return SdkAddress.fromString(g).toScVal();
+  } catch {
+    return xdr.ScVal.scvVoid();
+  }
 }
 export function voidArg(): ScArg {
   return xdr.ScVal.scvVoid();
 }
 export function i128Arg(v: bigint | string | number): ScArg {
-  return nativeToScVal(typeof v === "bigint" ? v : BigInt(v), { type: "i128" });
+  try {
+    return nativeToScVal(typeof v === "bigint" ? v : BigInt(v || 0), { type: "i128" });
+  } catch {
+    return nativeToScVal(0n, { type: "i128" });
+  }
 }
 
 /** Read-only contract call. */
@@ -150,7 +158,7 @@ export async function fetchContractEvents(startLedger: number, contractId: strin
   const res = await server.getEvents({
     startLedger,
     filters: [{ type: "contract", contractIds: [contractId], topics: [["*"]] }],
-    limit: 10000,
+    limit: 100,
   });
   const parsed = res.events.map((e) => {
     const topics = e.topic.map((t) => {

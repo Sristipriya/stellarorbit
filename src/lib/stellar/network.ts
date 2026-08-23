@@ -36,18 +36,28 @@ export const HAS_REAL_CONTRACT = Boolean(ORBIT_VAULT_CONTRACT_ID);
 /** XLM has 7 decimals on Stellar; Soroban i128 uses stroops (1 XLM = 1e7). */
 export const STROOPS_PER_XLM = 10_000_000n;
 
-export function xlmToStroops(xlm: number | string): bigint {
-  const s = typeof xlm === "number" ? xlm.toString() : xlm;
-  const [whole, frac = ""] = s.split(".");
-  const fracPadded = (frac + "0000000").slice(0, 7);
-  return BigInt(whole || "0") * STROOPS_PER_XLM + BigInt(fracPadded || "0");
+export function xlmToStroops(xlm: number | string | null | undefined): bigint {
+  if (!xlm && xlm !== 0) return 0n;
+  try {
+    const s = typeof xlm === "number" ? xlm.toString() : String(xlm || "0");
+    const [whole, frac = ""] = s.split(".");
+    const fracPadded = (frac + "0000000").slice(0, 7);
+    return BigInt(whole || "0") * STROOPS_PER_XLM + BigInt(fracPadded || "0");
+  } catch {
+    return 0n;
+  }
 }
 
-export function stroopsToXlm(stroops: bigint | number | string, dp = 4): string {
-  const n = typeof stroops === "bigint" ? stroops : BigInt(stroops);
-  const whole = n / STROOPS_PER_XLM;
-  const frac = (n % STROOPS_PER_XLM).toString().padStart(7, "0").slice(0, dp);
-  return `${whole.toString()}.${frac}`;
+export function stroopsToXlm(stroops: bigint | number | string | null | undefined, dp = 4): string {
+  if (stroops === null || stroops === undefined) return "0.0000";
+  try {
+    const n = typeof stroops === "bigint" ? stroops : BigInt(stroops || 0);
+    const whole = n / STROOPS_PER_XLM;
+    const frac = (n % STROOPS_PER_XLM).toString().padStart(7, "0").slice(0, dp);
+    return `${whole.toString()}.${frac}`;
+  } catch {
+    return "0.0000";
+  }
 }
 
 export function shortAddr(addr: string | null | undefined): string {

@@ -24,15 +24,20 @@ function AuthPage() {
   }, [address]);
 
   async function checkAndFund(addr: string) {
-    setFunding(true);
-    const bal = await fetchXlmBalance(addr);
-    
-    if (!bal.funded) {
-      // Automatically fund the new wallet
-      await fundWithFriendbot(addr);
+    try {
+      setFunding(true);
+      const bal = await fetchXlmBalance(addr);
+      
+      if (!bal.funded) {
+        // Automatically fund the new wallet
+        await fundWithFriendbot(addr);
+      }
+    } catch (e) {
+      console.error("Funding error on auth:", e);
+    } finally {
+      setFunding(false);
+      navigate({ to: '/app' });
     }
-    
-    navigate({ to: '/app' });
   }
 
   return (
