@@ -227,20 +227,23 @@ export function DepositCard({
       <button
         onClick={submit}
         disabled={!address || !amount || insufficient || tx.kind === "pending"}
-        className={`brutalist-button mt-4 w-full justify-center ${useZap ? "bg-[var(--orbit-accent)]/20 border-[var(--orbit-accent)]" : ""}`}
+        className="group/btn relative mt-6 w-full overflow-hidden rounded-xl bg-[var(--orbit-accent)] px-6 py-4 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 shadow-[0_0_30px_var(--orbit-accent-soft)]"
       >
-        {tx.kind === "pending"
-          ? "Signing…"
-          : insufficient
-            ? "Insufficient balance"
-            : useZap
-              ? `⚡ Zap ${currentAsset} into Orbit`
-              : "Deposit into Orbit"}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-[100%] transition-transform duration-700 group-hover/btn:translate-x-[100%]" />
+        <span className="relative font-display text-sm font-semibold uppercase tracking-[0.2em] text-black">
+          {tx.kind === "pending"
+            ? (useZap ? "Zapping..." : "Depositing...")
+            : insufficient
+              ? "Insufficient Balance"
+              : useZap
+                ? `⚡ Confirm Zap (${currentAsset})`
+                : "Confirm Deposit"}
+        </span>
       </button>
 
       {useZap && (
-        <div className="mt-2 text-center text-[9px] text-[var(--orbit-accent)]/70">
-          Zapping earns Orbit Points! 🏆
+        <div className="mt-2.5 text-center text-[10px] font-mono text-[var(--orbit-accent)]/80">
+          Zapping automatically swaps & awards Orbit Points 🏆
         </div>
       )}
 
