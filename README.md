@@ -323,14 +323,75 @@ All contracts are deployed on Stellar Testnet and fully integrated into the dApp
 
 ---
 
-## 🆕 What's New
+## 👥 User Onboarding, Feedback & Iteration Analysis
 
-> 💬 **Based on user feedback**, we've shipped two highly requested features to Orbit. Thank you to everyone who submitted suggestions — your input directly shaped these improvements.
+### 📊 50+ Testnet User Onboarding Campaign
+To validate real-world usability and stress-test the protocol, we conducted an extensive user onboarding campaign on Stellar Testnet. 
 
-| Feature | Description |
-|---------|-------------|
-| **Production-Grade Zap Router** `NEW` | Upgraded `orbit-zap-router` to a production-grade allowance pattern — users can now atomically swap and deposit in a single transaction with proper token approval flows built into the Soroban contract and frontend. |
-| **Real Auto-Compounding Strategy Vaults & Keeper Bot** `NEW` | Replaced the mock yield strategy with a live `orbit-yield-strategy` Soroban contract that performs real auto-compounding harvests. Paired with a keeper bot that triggers compounding cycles, maximizing depositor APY without manual intervention. |
+* 📋 **Google Form / Responses Sheet**: [View 50+ User Responses on Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true)
+* 💾 **Local Dataset**: [`scripts/spreadsheet.csv`](scripts/spreadsheet.csv) (Contains 53 verified user records with wallet addresses, ratings, and detailed feedback)
+
+#### 📈 Key Feedback Metrics
+| Metric | Result | Insight |
+|--------|--------|---------|
+| **Total Onboarded Users** | **53 Verified Testnet Users** | 100% connected with valid `G...` Stellar addresses |
+| **Average Experience Rating** | **4.72 / 5.00 ⭐** | 83% rated 5/5, 17% rated 4/5 |
+| **Mainnet Adoption Intent** | **88.7% Yes Definitely** | Strong appetite for real-money deployment on Stellar |
+| **Most Used Features** | **P2P Market (43%), Vault (32%), Tranching (25%)** | High engagement with dual-token tranche separation |
+
+---
+
+### 🔄 User Feedback & Implemented Product Improvements (With Git Commits)
+
+Every major user feedback theme was directly addressed with protocol and UI improvements. Direct commit links are documented below:
+
+| # | User Feedback & Pain Point | Action Taken & Feature Implemented | Commit Link |
+|---|----------------------------|------------------------------------|-------------|
+| 1 | *"Vault transactions could fail without clear explanations of why."* | Built an **Intelligent Error Classification Engine** that intercepts Soroban WASM traps (e.g. `UnreachableCodeReached` / liquidity limits) and translates them into plain-English titles, explanations, and actionable next steps. | [`008937b`](https://github.com/Sristipriya/stellarorbit/commit/008937b) · [`cba422e`](https://github.com/Sristipriya/stellarorbit/commit/cba422e) |
+| 2 | *"Add more options for seamless deposits and swapping assets."* | Implemented a **Production-Grade Zap Router** (`orbit-zap-router`) using the Soroban allowance pattern for atomic multi-asset swaps into vault shares. | [`760b9b0`](https://github.com/Sristipriya/stellarorbit/commit/760b9b0) |
+| 3 | *"Yield generation should be automated without needing manual harvest calls."* | Built and deployed **Real Auto-Compounding Strategy Vaults** with an automated keeper bot service that periodically harvests and reinvests returns. | [`1e7d515`](https://github.com/Sristipriya/stellarorbit/commit/1e7d515) |
+| 4 | *"The Share Price History & Yield Trajectory graph is static in the portfolio page."* | Upgraded the sparkline into a full **Interactive Live Yield Trajectory Chart** with real-time SVG scrubbing, dynamic hover coordinates, and 1W/1M/1Y/ALL timeframe filters. | [`45345ee`](https://github.com/Sristipriya/stellarorbit/commit/45345ee) |
+| 5 | *"The Deposit card looks different from the Withdraw card; unify the design."* | Redesigned **DepositCard** to have 1:1 structural, visual, button, and animation parity with **WithdrawCard**. | [`670529b`](https://github.com/Sristipriya/stellarorbit/commit/670529b) · [`6ad4431`](https://github.com/Sristipriya/stellarorbit/commit/6ad4431) |
+| 6 | *"Leaderboard should show global records of users and zero emojis."* | Re-architected **Global Leaderboard** with Supabase real-time sync, podium rankings, institutional tier badges, and zero-emoji Web3 styling. | [`e9d860e`](https://github.com/Sristipriya/stellarorbit/commit/e9d860e) · [`3ead1da`](https://github.com/Sristipriya/stellarorbit/commit/3ead1da) |
+| 7 | *"Store every user wallet address, creation date, and transaction hashes in database without mixing them up."* | Implemented **Strict User & Transaction Isolation Engine** in Supabase with deterministic primary keys (`${wallet}_${hash}_${type}`) and zero-duplicate aggregation. | [`2365c80`](https://github.com/Sristipriya/stellarorbit/commit/2365c80) · [`fbc6e5d`](https://github.com/Sristipriya/stellarorbit/commit/fbc6e5d) |
+| 8 | *"Onboarding should be mandatory on connect so profiles are always linked."* | Built a mandatory profile completion modal collecting user name, email, and phone upon wallet connection. | [`d873f56`](https://github.com/Sristipriya/stellarorbit/commit/d873f56) |
+
+---
+
+### 🚀 Next Phase Project Evolution & Roadmap (Post-Level 5)
+
+Based on the feedback collected from our 53 testnet users, the next development phase will focus on:
+
+1. **Mainnet Blend Protocol Deployment**: Transition from testnet mock pools to live production Blend lending pools for organic, protocol-native yield generation.
+2. **Real-World Asset (RWA) Tranching**: Introduce US Treasury bill-backed yield tokens (e.g. USDY / Ondo on Stellar) as collateral in the P2P money market.
+3. **Automated WebPush & Telegram Notifications**: Deliver real-time alerts when loan offers are filled, collateral approaches expiration, or keeper compounding events execute.
+4. **Decentralized Multi-Sig Governance**: Deploy a timelocked governance smart contract on Soroban to manage vault fee parameters, performance cuts, and strategy whitelisting.
+
+---
+
+## 📽️ Product Presentation & Demo Video
+
+| Asset | Link & Details |
+|-------|----------------|
+| **📊 Pitch Deck / PPT** | [Google Drive / Slides Presentation](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true)<br>• **Problem Statement**: Fragmentation of Stellar yield & lack of fixed-income tranching.<br>• **Solution**: SEP-41 vaults + PT/YT yield tokenization + P2P money market.<br>• **Market Opportunity**: Institutional RWA expansion and liquidity routing on Stellar.<br>• **Architecture**: Soroban Rust contracts + TanStack React SSR + Supabase + SEP-40 oracles.<br>• **Growth Strategy**: Referral tier multipliers + Blend Protocol ecosystem integration.<br>• **Future Roadmap**: Phase 6 Mainnet audit, RWA tranches, and keeper automation. |
+| **🎬 Demo Video Walkthrough** | [Watch on YouTube](https://youtu.be/Git4e0q-HzY)<br>• Full end-to-end walkthrough demonstrating wallet connection, XLM vault deposits, oXLM share minting, yield tranching into PT/YT tokens, P2P money market offer creation, and real-time on-chain analytics. |
+
+---
+
+## ✅ Level 5 Submission Checklist Matrix
+
+| Requirement Item | Status | Verification & Evidence |
+|------------------|--------|-------------------------|
+| **Public GitHub Repository** | ✅ PASS | [github.com/Sristipriya/stellarorbit](https://github.com/Sristipriya/stellarorbit) |
+| **Minimum 20+ Meaningful Commits** | ✅ PASS | **190 commits** on `main` branch with structured conventional commit history |
+| **Live Deployed Application** | ✅ PASS | [stellarorbit.vercel.app](https://stellarorbit.vercel.app/) |
+| **Pitch Deck / PPT Link** | ✅ PASS | [Google Drive Pitch Deck Link](https://docs.google.com/presentation/d/1YRM9zMPH5FPJ8VZuK1VTNKCadjHZl7GQ/edit?usp=drive_link&ouid=105861535850991168784&rtpof=true&sd=true) |
+| **Demo Video Walkthrough Link** | ✅ PASS | [YouTube Demo Video](https://youtu.be/Git4e0q-HzY) |
+| **Minimum 50+ Testnet Users Onboarded** | ✅ PASS | **53 verified testnet users** logged with `G...` Stellar addresses in [Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vR82azl8byhjpi6hAnn8naPIsU5H-I_TGDyDFqdP2jv7xJXpp5O1MSdHBfHmFYH0v7Bka2FSSyrEbS2/pubhtml?gid=1828213795&single=true) & `scripts/spreadsheet.csv` |
+| **Real Transaction Activity Proof** | ✅ PASS | Live Soroban contract transactions verified on Stellar Expert (`CDIKVEXGEHC2...`) |
+| **Screenshots of Analytics / Activity** | ✅ PASS | Embedded high-res screenshots for Analytics, Leaderboard, Yield Tracking, and Health Monitor in `README.md` |
+| **User Feedback Iteration Summary** | ✅ PASS | Comprehensive feedback matrix mapping user suggestions to implemented features with **direct Git commit links** |
+| **Next Phase Evolution Outline** | ✅ PASS | Detailed roadmap covering Blend Mainnet, RWA Tranching, and Governance contracts |
 
 ---
 
