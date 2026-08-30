@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { TopNav } from "@/components/orbit/TopNav";
+import { OrbitLogo } from "@/components/orbit/OrbitLogo";
 import { EtheralShadow } from "@/components/ui/etheral-shadow";
 import { Hero as AnimatedHero, ShaderBackground } from "@/components/ui/animated-shader-hero";
+import { ExternalLink, Shield, Activity, Terminal, ArrowUpRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -362,10 +364,157 @@ function Roadmap() {
 
 function Footer() {
   return (
-    <footer className="border-t border-[var(--orbit-edge)]">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-6 py-8 font-mono text-xs text-[var(--orbit-mute)]">
-        <span>orbit · index vault on stellar testnet</span>
-        <span>not financial advice · testnet assets only</span>
+    <footer className="relative border-t border-[var(--orbit-edge)] bg-black/80 backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-6 py-16">
+        <div className="grid gap-12 lg:grid-cols-12">
+          {/* Brand Column */}
+          <div className="lg:col-span-4 space-y-4">
+            <Link to="/" className="group flex items-center gap-3">
+              <OrbitLogo size={32} className="transition-transform group-hover:rotate-12" />
+              <span className="font-display text-2xl font-bold tracking-tight text-white group-hover:text-[var(--orbit-accent)] transition-colors">
+                orbit
+              </span>
+              <span className="rounded-full border border-[var(--orbit-edge)] bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--orbit-ok)]">
+                Testnet Live
+              </span>
+            </Link>
+            <p className="text-xs text-[var(--orbit-mute)] leading-relaxed max-w-sm">
+              Institutional-grade structured yield vaults, dual-token tranching (PT/YT), and peer-to-peer collateralized money markets built natively on Stellar Soroban.
+            </p>
+            <div className="flex items-center gap-2 pt-2">
+              <span className="live-dot" />
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--orbit-ok)]">
+                Soroban RPC · 100% Operational
+              </span>
+            </div>
+          </div>
+
+          {/* Column 2: Products */}
+          <div className="lg:col-span-2 space-y-3 font-mono text-xs">
+            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)] font-bold">
+              Products
+            </div>
+            <ul className="space-y-2.5">
+              <li>
+                <Link to="/app" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  Yield Vaults
+                </Link>
+              </li>
+              <li>
+                <Link to="/app" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  Yield Tranching
+                </Link>
+              </li>
+              <li>
+                <Link to="/app" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  P2P Money Market
+                </Link>
+              </li>
+              <li>
+                <Link to="/strategies" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  Strategies
+                </Link>
+              </li>
+              <li>
+                <Link to="/analytics" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  Protocol Analytics
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Resources & Docs */}
+          <div className="lg:col-span-3 space-y-3 font-mono text-xs">
+            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)] font-bold">
+              Documentation
+            </div>
+            <ul className="space-y-2.5">
+              <li>
+                <Link to="/docs" className="text-[var(--orbit-mute)] hover:text-white transition-colors flex items-center gap-1.5">
+                  Protocol Docs <ArrowUpRight className="h-3 w-3 opacity-60" />
+                </Link>
+              </li>
+              <li>
+                <Link to="/docs" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  NAV & Price Formulas
+                </Link>
+              </li>
+              <li>
+                <Link to="/docs" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  Principal & Yield Tokens
+                </Link>
+              </li>
+              <li>
+                <Link to="/docs" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  Deployed Contracts
+                </Link>
+              </li>
+              <li>
+                <Link to="/docs" className="text-[var(--orbit-mute)] hover:text-white transition-colors">
+                  Developer SDK Guide
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Ecosystem & Verification */}
+          <div className="lg:col-span-3 space-y-3 font-mono text-xs">
+            <div className="text-[10px] uppercase tracking-[0.25em] text-[var(--orbit-mute)] font-bold">
+              Ecosystem
+            </div>
+            <ul className="space-y-2.5">
+              <li>
+                <a
+                  href="https://github.com/Sristipriya/stellarorbit"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[var(--orbit-mute)] hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  GitHub Repository <ExternalLink className="h-3 w-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://stellar.expert/explorer/testnet/contract/CDIKVEXGEHC2FBKP5P7YYZGKFZQUVKN5E4G26NFC7KKU5MLFR27JDIDC"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[var(--orbit-mute)] hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  Stellar Expert Explorer <ExternalLink className="h-3 w-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://soroban.stellar.org"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[var(--orbit-mute)] hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  Soroban Framework <ExternalLink className="h-3 w-3 opacity-60" />
+                </a>
+              </li>
+              <li>
+                <Link to="/admin/" className="text-[var(--orbit-mute)] hover:text-white transition-colors flex items-center gap-1.5">
+                  <Shield className="h-3 w-3 text-[var(--orbit-accent)]" /> Admin Portal
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Sub-bar */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[var(--orbit-edge)] pt-8 font-mono text-[11px] text-[var(--orbit-mute)]">
+          <div>
+            © {new Date().getFullYear()} Orbit Protocol. Built natively on Stellar Soroban.
+          </div>
+          <div className="flex items-center gap-6">
+            <span>Stellar Testnet Deployment</span>
+            <span>·</span>
+            <span>Non-Custodial</span>
+            <span>·</span>
+            <span>SEP-41 / SEP-40 Compliant</span>
+          </div>
+        </div>
       </div>
     </footer>
   );
