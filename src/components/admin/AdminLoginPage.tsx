@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Globe, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { adminLogin } from "@/lib/admin-auth";
+import { OrbitLogo } from "@/components/orbit/OrbitLogo";
 
 export function AdminLoginPage({ onSuccess }: { onSuccess: () => void }) {
   const [user, setUser] = useState("");
@@ -34,8 +35,8 @@ export function AdminLoginPage({ onSuccess }: { onSuccess: () => void }) {
       >
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--orbit-accent)]/20 border border-[var(--orbit-accent)]/30">
-            <Globe className="h-7 w-7 text-[var(--orbit-accent)]" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20 shadow-[0_0_30px_var(--orbit-accent-soft)]">
+            <OrbitLogo size={36} />
           </div>
           <div className="font-display text-2xl font-semibold">Orbit Admin</div>
           <div className="mt-1 font-mono text-xs text-[var(--orbit-mute)]">

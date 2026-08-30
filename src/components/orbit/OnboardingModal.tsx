@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { Rocket, CheckCircle2, User, Mail, Phone } from "lucide-react";
+import { CheckCircle2, User, Mail, Phone } from "lucide-react";
+import { OrbitLogo } from "@/components/orbit/OrbitLogo";
 
 interface OnboardingModalProps {
   walletAddress: string;
@@ -71,8 +72,8 @@ export function OnboardingModal({ walletAddress, onComplete }: OnboardingModalPr
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
         {/* Icon */}
-        <div className="relative mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20 shadow-[0_0_30px_var(--orbit-accent-soft)]">
-          <Rocket className="h-7 w-7 text-[var(--orbit-accent)]" />
+        <div className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20 shadow-[0_0_30px_var(--orbit-accent-soft)]">
+          <OrbitLogo size={36} />
         </div>
 
         <h2 className="text-center font-display text-2xl font-bold text-white mb-1">

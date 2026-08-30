@@ -9,9 +9,9 @@ import {
   LogOut,
   Activity,
   ChevronRight,
-  Shield,
 } from "lucide-react";
 import { adminLogout } from "@/lib/admin-auth";
+import { OrbitLogo } from "@/components/orbit/OrbitLogo";
 
 const NAV = [
   { href: "/admin/", label: "Overview", icon: LayoutDashboard },
@@ -39,15 +39,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-[var(--orbit-edge)]">
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-xl shadow-[0_0_20px_var(--orbit-accent-soft)]"
-            style={{ background: "var(--orbit-accent)" }}
-          >
-            <Shield className="h-4 w-4 text-black" />
-          </div>
+        <Link to="/" className="flex items-center gap-3 px-5 py-5 border-b border-[var(--orbit-edge)] group transition-colors">
+          <OrbitLogo size={28} className="transition-transform group-hover:rotate-12" />
           <div>
-            <div className="font-display text-sm font-bold">Orbit</div>
+            <div className="font-display text-sm font-bold text-white group-hover:text-[var(--orbit-accent)] transition-colors">orbit</div>
             <div className="flex items-center gap-1 mt-0.5">
               <span
                 className="inline-block h-1.5 w-1.5 rounded-full"
@@ -58,7 +53,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Nav */}
         <nav className="flex-1 space-y-0.5 p-2 mt-2">

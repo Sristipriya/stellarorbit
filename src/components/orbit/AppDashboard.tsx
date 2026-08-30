@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
+import { OrbitLogo } from "./OrbitLogo";
 import {
   LayoutDashboard,
   ArrowDownToLine,
@@ -526,18 +528,18 @@ function Sidebar({
   return (
     <div className="orbit-sidebar flex h-full flex-col">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-[var(--orbit-edge)]">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--orbit-accent)] shadow-[0_0_20px_var(--orbit-accent-soft)]">
-          <Globe className="h-4 w-4 text-black" />
-        </div>
+      <Link to="/" className="flex items-center gap-3 px-5 py-5 border-b border-[var(--orbit-edge)] group transition-colors">
+        <OrbitLogo size={28} className="transition-transform group-hover:rotate-12" />
         <div>
-          <span className="font-display text-base font-bold tracking-tight">orbit</span>
+          <span className="font-display text-base font-bold tracking-tight text-white group-hover:text-[var(--orbit-accent)] transition-colors">
+            orbit
+          </span>
           <div className="flex items-center gap-1 mt-0.5">
             <span className="live-dot" />
             <span className="font-mono text-[8px] uppercase tracking-widest text-[var(--orbit-ok)]">Live · Testnet</span>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Wallet badge */}
       {address && (
@@ -1124,7 +1126,7 @@ function ConnectPrompt({ onConnect }: { onConnect: () => void }) {
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
         
         <div className="relative mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-[1.5rem] bg-[var(--orbit-accent)]/10 border border-[var(--orbit-accent)]/20 shadow-[0_0_40px_var(--orbit-accent-soft)]">
-          <Wallet className="h-10 w-10 text-[var(--orbit-accent)]" />
+          <OrbitLogo size={48} />
           <div className="absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-white/10" />
         </div>
         
