@@ -20,9 +20,40 @@ Earn real yield · Yield Tranching · Peer-to-Peer Collateral Lending · Built o
 
 ---
 
+## What's New in Orbit Protocol
+
+Orbit has rolled out a suite of DeFi primitives and platform enhancements to elevate user yield farming, personalized analytics, and decentralized community governance:
+
+### 1. Liquidity Mining & Liquid Staking Protocol (`/staking`)
+- **4 High-Yield Staking Pools**:
+  - **`oXLM` Liquid Staking** (18.5% Base APR · Up to 74.0% Boosted): Stake vault receipt shares to farm liquid `ORBIT` governance emissions while simultaneously collecting underlying Blend protocol yield.
+  - **`PT-XLM` Fixed Farm** (24.2% Base APR · Up to 96.8% Boosted): Lock Principal Tranche tokens for guaranteed fixed emissions with zero impermanent loss.
+  - **`YT-XLM` Leveraged Mining** (42.8% Base APR · Up to 171.2% Boosted): High-conviction yield token mining for variable emissions and protocol fee buybacks.
+  - **`ORBIT / XLM` LP Farm** (65.0% Base APR · Up to 260.0% Boosted): Provide liquidity to the primary Soroswap pair to maximize protocol governance yield.
+- **Lock Duration Multipliers**: Flexible (1.0x), 30 Days (1.5x), 90 Days (2.5x), and 180 Days (4.0x Max Boost).
+- **Per-Second Live Reward Accrual Engine**: Dynamic live reward ticker continuously calculating and displaying pending claimable `ORBIT` tokens.
+- **1-Click Harvest All & Auto-Compounding**: Instantly harvest rewards or auto-compound into `oXLM` shares.
+
+### 2. Live Strategy Marketplace & Auto-Compounding Vaults (`/strategies`)
+- **Automated Yield Vault Strategies**:
+  - **Blend Protocol Auto-Compounder** (14.8% APY): Automated harvest & reinvestment into the XLM lending market.
+  - **PT Fixed-Yield Maximizer** (19.4% APY): Dynamic sweeps of discounted Principal Tranche maturities for risk-free yield arbitrage.
+  - **Soroswap AQUA/XLM LP Compounder** (28.2% APY): Automated harvesting and reinvestment of DEX liquidity rewards.
+  - **Delta-Neutral Funding Shield** (22.5% APY): Spot vault deposits paired with synthetic hedging.
+  - **Phoenix Orderbook Market Making** (34.0% APY): Algorithmic market making on Phoenix CLOB orderbook.
+- **DAO Community Proposal Engine**: Community members can propose custom automated strategies directly through an interactive modal.
+- **Points-Based Quorum Voting**: Upvote proposed strategies with Orbit Points with real-time progress bars towards the 5,000-point deployment quorum.
+- **Active Strategy Portfolio Tracker**: Manage and withdraw allocated capital across all automated strategies.
+
+### 3. Personalized Portfolio PnL Tracker
+- **Historical Balance Reconstruction**: Fetches the user's isolated transaction history (deposits/withdrawals) directly from the Supabase ledger.
+- **Dynamic Net Worth & PnL Curve**: Multiplies reconstructed share balances against historical on-chain share price (`priceHistory`) to plot accurate personal net worth and PnL growth curves alongside projected Blend APY trajectories.
+
+---
+
 ## Comprehensive Overview
 
-Orbit is a full-stack decentralized finance protocol built natively on Stellar using Soroban smart contracts. Architected across 6 progressive development phases over ~2 months, Orbit transforms basic yield aggregation into an institutional-grade, multi-product DeFi suite:
+Orbit is a full-stack decentralized finance protocol built natively on Stellar using Soroban smart contracts. Architected across progressive development phases, Orbit transforms basic yield aggregation into an institutional-grade, multi-product DeFi suite:
 
 ### Core Protocol Stack & Features
 
@@ -407,8 +438,11 @@ Based on the feedback collected from our 53 testnet users, the next development 
 | **Mobile PWA** | Progressive Web App support for mobile and desktop environments. |
 | **SEP-40 Price Oracles** | Live USD valuation of vault assets and user share balances. |
 | **Supabase Wallet & Tx Persistence** | Stores wallet metadata and user-scoped transaction hashes in Supabase for persistent identity and history. |
-| **Production-Grade Zap Router** `NEW` | Atomic swap-and-deposit via upgraded allowance pattern in `orbit-zap-router` Soroban contract. |
-| **Auto-Compounding Vaults & Keeper Bot** `NEW` | Live `orbit-yield-strategy` contract with keeper bot that auto-harvests and compounds depositor yield. |
+| **Production-Grade Zap Router** | Atomic swap-and-deposit via upgraded allowance pattern in `orbit-zap-router` Soroban contract. |
+| **Auto-Compounding Vaults & Keeper Bot** | Live `orbit-yield-strategy` contract with keeper bot that auto-harvests and compounds depositor yield. |
+| **Liquidity Mining & Staking Protocol** `NEW` | Multi-pool staking (oXLM, PT-XLM, YT-XLM, ORBIT-LP) with lock multipliers and real-time per-second emissions. |
+| **Live Strategy Marketplace & DAO** `NEW` | Live automated yield execution with community strategy proposals and point-based quorum voting. |
+| **Personalized Portfolio PnL Tracker** `NEW` | Reconstructs user historical net worth by crunching Supabase transaction ledger data against historical NAV. |
 
 ---
 
