@@ -32,6 +32,7 @@ import {
   Sparkles,
   Layers,
   Flame,
+  Compass,
 } from "lucide-react";
 import { DepositCard } from "./DepositCard";
 import { WithdrawCard } from "./WithdrawCard";
@@ -62,6 +63,7 @@ import { useNotifications } from "@/lib/notifications";
 import { PointsTab } from "./PointsTab";
 import { DefiTab } from "./DefiTab";
 import { StakingTab } from "./StakingTab";
+import { StrategyMarketplace } from "./StrategyMarketplace";
 import { handleReferralFromUrl } from "@/lib/points";
 import {
   recordUserTransaction,
@@ -506,6 +508,7 @@ const NAV_ITEMS: { id: Tab; label: string; icon: React.FC<{ className?: string }
   { id: "withdraw", label: "Withdraw", icon: ArrowUpFromLine },
   { id: "defi", label: "DeFi", icon: Layers },
   { id: "staking", label: "Liquidity Mining", icon: Flame },
+  { id: "strategies", label: "Strategies", icon: Compass },
   { id: "points", label: "Points & Refs", icon: Zap },
   { id: "history", label: "History", icon: History },
   { id: "leaderboard", label: "Leaderboard", icon: Trophy },
@@ -1188,6 +1191,7 @@ export function AppDashboard() {
     faucet: "Testnet Faucet",
     defi: "DeFi Super-Protocol",
     staking: "Liquidity Mining & Staking",
+    strategies: "Strategies Marketplace",
     settings: "Settings",
     points: "Points & Referrals",
     analyze: "Portfolio Analyzer",
@@ -1270,6 +1274,8 @@ export function AppDashboard() {
         );
       case "staking":
         return <StakingTab address={wallet.address} walletBalance={wallet.balance?.xlm ?? null} />;
+      case "strategies":
+        return <StrategyMarketplace />;
       case "points":
         return <PointsTab address={wallet.address} state={vault.state} />;
       case "settings":

@@ -18,7 +18,8 @@ export type Tab =
   | "settings"
   | "points"
   | "defi"
-  | "staking";
+  | "staking"
+  | "strategies";
 
 const MOBILE_TABS: { id: Tab; label: string; icon: React.FC<{ className?: string }> }[] = [
   { id: "portfolio", label: "Home", icon: LayoutDashboard },
