@@ -9,6 +9,7 @@
  *             tracks vault shares locally in localStorage.
  */
 import {
+  nativeToScVal,
   Asset,
   Horizon,
   Memo,
@@ -470,7 +471,7 @@ export async function harvest(
   s.totalAssets += net;
   writeDemoState(s);
   appendDemoHistory(priceScaled(s.totalAssets, s.totalShares));
-  return { txHash, yieldAmountStroops };
+  return { txHash };
 }
 
 /* ─────────────── P&L Tracking (Supabase, per wallet) ──────────── */

@@ -8,6 +8,7 @@ import {
 import { computePnl, type PriceSnapshot, type VaultState } from "@/lib/stellar/vault";
 import { stroopsToXlm, STROOPS_PER_XLM } from "@/lib/stellar/network";
 import { fetchXlmUsdPrice } from "@/lib/oracle-price";
+import { getUserTransactions, type UserTransaction } from "@/lib/user-transactions";
 
 interface PortfolioProps {
   address: string;
@@ -23,10 +24,14 @@ export function PortfolioAnalyzer({ address, state, priceHistory }: PortfolioPro
   // Simulator state
   const [simAmount, setSimAmount] = useState<number>(1000);
   const [simMonths, setSimMonths] = useState<number>(12);
+  const [txs, setTxs] = useState<UserTransaction[]>([]);
 
   useEffect(() => {
-    if (address && state.userSharesStroops > 0n) {
-      computePnl(address, state, "xlm").then(setPnl);
+    if (address) {
+      if (state.userSharesStroops > 0n) {
+        computePnl(address, state, "xlm").then(setPnl);
+      }
+      getUserTransactions(address).then(setTxs);
     }
     fetchXlmUsdPrice().then(setXlmUsd);
   }, [address, state.userSharesStroops, state.pricePerShareScaled]);
@@ -173,21 +178,21 @@ export function PortfolioAnalyzer({ address, state, priceHistory }: PortfolioPro
             <div className="rounded-2xl border border-[var(--orbit-edge)] bg-black/40 p-6 backdrop-blur-md">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-display text-base font-bold text-white">NAV Performance & Yield Curve</h3>
+                  <h3 className="font-display text-base font-bold text-white">Personalized Net Worth & PnL Curve</h3>
                   <p className="font-mono text-xs text-[var(--orbit-mute)]">
-                    Historical on-chain share price vs Blend Protocol APY trajectory
+                    Your real historical balances mapped against vault APY trajectory
                   </p>
                 </div>
                 <div className="flex items-center gap-3 font-mono text-xs">
                   <span className="flex items-center gap-1.5 text-[var(--orbit-accent)]">
-                    <span className="h-2 w-2 rounded-full bg-[var(--orbit-accent)]" /> Live NAV
+                    <span className="h-2 w-2 rounded-full bg-[var(--orbit-accent)]" /> Historical Portfolio Value
                   </span>
                   <span className="flex items-center gap-1.5 text-[var(--orbit-warn)]">
-                    <span className="h-2 w-2 rounded-full bg-[var(--orbit-warn)]" /> Projections ({apyPct.toFixed(2)}% APY)
+                    <span className="h-2 w-2 rounded-full bg-[var(--orbit-warn)]" /> Projected Value ({apyPct.toFixed(2)}% APY)
                   </span>
                 </div>
               </div>
-              <InteractiveYieldChart history={priceHistory} apyBps={state.apyBps} />
+              <UserPnLChart history={priceHistory} txs={txs} apyBps={state.apyBps} />
             </div>
 
             {/* Position Summary Grid */}
@@ -404,7 +409,7 @@ export function PortfolioAnalyzer({ address, state, priceHistory }: PortfolioPro
   );
 }
 
-function InteractiveYieldChart({ history, apyBps }: { history: PriceSnapshot[]; apyBps: bigint }) {
+function UserPnLChart({ history, txs, apyBps }: { history: PriceSnapshot[]; txs: UserTransaction[]; apyBps: bigint }) {
   const w = 600;
   const h = 140;
   const pad = 16;
@@ -413,17 +418,37 @@ function InteractiveYieldChart({ history, apyBps }: { history: PriceSnapshot[]; 
   const apyPct = Number(apyBps > 0n ? apyBps : 525n) / 100;
   const monthlyRate = Math.pow(1 + apyPct / 100, 1 / 12) - 1;
 
-  const baseValue = hasReal
-    ? Number(history[history.length - 1].priceScaled) / Number(STROOPS_PER_XLM)
-    : 1.0;
+  // Compute historical user balances
+  // txs are sorted by created_at descending from the DB, so we reverse it
+  const sortedTxs = [...txs].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  
+  const realValues = history.map((snap) => {
+    const t = snap.timestamp; // snapshot timestamp in ms
+    let shares = 0;
+    for (const tx of sortedTxs) {
+      if (new Date(tx.created_at).getTime() <= t) {
+        if (tx.status === "success" && tx.shares) {
+          const numShares = Number(tx.shares);
+          if (tx.type === "deposit") shares += numShares;
+          else if (tx.type === "withdraw") shares -= numShares;
+        }
+      } else {
+        break;
+      }
+    }
+    const nav = Number(snap.priceScaled) / Number(STROOPS_PER_XLM);
+    return shares > 0 ? shares * nav : 0;
+  });
+  
+  if (!hasReal || realValues.length === 0) {
+    realValues.push(0, 0);
+  }
+
+  const baseValue = realValues[realValues.length - 1];
   const projectedCount = 10;
   const projected = Array.from({ length: projectedCount }, (_, i) =>
     baseValue * Math.pow(1 + monthlyRate, i)
   );
-
-  const realValues = hasReal
-    ? history.map((s) => Number(s.priceScaled) / Number(STROOPS_PER_XLM))
-    : [1.0, 1.0];
 
   const allValues = [...realValues, ...projected];
   const minV = Math.min(...allValues);

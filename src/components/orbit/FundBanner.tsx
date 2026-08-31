@@ -8,11 +8,11 @@ export function FundBanner({ address, onFunded }: { address: string; onFunded: (
     setLoading(true);
     const r = await fundWithFriendbot(address);
     setLoading(false);
-    if (r.ok) {
+    if (r) {
       toast.success("Funded by Friendbot", { description: "10,000 XLM credited on Testnet." });
       onFunded();
     } else {
-      toast.error("Friendbot failed", { description: r.error });
+      toast.error("Friendbot failed", { description: "Could not fund account" });
     }
   }
   return (

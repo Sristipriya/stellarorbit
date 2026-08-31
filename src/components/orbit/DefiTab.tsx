@@ -8,6 +8,7 @@ import { useWallet } from "../../hooks/use-wallet";
 import { useNotifications } from "../../lib/notifications";
 import { stroopsToXlm } from "../../lib/stellar/network";
 import { getVaultById, type VaultMeta } from "../../lib/stellar/vaults";
+import { type VaultState } from "../../lib/stellar/vault";
 import { classifyError } from "../../lib/stellar/wallet";
 import { recordUserTransaction } from "../../lib/user-transactions";
 
@@ -103,7 +104,7 @@ export function DefiTab({
             <button 
               className="liquid-btn w-full mt-4" 
               disabled={!wrapAmount || Number(wrapAmount) <= 0 || defi.isWrapping || Number(wrapAmount) > Number(stroopsToXlm(vaultState?.userSharesStroops || 0n))}
-              onClick={() => defi.wrap(wrapAmount).then((res) => {
+              onClick={() => defi.wrap(wrapAmount).then((res: any) => {
                 if (address) {
                   const txHash = typeof res === "object" && res && "txHash" in res ? String(res.txHash) : `wrap_${Date.now()}`;
                   recordUserTransaction({
@@ -172,7 +173,7 @@ export function DefiTab({
                 <button 
                   className="liquid-btn text-[var(--orbit-ok)]" 
                   disabled={defi.isLending || !lendAmount || !lendInterest || !activeVault?.ptId}
-                  onClick={() => defi.lend(lendAmount, lendInterest, activeVault.ptId!, "100").then((res) => { 
+                  onClick={() => defi.lend(lendAmount, lendInterest, activeVault?.ptId || "", "100").then((res: any) => { 
                     if (address) {
                       const txHash = typeof res === "object" && res && "txHash" in res ? String(res.txHash) : `lend_${Date.now()}`;
                       recordUserTransaction({
@@ -219,7 +220,7 @@ export function DefiTab({
                       </div>
                       <button 
                         className="liquid-btn px-4 py-1.5 text-[10px]"
-                        onClick={() => defi.borrow(offer.id).then((res) => {
+                        onClick={() => defi.borrow(offer.id).then((res: any) => {
                           if (address) {
                             const txHash = typeof res === "object" && res && "txHash" in res ? String(res.txHash) : `borrow_${Date.now()}`;
                             recordUserTransaction({

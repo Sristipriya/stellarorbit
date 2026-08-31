@@ -49,7 +49,7 @@ export async function fetchDefiState(address: string, vault?: VaultMeta): Promis
     if (vault.marketId) {
       const count = await readContract<number>("get_offer_count", [], vault.marketId).catch(() => 0);
       for (let i = 1; i <= count; i++) {
-        const offer = await readContract<any>("get_offer", [nativeToScVal(i, "u32")], vault.marketId).catch(() => null);
+        const offer = await readContract<any>("get_offer", [nativeToScVal(i, { type: "u32" })], vault.marketId).catch(() => null);
         if (offer && offer.is_active) {
           offers.push({
             id: i,
@@ -110,20 +110,20 @@ export async function createLendOffer(address: string, usdcAmount: string, inter
 
   return invokeContract(address, "create_offer", [
     addrArg(address),
-    nativeToScVal(usdcStrp, "i128"),
-    nativeToScVal(intStrp, "i128"),
-    nativeToScVal(100000, "u32"), // ~1 week duration
+    nativeToScVal(usdcStrp, { type: "i128" }),
+    nativeToScVal(intStrp, { type: "i128" }),
+    nativeToScVal(100000, { type: "u32" }), // ~1 week duration
     addrArg(colTokenId),
-    nativeToScVal(colStrp, "i128")
+    nativeToScVal(colStrp, { type: "i128" })
   ], marketId);
 }
 
 export async function borrow(address: string, offerId: number, marketId: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No market contract deployed.");
-  return invokeContract(address, "borrow", [addrArg(address), nativeToScVal(offerId, "u32")], marketId);
+  return invokeContract(address, "borrow", [addrArg(address), nativeToScVal(offerId, { type: "u32" })], marketId);
 }
 
 export async function repay(address: string, offerId: number, marketId: string) {
   if (!HAS_REAL_CONTRACT) throw new Error("No market contract deployed.");
-  return invokeContract(address, "repay", [addrArg(address), nativeToScVal(offerId, "u32")], marketId);
+  return invokeContract(address, "repay", [addrArg(address), nativeToScVal(offerId, { type: "u32" })], marketId);
 }

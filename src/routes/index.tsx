@@ -494,7 +494,7 @@ function Footer() {
                 </a>
               </li>
               <li>
-                <Link to="/admin/" className="text-[var(--orbit-mute)] hover:text-white transition-colors flex items-center gap-1.5">
+                <Link to="/admin" className="text-[var(--orbit-mute)] hover:text-white transition-colors flex items-center gap-1.5">
                   <Shield className="h-3 w-3 text-[var(--orbit-accent)]" /> Admin Portal
                 </Link>
               </li>
