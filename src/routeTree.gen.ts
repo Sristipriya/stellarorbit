@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StrategiesRouteImport } from './routes/strategies'
+import { Route as StakingRouteImport } from './routes/staking'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
@@ -23,6 +24,11 @@ import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 const StrategiesRoute = StrategiesRouteImport.update({
   id: '/strategies',
   path: '/strategies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StakingRoute = StakingRouteImport.update({
+  id: '/staking',
+  path: '/staking',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsRoute = DocsRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/docs': typeof DocsRoute
+  '/staking': typeof StakingRoute
   '/strategies': typeof StrategiesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/docs': typeof DocsRoute
+  '/staking': typeof StakingRoute
   '/strategies': typeof StrategiesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/docs': typeof DocsRoute
+  '/staking': typeof StakingRoute
   '/strategies': typeof StrategiesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/transactions': typeof AdminTransactionsRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/docs'
+    | '/staking'
     | '/strategies'
     | '/admin/settings'
     | '/admin/transactions'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/docs'
+    | '/staking'
     | '/strategies'
     | '/admin/settings'
     | '/admin/transactions'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/docs'
+    | '/staking'
     | '/strategies'
     | '/admin/settings'
     | '/admin/transactions'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   DocsRoute: typeof DocsRoute
+  StakingRoute: typeof StakingRoute
   StrategiesRoute: typeof StrategiesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminTransactionsRoute: typeof AdminTransactionsRoute
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/strategies'
       fullPath: '/strategies'
       preLoaderRoute: typeof StrategiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staking': {
+      id: '/staking'
+      path: '/staking'
+      fullPath: '/staking'
+      preLoaderRoute: typeof StakingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs': {
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   DocsRoute: DocsRoute,
+  StakingRoute: StakingRoute,
   StrategiesRoute: StrategiesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminTransactionsRoute: AdminTransactionsRoute,

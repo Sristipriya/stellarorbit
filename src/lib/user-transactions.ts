@@ -17,7 +17,7 @@ export interface UserTransaction {
   id: string;
   wallet_address: string;
   tx_hash: string;
-  type: "deposit" | "withdraw" | "wrap" | "unwrap" | "lend" | "borrow" | "faucet";
+  type: "deposit" | "withdraw" | "wrap" | "unwrap" | "lend" | "borrow" | "faucet" | "stake" | "unstake" | "claim_rewards" | "compound";
   amount: string;
   asset: string;
   vault_id: string;
@@ -30,7 +30,7 @@ export interface UserTransaction {
 export interface RecordTxInput {
   walletAddress: string;
   txHash: string;
-  type: "deposit" | "withdraw" | "wrap" | "unwrap" | "lend" | "borrow" | "faucet";
+  type: "deposit" | "withdraw" | "wrap" | "unwrap" | "lend" | "borrow" | "faucet" | "stake" | "unstake" | "claim_rewards" | "compound";
   amount: string | number;
   asset?: string;
   vaultId?: string;

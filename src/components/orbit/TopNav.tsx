@@ -22,6 +22,9 @@ export function TopNav({ inApp = false }: { inApp?: boolean }) {
           <Link to="/" className="hover:text-[var(--orbit-ink)]">
             Home
           </Link>
+          <Link to="/staking" className="hover:text-[var(--orbit-ink)]">
+            Staking
+          </Link>
           <Link to="/analytics" className="hover:text-[var(--orbit-ink)]">
             Analytics
           </Link>
